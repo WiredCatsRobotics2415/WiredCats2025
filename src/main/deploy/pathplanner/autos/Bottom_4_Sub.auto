@@ -1,0 +1,61 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7171143189779416,
+      "y": 4.38
+    },
+    "rotation": -60.0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bot1SubComplete"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bot2SubComplete"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOff"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Four Note",
+  "choreoAuto": false
+}

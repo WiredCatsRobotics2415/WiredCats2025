@@ -1,0 +1,65 @@
+{
+  "version": 1.0,
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 3.91,
+        "y": 5.46
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 4.933951687193068,
+        "y": 3.604404954283446
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 6.859154816847238,
+        "y": 3.878598370010111
+      },
+      "prevControl": {
+        "x": 6.517721224745406,
+        "y": 4.0022271467029995
+      },
+      "nextControl": {
+        "x": 7.028152268351891,
+        "y": 3.8174065345345185
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 7.526505775504587,
+        "y": 2.4459895159344645
+      },
+      "prevControl": {
+        "x": 7.030132004205512,
+        "y": 3.5179264926774976
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0,
+    "rotateFast": false
+  },
+  "reversed": false,
+  "folder": "Four Note",
+  "previewStartingState": null,
+  "useDefaultConstraints": false
+}

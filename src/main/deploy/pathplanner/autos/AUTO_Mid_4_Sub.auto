@@ -1,0 +1,115 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 1.3449097592639632,
+      "y": 5.5658008306757365
+    },
+    "rotation": 0
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid1Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAlign"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid2Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid3Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAlign"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid4Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid5Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "AutoAlign"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "AutoMid6Sub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOff"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Mid4Sub"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Four Note",
+  "choreoAuto": false
+}

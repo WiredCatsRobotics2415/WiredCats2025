@@ -1,0 +1,55 @@
+{
+  "version": 1.0,
+  "startingPose": {
+    "position": {
+      "x": 0.7319122330552369,
+      "y": 4.380922607999063
+    },
+    "rotation": -58.78159723565359
+  },
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSub"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOn"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom_2_Note"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ShootSubNoFly"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Bottom_Leave"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "FlywheelOff"
+          }
+        }
+      ]
+    }
+  },
+  "folder": "Two Note",
+  "choreoAuto": false
+}
