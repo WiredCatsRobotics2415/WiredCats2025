@@ -1,4 +1,4 @@
-package main.java.frc.robot;
+package frc.robot;
 
 public class RobotContainer {
   private static RobotContainer instance;

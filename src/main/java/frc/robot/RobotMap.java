@@ -1,3 +1,3 @@
-package main.java.frc.robot;
+package frc.robot;
 
 public class RobotMap {}
