@@ -13,14 +13,14 @@
 
 package frc.robot;
 
+import frc.constants.BuildConstants;
+import frc.constants.RuntimeConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
-import frc.constants.RuntimeConstants;
-import frc.constants.BuildConstants;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
