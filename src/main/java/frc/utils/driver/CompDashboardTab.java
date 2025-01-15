@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.utils.driver.CompDashboardManager.LayoutConstants.LayoutInfo;
+import frc.utils.driver.CompDashboardTab.LayoutConstants.LayoutInfo;
 import java.util.function.BooleanSupplier;
 
-public class CompDashboardManager {
+public class CompDashboardTab {
     public static class LayoutConstants {
         public static final record LayoutInfo(int x, int y, int width, int height) {};
 
@@ -30,47 +30,39 @@ public class CompDashboardManager {
     private ShuffleboardTab teleopTab = Shuffleboard.getTab("Teleoperated");
     private ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
 
-    private static CompDashboardManager instance;
+    private static CompDashboardTab instance;
 
-    private CompDashboardManager() {
-        teleopTab.addNumber("Match Time", () -> DriverStation.getMatchTime())
-            .withWidget("Match Time")
+    private CompDashboardTab() {
+        teleopTab.addNumber("Match Time", () -> DriverStation.getMatchTime()).withWidget("Match Time")
             .withPosition(LayoutConstants.MatchTime.x, LayoutConstants.MatchTime.y)
             .withSize(LayoutConstants.MatchTime.width, LayoutConstants.MatchTime.height);
     }
 
-    public static CompDashboardManager getInstance() {
-        if (instance == null) instance = new CompDashboardManager();
+    public static CompDashboardTab getInstance() {
+        if (instance == null) instance = new CompDashboardTab();
         return instance;
     }
 
-    public void addBoolSupplier(boolean onTeleop, String title, BooleanSupplier supplier,
-        LayoutInfo layoutInfo) {
+    public void addBoolSupplier(boolean onTeleop, String title, BooleanSupplier supplier, LayoutInfo layoutInfo) {
         ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
-        tab.addBoolean(title, supplier).withWidget("Boolean Box")
-            .withPosition(layoutInfo.x, layoutInfo.y)
+        tab.addBoolean(title, supplier).withWidget("Boolean Box").withPosition(layoutInfo.x, layoutInfo.y)
             .withSize(layoutInfo.width, layoutInfo.height);
     }
 
-    public void addCommand(boolean onTeleop, String title, Command command,
-        LayoutInfo layoutInfo) {
+    public void addCommand(boolean onTeleop, String title, Command command, LayoutInfo layoutInfo) {
         ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
-        tab.add(title, command).withWidget("Command")
-            .withPosition(layoutInfo.x, layoutInfo.y)
+        tab.add(title, command).withWidget("Command").withPosition(layoutInfo.x, layoutInfo.y)
             .withSize(layoutInfo.width, layoutInfo.height);
     }
 
-    public void addChooser(boolean onTeleop, String title, SendableChooser chooser,
-        LayoutInfo layoutInfo) {
+    public void addChooser(boolean onTeleop, String title, SendableChooser chooser, LayoutInfo layoutInfo) {
         ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
-        tab.add(title, chooser).withWidget("ComboBox Chooser")
-            .withPosition(layoutInfo.x, layoutInfo.y)
+        tab.add(title, chooser).withWidget("ComboBox Chooser").withPosition(layoutInfo.x, layoutInfo.y)
             .withSize(layoutInfo.width, layoutInfo.height);
     }
 
     public void addAlertGroup(String title, Sendable sendable, LayoutInfo layoutInfo) {
-        teleopTab.add(title, sendable).withWidget("Alerts")
-            .withPosition(layoutInfo.x, layoutInfo.y)
+        teleopTab.add(title, sendable).withWidget("Alerts").withPosition(layoutInfo.x, layoutInfo.y)
             .withSize(layoutInfo.width, layoutInfo.height);
     }
 }

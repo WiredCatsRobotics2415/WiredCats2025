@@ -16,7 +16,7 @@ package frc.robot;
 import frc.constants.BuildConstants;
 import frc.constants.RuntimeConstants;
 import frc.utils.tuning.TuningModeTab;
-
+import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -73,5 +73,10 @@ public class Robot extends LoggedRobot {
         if (RuntimeConstants.TuningMode) {
             TuningModeTab.enableTuningMode();
         }
+    }
+
+    @Override
+    public void simulationPeriodic() {
+        SimulatedArena.getInstance().simulationPeriodic();
     }
 }
