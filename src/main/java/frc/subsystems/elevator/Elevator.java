@@ -1,5 +1,3 @@
 package frc.subsystems.elevator;
 
-public class Elevator {
-    
-}
+public class Elevator {}

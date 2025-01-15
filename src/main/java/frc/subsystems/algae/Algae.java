@@ -1,5 +1,3 @@
 package frc.subsystems.algae;
 
-public class Algae {
-    
-}
+public class Algae {}
