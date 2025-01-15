@@ -22,8 +22,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Subsystems.VisionConstants;
-import frc.constants.generated.TunerConstants;
-import frc.constants.generated.TunerConstants.TunerSwerveDrivetrain;
+import frc.constants.TunerConstants;
+import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
@@ -117,10 +117,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void updateLimelights() {
         vision.sendOrientation(getRotation());
         for (PoseEstimate estimate : vision.getPoseEstimates()) {
-            if (Math.abs(m_pigeon2.getYawRate()) < 720 && estimate.tagCount > 0) {
+            if (Math.abs(.getYawRate()) < 720 && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
-            } 
+            }
         }
     }
 

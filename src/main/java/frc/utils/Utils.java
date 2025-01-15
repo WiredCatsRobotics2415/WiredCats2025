@@ -1,12 +1,11 @@
 package frc.utils;
 
+import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.Alert.AlertType;
 import frc.constants.RuntimeConstants;
 import frc.constants.RuntimeConstants.Mode;
 import frc.robot.Robot;
 import java.lang.reflect.InvocationTargetException;
-
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
 
 public class Utils {
     /**
@@ -30,14 +29,12 @@ public class Utils {
                 attemptedInstantationType = real;
             }
             return attemptedInstantationType.getDeclaredConstructors()[0].newInstance();
-        } catch (InstantiationException | SecurityException | IllegalAccessException
-            | InvocationTargetException e) {
+        } catch (InstantiationException | SecurityException | IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
             System.out.println("COULD NOT INSTANTIATE IO IMPLEMENTATION FOR CLASS "
-                + attemptedInstantationType.getName()
-                + "; SEE ERROR MESSAGE ABOVE (NOT THE CASTEXCEPTION)");
-            new Alert("COULD NOT INSTANTIATE IO IMPLEMENTATION FOR CLASS "
-                + attemptedInstantationType.getName(), AlertType.kError).set(true);
+                + attemptedInstantationType.getName() + "; SEE ERROR MESSAGE ABOVE (NOT THE CASTEXCEPTION)");
+            new Alert("COULD NOT INSTANTIATE IO IMPLEMENTATION FOR CLASS " + attemptedInstantationType.getName(),
+                AlertType.kError).set(true);
 
         }
         return new Object();
