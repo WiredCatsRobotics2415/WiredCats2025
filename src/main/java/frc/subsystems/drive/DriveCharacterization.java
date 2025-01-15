@@ -18,14 +18,15 @@ public class DriveCharacterization extends Characterizer {
     private static final SwerveRequest.SysIdSwerveRotation rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     private DriveCharacterization(CommandSwerveDrivetrain driveSubsystem) {
-        super();
+        super("Swerve");
         this.driveSubsystem = driveSubsystem;
 
         SysIdRoutine sysIdRoutineTranslation = new SysIdRoutine(new SysIdRoutine.Config(null, // (1 V/s)
             Volts.of(4), // Prevent brownout
             null, // (10 s)
             state -> SignalLogger.writeString("SysIdTranslationState", state.toString())),
-            new SysIdRoutine.Mechanism(output -> setControl(translationCharacterization.withVolts(output)), null,
+            new SysIdRoutine.Mechanism(
+                output -> driveSubsystem.setControl(translationCharacterization.withVolts(output)), null,
                 driveSubsystem));
 
         SysIdRoutine sysIdRoutineSteer = new SysIdRoutine(new SysIdRoutine.Config(null, // Use default ramp rate (1 V/s)
@@ -33,7 +34,7 @@ public class DriveCharacterization extends Characterizer {
             null, // Use default timeout (10 s)
             // Log state with SignalLogger class
             state -> SignalLogger.writeString("SysIdSteerState", state.toString())),
-            new SysIdRoutine.Mechanism(volts -> setControl(steerCharacterization.withVolts(volts)), null,
+            new SysIdRoutine.Mechanism(volts -> driveSubsystem.setControl(steerCharacterization.withVolts(volts)), null,
                 driveSubsystem));
 
         SysIdRoutine sysIdRoutineRotation = new SysIdRoutine(new SysIdRoutine.Config(
@@ -46,7 +47,7 @@ public class DriveCharacterization extends Characterizer {
             new SysIdRoutine.Mechanism(output ->
             {
                 /* output is actually radians per second, but SysId only supports "volts" */
-                setControl(rotationCharacterization.withRotationalRate(output.in(Volts)));
+                driveSubsystem.setControl(rotationCharacterization.withRotationalRate(output.in(Volts)));
                 /* also log the requested output for SysId */
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             }, null, driveSubsystem));

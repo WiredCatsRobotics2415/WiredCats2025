@@ -13,6 +13,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -115,9 +116,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void updateLimelights() {
-        vision.sendOrientation(getRotation());
+        vision.sendOrientation(this.getState().Pose.getRotation());
         for (PoseEstimate estimate : vision.getPoseEstimates()) {
-            if (Math.abs(.getYawRate()) < 720 && estimate.tagCount > 0) {
+            if (Math.abs((Units.radiansToRotations(this.getState().Speeds.omegaRadiansPerSecond))) < 720
+                && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
             }
