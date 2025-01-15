@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class RuntimeConstants {
     public static final Mode simMode = Mode.SIM;
     public static final Mode currentMode = RobotBase.isReal() ? Mode.REAL : simMode;
+    public static final boolean TuningMode = true;
 
     public static enum Mode {
         /** Running on a real robot. */
