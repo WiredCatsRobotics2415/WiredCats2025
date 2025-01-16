@@ -8,9 +8,6 @@ import com.ctre.phoenix6.hardware.*;
 import com.ctre.phoenix6.signals.*;
 import com.ctre.phoenix6.swerve.*;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.*;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 
@@ -112,6 +109,8 @@ public class TunerConstants {
 
     private static final Distance kFrontLeftXPos = Inches.of(13);
     private static final Distance kFrontLeftYPos = Inches.of(11);
+    private static final double FrontLeftInchesFromCenter = Math
+        .sqrt(Math.pow(kFrontLeftXPos.magnitude(), 2) + Math.pow(kFrontLeftYPos.magnitude(), 2));
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;
@@ -123,6 +122,8 @@ public class TunerConstants {
 
     private static final Distance kFrontRightXPos = Inches.of(13);
     private static final Distance kFrontRightYPos = Inches.of(-11);
+    private static final double FrontRightInchesFromCenter = Math
+        .sqrt(Math.pow(kFrontRightXPos.magnitude(), 2) + Math.pow(kFrontRightYPos.magnitude(), 2));
 
     // Back Left
     private static final int kBackLeftDriveMotorId = 1;
@@ -134,6 +135,8 @@ public class TunerConstants {
 
     private static final Distance kBackLeftXPos = Inches.of(-13);
     private static final Distance kBackLeftYPos = Inches.of(11);
+    private static final double BackLeftInchesFromCenter = Math
+        .sqrt(Math.pow(kBackLeftXPos.magnitude(), 2) + Math.pow(kBackLeftYPos.magnitude(), 2));
 
     // Back Right
     private static final int kBackRightDriveMotorId = 3;
@@ -145,6 +148,11 @@ public class TunerConstants {
 
     private static final Distance kBackRightXPos = Inches.of(-13);
     private static final Distance kBackRightYPos = Inches.of(-11);
+    private static final double BackRightInchesFromCenter = Math
+        .sqrt(Math.pow(kBackRightXPos.magnitude(), 2) + Math.pow(kBackRightYPos.magnitude(), 2));
+
+    public static final double DriveBaseRadius = (FrontLeftInchesFromCenter + FrontRightInchesFromCenter +
+        BackLeftInchesFromCenter + BackRightInchesFromCenter) / 4;
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft = ConstantCreator
         .createModuleConstants(kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId,
@@ -184,38 +192,6 @@ public class TunerConstants {
         public TunerSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
             SwerveModuleConstants<?, ?, ?>... modules) {
             super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, modules);
-        }
-
-        /**
-         * Constructs a CTRE SwerveDrivetrain using the specified constants.
-         * <p>
-         * This constructs the underlying hardware devices, so users should not construct the devices themselves. If they need the devices, they can access them through getters in the classes.
-         *
-         * @param drivetrainConstants     Drivetrain-wide constants for the swerve drive
-         * @param odometryUpdateFrequency The frequency to run the odometry loop. If unspecified or set to 0 Hz, this is 250 Hz on CAN FD, and 100 Hz on CAN 2.0.
-         * @param modules                 Constants for each specific module
-         */
-        public TunerSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants, double odometryUpdateFrequency,
-            SwerveModuleConstants<?, ?, ?>... modules) {
-            super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, odometryUpdateFrequency, modules);
-        }
-
-        /**
-         * Constructs a CTRE SwerveDrivetrain using the specified constants.
-         * <p>
-         * This constructs the underlying hardware devices, so users should not construct the devices themselves. If they need the devices, they can access them through getters in the classes.
-         *
-         * @param drivetrainConstants       Drivetrain-wide constants for the swerve drive
-         * @param odometryUpdateFrequency   The frequency to run the odometry loop. If unspecified or set to 0 Hz, this is 250 Hz on CAN FD, and 100 Hz on CAN 2.0.
-         * @param odometryStandardDeviation The standard deviation for odometry calculation in the form [x, y, theta]ᵀ, with units in meters and radians
-         * @param visionStandardDeviation   The standard deviation for vision calculation in the form [x, y, theta]ᵀ, with units in meters and radians
-         * @param modules                   Constants for each specific module
-         */
-        public TunerSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants, double odometryUpdateFrequency,
-            Matrix<N3, N1> odometryStandardDeviation, Matrix<N3, N1> visionStandardDeviation,
-            SwerveModuleConstants<?, ?, ?>... modules) {
-            super(TalonFX::new, TalonFX::new, CANcoder::new, drivetrainConstants, odometryUpdateFrequency,
-                odometryStandardDeviation, visionStandardDeviation, modules);
         }
     }
 }

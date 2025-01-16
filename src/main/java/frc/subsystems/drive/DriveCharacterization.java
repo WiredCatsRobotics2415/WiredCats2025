@@ -3,10 +3,18 @@ package frc.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.constants.TunerConstants;
 import frc.utils.tuning.Characterizer;
+import java.util.stream.DoubleStream;
 
 public class DriveCharacterization extends Characterizer {
     private static DriveCharacterization instance;
@@ -62,10 +70,73 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kForward).withName("Steer: Quasi Forward"));
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
+        commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
+
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
         commands.add(sysIdRoutineRotation.quasistatic(Direction.kForward).withName("Rotation: Quasi Forward"));
         commands.add(sysIdRoutineRotation.quasistatic(Direction.kReverse).withName("Rotation: Quasi Backward"));
+    }
+
+    public class WheelRadiusCharacterization extends Command {
+        double driveBaseRadius = TunerConstants.DriveBaseRadius;
+        CommandSwerveDrivetrain drive;
+
+        double[] lastModuleDriveEncoderPositions = new double[4];
+        double lastGyroRads;
+
+        int runForSeconds;
+        double[] radii;
+        int execution = 0;
+
+        public WheelRadiusCharacterization(CommandSwerveDrivetrain drive, int runtimeSeconds) {
+            this.drive = drive;
+            runForSeconds = runtimeSeconds;
+            radii = new double[runtimeSeconds * 20];
+        }
+
+        @Override
+        public void initialize() {
+            int i = 0;
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : drive.getModules()) {
+                lastModuleDriveEncoderPositions[i] = m.getPosition(true).distanceMeters;
+                i++;
+            }
+            lastGyroRads = drive.getPigeon2().getAccumGyroY().getValueAsDouble();
+        }
+
+        @Override
+        public void execute() {
+            double currentGyroRads = drive.getPigeon2().getAccumGyroY().getValueAsDouble();
+            double currentModuleDriveEncoderPositions[] = new double[4];
+            int i = 0;
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : drive.getModules()) {
+                currentModuleDriveEncoderPositions[i] = m.getPosition(true).distanceMeters;
+                i++;
+            }
+            double deltaSum = 0;
+            for (int j = 0; j < 4; j++) {
+                deltaSum += currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j];
+            }
+            radii[execution] = ((currentGyroRads - lastGyroRads) * (driveBaseRadius)) / (deltaSum / 4);
+
+            lastGyroRads = currentGyroRads;
+            lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
+
+            drive.setControl(rotationCharacterization.withRotationalRate(Math.PI*(execution/(runForSeconds * 20))));
+
+            execution++;
+
+            if (execution > radii.length) {
+                end(false);
+            }
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            double sum = DoubleStream.of(radii).sum();
+            System.out.println("CHARACTERIZED RADIUS (INCHES): " + (sum / radii.length));
+        }
     }
 
     public void enable(CommandSwerveDrivetrain driveSubsystem) {
