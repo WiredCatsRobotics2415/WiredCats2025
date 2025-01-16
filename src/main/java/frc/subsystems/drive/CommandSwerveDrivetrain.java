@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
@@ -61,6 +62,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
         configureAutoBuilder();
+        if (RuntimeConstants.TuningMode) DriveCharacterization.enable(this);
+    }
+
+    public static CommandSwerveDrivetrain instance;
+
+    public static CommandSwerveDrivetrain getInstance() {
+        System.out.println("instance");
+        if (instance == null) instance = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
+            TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);
+        return instance;
     }
 
     private void configureAutoBuilder() {

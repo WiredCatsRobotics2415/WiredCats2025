@@ -7,8 +7,6 @@ import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -103,6 +101,7 @@ public class DriveCharacterization extends Characterizer {
                 i++;
             }
             lastGyroRads = drive.getPigeon2().getAccumGyroY().getValueAsDouble();
+            System.out.println("Initialization");
         }
 
         @Override
@@ -123,9 +122,10 @@ public class DriveCharacterization extends Characterizer {
             lastGyroRads = currentGyroRads;
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
-            drive.setControl(rotationCharacterization.withRotationalRate(Math.PI*(execution/(runForSeconds * 20))));
+            drive.setControl(rotationCharacterization.withRotationalRate(Math.PI * (execution / (runForSeconds * 20))));
 
             execution++;
+            System.out.println("exection number " + execution + " out of " + radii.length);
 
             if (execution > radii.length) {
                 end(false);
@@ -139,7 +139,7 @@ public class DriveCharacterization extends Characterizer {
         }
     }
 
-    public void enable(CommandSwerveDrivetrain driveSubsystem) {
+    public static void enable(CommandSwerveDrivetrain driveSubsystem) {
         if (instance == null) instance = new DriveCharacterization(driveSubsystem);
     }
 }

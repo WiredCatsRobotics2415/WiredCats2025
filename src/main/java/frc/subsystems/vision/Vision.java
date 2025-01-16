@@ -12,7 +12,7 @@ public class Vision extends SubsystemBase {
     private static Vision instance;
 
     private Vision() {
-        io = (VisionIO) Utils.getIOImplementation(VisionIOReal.class, null, VisionIO.class);
+        io = (VisionIO) Utils.getIOImplementation(VisionIOReal.class, VisionIOSim.class, VisionIO.class);
     }
 
     public static Vision getInstance() {
