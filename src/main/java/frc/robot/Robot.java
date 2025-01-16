@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.BuildConstants;
 import frc.constants.RuntimeConstants;
 import frc.utils.tuning.TuningModeTab;
@@ -80,5 +81,10 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
+    }
+
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run();
     }
 }
