@@ -6,10 +6,10 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.utils.driver.CompDashboardTab.LayoutConstants.LayoutInfo;
+import frc.utils.driver.DashboardManager.LayoutConstants.LayoutInfo;
 import java.util.function.BooleanSupplier;
 
-public class CompDashboardTab {
+public class DashboardManager {
     public static class LayoutConstants {
         public static final record LayoutInfo(int x, int y, int width, int height) {};
 
@@ -30,16 +30,16 @@ public class CompDashboardTab {
     private ShuffleboardTab teleopTab = Shuffleboard.getTab("Teleoperated");
     private ShuffleboardTab autoTab = Shuffleboard.getTab("Autonomous");
 
-    private static CompDashboardTab instance;
+    private static DashboardManager instance;
 
-    private CompDashboardTab() {
+    private DashboardManager() {
         teleopTab.addNumber("Match Time", () -> DriverStation.getMatchTime()).withWidget("Match Time")
             .withPosition(LayoutConstants.MatchTime.x, LayoutConstants.MatchTime.y)
             .withSize(LayoutConstants.MatchTime.width, LayoutConstants.MatchTime.height);
     }
 
-    public static CompDashboardTab getInstance() {
-        if (instance == null) instance = new CompDashboardTab();
+    public static DashboardManager getInstance() {
+        if (instance == null) instance = new DashboardManager();
         return instance;
     }
 
