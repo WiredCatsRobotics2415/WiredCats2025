@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
+import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -32,7 +33,6 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
-
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -49,20 +49,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds();
     public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05) // Add a 5% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     private Vision vision = Vision.getInstance();
+    private static CommandSwerveDrivetrain instance;
 
-    /**
-     * Constructs a CTRE SwerveDrivetrain using the specified constants.
-     *
-     * <p>
-     * This constructs the underlying hardware devices, so users should not construct the devices themselves. If they need the devices, they can access them through getters in the classes.
-     *
-     * @param drivetrainConstants Drivetrain-wide constants for the swerve drive
-     * @param modules             Constants for each specific module
-     */
-    public CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
+    private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules));
         if (Utils.isSimulation()) {
@@ -78,10 +70,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
     }
 
-    public static CommandSwerveDrivetrain instance;
-
     public static CommandSwerveDrivetrain getInstance() {
-        System.out.println("instance");
         if (instance == null) instance = new CommandSwerveDrivetrain(TunerConstants.DrivetrainConstants,
             TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);
         return instance;

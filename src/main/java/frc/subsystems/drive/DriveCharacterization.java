@@ -6,12 +6,13 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.TunerConstants;
@@ -81,11 +82,12 @@ public class DriveCharacterization extends Characterizer {
     }
 
     public class WheelRadiusCharacterization extends Command {
-        double driveBaseRadius = TunerConstants.DriveBaseRadius;
+        double driveBaseRadius = TunerConstants.DriveBaseRadiusInches;
+        double wheelRadiusMeters = TunerConstants.kWheelRadius.in(Meters);
         CommandSwerveDrivetrain drive;
 
         double[] lastModuleDriveEncoderPositions = new double[4];
-        double lastGyroRads;
+        double lastGyroDegrees;
 
         int runForSeconds;
         double[] radii;
@@ -101,49 +103,55 @@ public class DriveCharacterization extends Characterizer {
         public void initialize() {
             int i = 0;
             for (SwerveModule<TalonFX, TalonFX, CANcoder> m : drive.getModules()) {
-                lastModuleDriveEncoderPositions[i] = m.getPosition(true).distanceMeters;
+                lastModuleDriveEncoderPositions[i] = Math.abs(
+                    Units.rotationsToDegrees(m.getPosition(true).distanceMeters / (2 * Math.PI * wheelRadiusMeters)));
                 i++;
             }
-            lastGyroRads = drive.getPigeon2().getAccumGyroY().getValueAsDouble();
+            lastGyroDegrees = drive.getPigeon2().getYaw().getValueAsDouble();
             System.out.println("Initialization");
         }
 
         @Override
         public void execute() {
-            double currentGyroRads = drive.getPigeon2().getAccumGyroY().getValueAsDouble();
+            double currentGyroDegrees = drive.getPigeon2().getYaw().getValueAsDouble();
             double currentModuleDriveEncoderPositions[] = new double[4];
             int i = 0;
             for (SwerveModule<TalonFX, TalonFX, CANcoder> m : drive.getModules()) {
-                currentModuleDriveEncoderPositions[i] = m.getPosition(true).distanceMeters;
+                // rotationsToRadius(dist/(2*rInMeters*pi))
+                currentModuleDriveEncoderPositions[i] = Math.abs(
+                    Units.rotationsToDegrees(m.getPosition(true).distanceMeters / (2 * Math.PI * wheelRadiusMeters)));
                 i++;
             }
             double deltaSum = 0;
             for (int j = 0; j < 4; j++) {
                 deltaSum += currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j];
             }
-            radii[execution] = ((currentGyroRads - lastGyroRads) * (driveBaseRadius)) / (deltaSum / 4);
+            System.out.println("--------");
+            System.out.println("    delta gyro: " + (currentGyroDegrees - lastGyroDegrees));
+            System.out.println("    delta wheels: " + (deltaSum / 4));
+            // inches = (degrees * inches)/degrees
+            radii[execution] = ((currentGyroDegrees - lastGyroDegrees) * (driveBaseRadius)) / (deltaSum / 4);
 
-            lastGyroRads = currentGyroRads;
+            lastGyroDegrees = currentGyroDegrees;
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
-            drive
-                .setControl(new SwerveRequest.ApplyRobotSpeeds()
-                    .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
-                        Math.PI * (execution / (runForSeconds * 20)), Rotation2d.fromRadians(currentGyroRads)))
-                    .withSteerRequestType(SteerRequestType.MotionMagicExpo));
+            drive.setControl(new SwerveRequest.ApplyRobotSpeeds()
+                .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
+                    2 * Math.PI * ((double) execution / radii.length), Rotation2d.fromRadians(currentGyroDegrees)))
+                .withSteerRequestType(SteerRequestType.MotionMagicExpo)
+                .withDriveRequestType(DriveRequestType.Velocity));
 
             execution++;
-            System.out.println("exection number " + execution + " out of " + radii.length);
-
-            if (execution > radii.length) {
-                end(false);
-            }
         }
 
         @Override
+        public boolean isFinished() { return execution == radii.length; }
+
+        @Override
         public void end(boolean interrupted) {
-            double sum = DoubleStream.of(radii).sum();
-            System.out.println("CHARACTERIZED RADIUS (INCHES): " + (sum / radii.length));
+            drive.setControl(new SwerveRequest.SwerveDriveBrake());
+            double average = DoubleStream.of(radii).filter(d -> Double.isFinite(d)).average().getAsDouble();
+            System.out.println("CHARACTERIZED RADIUS (INCHES): " + average);
         }
     }
 
