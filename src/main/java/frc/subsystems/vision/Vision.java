@@ -33,13 +33,6 @@ public class Vision extends SubsystemBase {
         return estimates;
     }
 
-    /**
-     * @return Gets the horizontal angle returned by the intake limelight's note detection.
-     */
-    public double getNoteAngleOnX() { return inputs.noteAngleX; }
-
-    public boolean isNoteVisible() { return inputs.noteVisible; }
-
     @Override
     public void periodic() {
         io.updateInputs(inputs);

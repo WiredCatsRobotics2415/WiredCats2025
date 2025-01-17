@@ -6,7 +6,10 @@ import com.ctre.phoenix6.SignalLogger;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
@@ -59,28 +62,17 @@ public class DriveCharacterization extends Characterizer {
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             }, null, driveSubsystem));
 
-        commands.add(new InstantCommand(() -> {
-            sysIdRoutineTranslation.dynamic(Direction.kForward).schedule();
-        }).withName("Translation: Dynamic Forward"));
-        commands.add(new InstantCommand(() -> {
-            sysIdRoutineTranslation.dynamic(Direction.kReverse).schedule();
-        }).withName("Translation: Dynamic Backward"));
-        commands.add(new InstantCommand(() -> {
-            sysIdRoutineTranslation.quasistatic(Direction.kForward).schedule();
-        }).withName("Translation: Quasi Forward"));
-        commands.add(new InstantCommand(() -> {
-            sysIdRoutineTranslation.quasistatic(Direction.kReverse).schedule();
-        }).withName("Translation: Quasi Backward"));
+        commands.add(sysIdRoutineTranslation.dynamic(Direction.kForward).withName("Translation: Dynamic Forward"));
+        commands.add(sysIdRoutineTranslation.dynamic(Direction.kReverse).withName("Translation: Dynamic Backward"));
+        commands.add(sysIdRoutineTranslation.quasistatic(Direction.kForward).withName("Translation: Quasi Forward"));
+        commands.add(sysIdRoutineTranslation.quasistatic(Direction.kReverse).withName("Translation: Quasi Backward"));
 
         commands.add(sysIdRoutineSteer.dynamic(Direction.kForward).withName("Steer: Dynamic Forward"));
         commands.add(sysIdRoutineSteer.dynamic(Direction.kReverse).withName("Steer: Dynamic Backward"));
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kForward).withName("Steer: Quasi Forward"));
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
-        commands.add(new InstantCommand(() -> {
-            System.out.println("scheduled");
-            new WheelRadiusCharacterization(driveSubsystem, 10).schedule();
-        }).withName("Wheel Radius Characterization"));
+        commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -134,7 +126,11 @@ public class DriveCharacterization extends Characterizer {
             lastGyroRads = currentGyroRads;
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
-            drive.setControl(rotationCharacterization.withRotationalRate(Math.PI * (execution / (runForSeconds * 20))));
+            drive
+                .setControl(new SwerveRequest.ApplyRobotSpeeds()
+                    .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
+                        Math.PI * (execution / (runForSeconds * 20)), Rotation2d.fromRadians(currentGyroRads)))
+                    .withSteerRequestType(SteerRequestType.MotionMagicExpo));
 
             execution++;
             System.out.println("exection number " + execution + " out of " + radii.length);

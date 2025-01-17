@@ -13,6 +13,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.BuildConstants;
 import frc.constants.RuntimeConstants;
@@ -74,6 +75,7 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         if (RuntimeConstants.TuningMode) {
+            SignalLogger.start();
             TuningModeTab.enableTuningMode();
         }
     }
@@ -86,5 +88,10 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         CommandScheduler.getInstance().run();
+    }
+
+    @Override
+    public void teleopInit() {
+        RobotContainer.getInstance().teleopInit();
     }
 }

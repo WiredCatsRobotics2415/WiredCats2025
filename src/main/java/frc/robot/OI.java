@@ -71,5 +71,8 @@ public class OI {
         return instance;
     }
 
-    private OI() {}
+    private OI() {
+        controller = new CommandXboxController(0);
+        numpad = new CommandJoystick(1);
+    }
 }

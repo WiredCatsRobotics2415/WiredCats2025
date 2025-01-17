@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -22,6 +23,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.constants.Controls;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
@@ -30,6 +32,8 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import java.util.function.Supplier;
+
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Class that extends the Phoenix 6 SwerveDrivetrain class and implements Subsystem so it can easily be used in command-based projects.
@@ -43,6 +47,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private boolean hasAppliedOperatorPerspective = false;
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds();
+    public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
+        .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05) // Add a 5% deadband
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     private Vision vision = Vision.getInstance();
 
@@ -63,6 +70,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configureAutoBuilder();
         if (RuntimeConstants.TuningMode) DriveCharacterization.enable(this);
+
+        this.registerTelemetry((SwerveDriveState state) -> {
+            Logger.recordOutput("Drive/Pose", state.Pose);
+            Logger.recordOutput("Drive/ModuleStates", state.ModuleStates);
+            Logger.recordOutput("Drive/ModuleTargets", state.ModuleTargets);
+        });
     }
 
     public static CommandSwerveDrivetrain instance;
