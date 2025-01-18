@@ -1,13 +1,9 @@
 package frc.robot;
 
-import com.pathplanner.lib.auto.AutoBuilder;
-
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
-import frc.utils.driver.DashboardManager;
-import frc.utils.driver.DashboardManager.LayoutConstants;
 
 public class RobotContainer {
     private static RobotContainer instance;
@@ -31,14 +27,13 @@ public class RobotContainer {
     }
 
     private void setupAuto() {
-        //Put Auto named commands here
-        autoChooser = AutoBuilder.buildAutoChooser("");
-        DashboardManager.getInstance().addChooser(false, "Auto", autoChooser,
-            LayoutConstants.AutoSelector);
+        // Put Auto named commands here
+        // autoChooser = AutoBuilder.buildAutoChooser("");
+        // DashboardManager.getInstance().addChooser(false, "Auto", autoChooser, LayoutConstants.AutoSelector);
     }
 
     public void neutralizeSubsystems() {
-        drive.setDefaultCommand(Commands.idle());
+        drive.setDefaultCommand(Commands.idle(drive));
     }
 
     private void configureControls() {
@@ -49,6 +44,6 @@ public class RobotContainer {
     }
 
     private void configureTriggers() {
-        //Triggers that interact across multiple subsystems/utils should be defined here
+        // Triggers that interact across multiple subsystems/utils should be defined here
     }
 }
