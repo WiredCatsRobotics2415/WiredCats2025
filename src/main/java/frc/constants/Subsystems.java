@@ -13,4 +13,11 @@ public class Subsystems {
 
         public static final Matrix<N3, N1> megatag2StdDev = VecBuilder.fill(.7, .7, 9999999);
     }
+
+    public class ElevatorConstants {
+        public static final double Stage1Height = 24;
+        public static final double Stage2Height = 24;
+        public static final double Stage3Height = 24;
+        public static final double MaxHeight = 72;
+    }
 }

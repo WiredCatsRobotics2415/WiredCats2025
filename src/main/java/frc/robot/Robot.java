@@ -15,8 +15,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.constants.BuildConstants;
 import frc.constants.RuntimeConstants;
+import frc.utils.Visualizer;
 import frc.utils.tuning.TuningModeTab;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -87,6 +87,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
         CommandScheduler.getInstance().run();
     }
 }
