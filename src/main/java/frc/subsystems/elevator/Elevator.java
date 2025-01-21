@@ -1,8 +1,14 @@
 package frc.subsystems.elevator;
 
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.Subsystems.ElevatorConstants;
+import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
+    @Getter private double goalInches = 0.0;
 
     private static Elevator instance;
 
@@ -15,5 +21,16 @@ public class Elevator extends SubsystemBase {
         return instance;
     }
 
-    public double getHeightInches() { return 0; }
+    /** Change goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
+    public Command changeGoal(double changeBy) {
+        return new RepeatCommand(new InstantCommand(() -> {
+            this.setGoal(this.getGoalInches() + changeBy);
+        }));
+    }
+
+    /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
+    public void setGoal(double goalInches) {
+        if (goalInches > ElevatorConstants.MaxHeight || goalInches < 0) return;
+        this.goalInches = goalInches;
+    }
 }

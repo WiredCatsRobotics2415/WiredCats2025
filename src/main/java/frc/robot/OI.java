@@ -12,17 +12,35 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class OI {
-    private static OI instance;
-
     CommandXboxController controller;
     CommandJoystick numpad;
 
-    public Map<String, Trigger> binds = new HashMap<String, Trigger>();
+    public enum Bind {
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward
+    }
 
+    public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
     private SlewRateLimiter xLimiter = new SlewRateLimiter(Controls.SlewRate);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(Controls.SlewRate);
 
-    public final double DEADBAND = 0.05;
+    private static OI instance;
+
+    public static OI getInstance() {
+        if (instance == null) {
+            instance = new OI();
+        }
+        return instance;
+    }
+
+    private OI() {
+        controller = new CommandXboxController(0);
+        numpad = new CommandJoystick(1);
+
+        binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
+        binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
+        binds.put(Bind.ManualArmForward, controller.povUp());
+        binds.put(Bind.ManualArmBack, controller.povDown());
+    }
 
     private double deadbandCompensation(double r) {
         return (r - Controls.Deadband) / (1 - Controls.Deadband);
@@ -63,16 +81,4 @@ public class OI {
     }
 
     public XboxController getHIDOfController() { return controller.getHID(); }
-
-    public static OI getInstance() {
-        if (instance == null) {
-            instance = new OI();
-        }
-        return instance;
-    }
-
-    private OI() {
-        controller = new CommandXboxController(0);
-        numpad = new CommandJoystick(1);
-    }
 }

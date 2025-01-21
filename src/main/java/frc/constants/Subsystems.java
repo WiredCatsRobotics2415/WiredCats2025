@@ -15,9 +15,15 @@ public class Subsystems {
     }
 
     public class ElevatorConstants {
-        public static final double Stage1Height = 24;
+        public static final double BaseHeight = 30;
         public static final double Stage2Height = 24;
-        public static final double Stage3Height = 24;
-        public static final double MaxHeight = 72;
+        public static final double Stage3Height = 23;
+        public static final double MaxHeight = 75;
+    }
+
+    public class ArmConstants {
+        // With 0 degrees being up
+        public static final double MaxDegreesBack = -135;
+        public static final double MaxDegreesFront = 135;
     }
 }
