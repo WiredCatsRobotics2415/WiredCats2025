@@ -16,7 +16,9 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, PresetIntakeFromSource, AutoScoreLeftL1,
+        AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3,
+        AutoScoreRightL4
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -40,6 +42,16 @@ public class OI {
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
         binds.put(Bind.ManualArmForward, controller.povUp());
         binds.put(Bind.ManualArmBack, controller.povDown());
+
+        binds.put(Bind.PresetIntakeFromSource, numpad.button(1));
+        binds.put(Bind.AutoScoreLeftL1, numpad.button(2));
+        binds.put(Bind.AutoScoreLeftL2, numpad.button(5));
+        binds.put(Bind.AutoScoreLeftL3, numpad.button(8));
+        binds.put(Bind.AutoScoreLeftL4, numpad.button(10)); // Slash
+        binds.put(Bind.AutoScoreRightL1, numpad.button(3));
+        binds.put(Bind.AutoScoreRightL2, numpad.button(6));
+        binds.put(Bind.AutoScoreRightL3, numpad.button(9));
+        binds.put(Bind.AutoScoreRightL4, numpad.button(11)); // Asterisk
     }
 
     public double[] getXY() {

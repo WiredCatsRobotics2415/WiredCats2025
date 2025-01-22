@@ -23,4 +23,8 @@ public class Elevator extends SubsystemBase {
         if (goalInches > ElevatorConstants.MaxHeight || goalInches < 0) return;
         this.goalInches = goalInches;
     }
+
+    public boolean atGoal() {
+        return true;
+    }
 }

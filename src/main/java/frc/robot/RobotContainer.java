@@ -3,6 +3,9 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.commands.ScoreCoral;
+import frc.commands.ScoreCoral.Level;
+import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
@@ -57,6 +60,15 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(1));
         oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(-1));
+
+        oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
+        oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));
+        oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3));
+        oi.binds.get(OI.Bind.AutoScoreLeftL4).onTrue(new ScoreCoral(Side.Left, Level.L4));
+        oi.binds.get(OI.Bind.AutoScoreRightL1).onTrue(new ScoreCoral(Side.Right, Level.L1));
+        oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2));
+        oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
+        oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
     }
 
     private void configureTriggers() {

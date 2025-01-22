@@ -33,12 +33,6 @@ public class SuperStructure {
         return instance;
     }
 
-    public void setArmGoalSafely(double armGoalDegrees) {
-        if (!willCollide(elevator.getGoalInches(), armGoalDegrees)) {
-            arm.setGoal(armGoalDegrees);
-        }
-    }
-
     /** Change arm goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
     public Command changeArmGoalBy(double changeByDegrees) {
         return new RepeatCommand(new InstantCommand(() -> {
@@ -53,6 +47,19 @@ public class SuperStructure {
         }));
     }
 
+    /** Sets goals and waits for both mechanisms to achieve them */
+    public Command runToPositionCommand(double elevatorGoalInches, double armGoalDegrees) {
+        return new RepeatCommand(new InstantCommand(() -> {
+            goToPosition(elevatorGoalInches, armGoalDegrees);
+        })).until(this::bothAtGoal);
+    }
+
+    public void setArmGoalSafely(double armGoalDegrees) {
+        if (!willCollide(elevator.getGoalInches(), armGoalDegrees)) {
+            arm.setGoal(armGoalDegrees);
+        }
+    }
+
     public void setElevatorGoalSafely(double elevatorGoalInches) {
         if (!willCollide(elevatorGoalInches, arm.getGoalDegrees())) {
             elevator.setGoal(elevatorGoalInches);
@@ -64,6 +71,10 @@ public class SuperStructure {
             elevator.setGoal(elevatorGoalInches);
             arm.setGoal(armGoalDegrees);
         }
+    }
+
+    public boolean bothAtGoal() {
+        return elevator.atGoal() && arm.atGoal();
     }
 
     private boolean willCollide(double elevatorGoalInches, double armGoalDegrees) {
