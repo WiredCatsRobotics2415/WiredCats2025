@@ -5,7 +5,9 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.constants.RuntimeConstants;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 
 public class TuningModeTab {
     private static TuningModeTab instance;
@@ -41,5 +43,14 @@ public class TuningModeTab {
         if (instance == null) {
             instance = new TuningModeTab();
         }
+    }
+
+    public static TuningModeTab getInstance() {
+        if (instance == null && RuntimeConstants.TuningMode) instance = new TuningModeTab();
+        return instance;
+    }
+
+    public void addBoolSupplier(String title, BooleanSupplier supplier) {
+        thisTab.addBoolean(title, supplier).withWidget("Boolean Box");
     }
 }

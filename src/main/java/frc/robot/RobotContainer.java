@@ -7,12 +7,14 @@ import frc.constants.Controls;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.superstructure.SuperStructure;
 
 public class RobotContainer {
     private static RobotContainer instance;
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
-    private Elevator elevator = Elevator.getInstance();
     private Arm arm = Arm.getInstance();
+    private Elevator elevator = Elevator.getInstance();
+    private SuperStructure superstructure = SuperStructure.getInstance();
     private OI oi = OI.getInstance();
 
     private SendableChooser<Command> autoChooser;
@@ -50,11 +52,11 @@ public class RobotContainer {
                 .withRotationalRate(oi.getRotation() * Controls.MaxAngularRadS);
         }));
 
-        oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(elevator.changeGoal(1));
-        oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(elevator.changeGoal(-1));
+        oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(1));
+        oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(superstructure.changeElevatorGoalBy(-1));
 
-        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(arm.changeGoal(1));
-        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(arm.changeGoal(-1));
+        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(1));
+        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(-1));
     }
 
     private void configureTriggers() {

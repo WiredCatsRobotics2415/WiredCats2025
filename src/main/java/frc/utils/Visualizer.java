@@ -3,6 +3,7 @@ package frc.utils;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
+import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
@@ -36,16 +37,20 @@ public class Visualizer {
         // Arm
         double angleRads = Units.degreesToRadians(armSubsystem.getGoalDegrees());
         Pose3d arm = new Pose3d(
-            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * 13), 0, Units.inchesToMeters(height) +
-                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * 13) + Units.inchesToMeters(13),
+            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches), 0,
+            Units.inchesToMeters(height) +
+                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches) +
+                Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
             new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/Arm", arm);
 
         // End effector
         Pose3d endEffector = new Pose3d(
-            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * 13), 0, Units.inchesToMeters(height) +
-                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * 13) + Units.inchesToMeters(13),
+            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches), 0,
+            Units.inchesToMeters(height) +
+                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches) +
+                Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
             new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/EndEffector", endEffector);
