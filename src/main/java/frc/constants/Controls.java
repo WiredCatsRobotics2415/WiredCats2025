@@ -3,7 +3,7 @@ package frc.constants;
 import edu.wpi.first.wpilibj.XboxController;
 
 public class Controls {
-    public static final double MaxDriveMeterS = 4.5;
+    public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.baseUnitMagnitude();
     public static final double MaxAngularRadS = Math.PI;
     public static final double MinimumDrivePower = 0.05d;
     public static final double RumbleSoftValue = 0.2d;

@@ -104,7 +104,6 @@ public class MapleSimSwerveDrivetrain {
      * Updates the Maple-Sim simulation and injects the results into the simulated CTRE devices, including motors and the IMU.
      */
     public void update() {
-        SimulatedArena.getInstance().simulationPeriodic();
         pigeonSim.setRawYaw(mapleSimDrive.getSimulatedDriveTrainPose().getRotation().getMeasure());
         pigeonSim.setAngularVelocityZ(RadiansPerSecond
             .of(mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative().omegaRadiansPerSecond));

@@ -42,25 +42,17 @@ public class OI {
         binds.put(Bind.ManualArmBack, controller.povDown());
     }
 
-    private double deadbandCompensation(double r) {
-        return (r - Controls.Deadband) / (1 - Controls.Deadband);
-    }
-
-    private double minimumPowerCompensation(double r) {
-        return r * (1 - Controls.MinimumDrivePower) + Controls.MinimumDrivePower;
-    }
-
     public double[] getXY() {
-        double x = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickY), Controls.Deadband);
-        double y = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickX), Controls.Deadband);
+        double x = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickX), Controls.Deadband);
+        double y = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickY), Controls.Deadband);
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
             double magInitial = Math.sqrt(x * x + y * y);
-            double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
-            double powerCompensated = minimumPowerCompensation(magCurved);
-            newX = Math.cos(angle) * powerCompensated;
-            newY = Math.sin(angle) * powerCompensated;
+            if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
+            double magCurved = Math.pow(magInitial, Controls.CurveExponent);
+            newX = Math.cos(angle) * magCurved;
+            newY = Math.sin(angle) * magCurved;
         } else {
             newX = xLimiter.calculate(x);
             newY = yLimiter.calculate(y);
@@ -71,12 +63,12 @@ public class OI {
     }
 
     public double getRotation() {
-        double deadbandCompensated = deadbandCompensation(
-            MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX), Controls.Deadband));
+        double deadbanded = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX),
+            Controls.Deadband);
         if (Controls.UseCurve) {
-            return Math.pow(minimumPowerCompensation(deadbandCompensated), Controls.CurveExponent);
+            return Math.pow(deadbanded, Controls.CurveExponent);
         } else {
-            return minimumPowerCompensation(deadbandCompensated);
+            return deadbanded;
         }
     }
 
