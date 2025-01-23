@@ -10,6 +10,8 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.util.Color;
 
 public class Subsystems {
     public class VisionConstants {
@@ -18,6 +20,14 @@ public class Subsystems {
         public static final String BackCenterName = "limelight-back";
 
         public static final Matrix<N3, N1> megatag2StdDev = VecBuilder.fill(.7, .7, 9999999);
+    }
+
+    public class LEDStripConstants {
+        public static final int PortPWM = 9;
+        public static final int Length = 60;
+        public static final Distance LedSpacing = Meters.of(1 / 120.0);
+
+        public static final Color WestminsterGreen = new Color(30, 72, 47);
     }
 
     public class DriveConstants {

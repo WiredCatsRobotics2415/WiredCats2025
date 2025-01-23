@@ -11,6 +11,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import lombok.Getter;
 
 public class RobotContainer {
     private static RobotContainer instance;
@@ -18,7 +19,7 @@ public class RobotContainer {
     private Arm arm = Arm.getInstance();
     private Elevator elevator = Elevator.getInstance();
     private SuperStructure superstructure = SuperStructure.getInstance();
-    private OI oi = OI.getInstance();
+    private @Getter OI oi = OI.getInstance();
 
     private SendableChooser<Command> autoChooser;
 

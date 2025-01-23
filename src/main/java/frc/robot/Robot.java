@@ -2,7 +2,6 @@ package frc.robot;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.utils.Visualizer;
 import frc.utils.tuning.TuningModeTab;
@@ -71,9 +70,6 @@ public class Robot extends LoggedRobot {
     @Override
     public void simulationPeriodic() {
         SimulatedArena.getInstance().simulationPeriodic();
-        if (RuntimeConstants.VisualizationEnabled) {
-            Logger.recordOutput("Visualization/ReefBlueAB", ReefMeasurements.blueReefCDApriltag);
-        }
     }
 
     @Override

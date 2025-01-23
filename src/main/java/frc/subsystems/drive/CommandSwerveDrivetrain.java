@@ -14,6 +14,7 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -22,8 +23,11 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
+import frc.constants.Measurements.ReefMeasurements;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.VisionConstants;
@@ -31,6 +35,7 @@ import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.tuning.TuningModeTab;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -63,7 +68,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
         configureAutoBuilder();
-        if (RuntimeConstants.TuningMode) DriveCharacterization.enable(this);
+        if (RuntimeConstants.TuningMode) {
+            DriveCharacterization.enable(this);
+            TuningModeTab.getInstance().addCommand("Set Pose: 3in from Apriltag 18 facing towards it",
+                new InstantCommand(() ->
+                {
+                    System.out.println("Reset pose");
+                    resetPose(ReefMeasurements.blueReefABApriltag.plus(new Transform2d(
+                        RobotMeasurements.CenterToPerpendicularFrame.times(-1), Meters.of(0), new Rotation2d())));
+                }));
+        }
 
         this.registerTelemetry((SwerveDriveState state) -> {
             Logger.recordOutput("Drive/Pose", state.Pose);
@@ -155,9 +169,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 measurementWasUsed = true;
             }
             if (measurementWasUsed) {
-                Logger.recordOutput("Limelights/" + (i + 1), estimate.pose);
+                // Logger.recordOutput("Limelights/" + (i + 1), estimate.pose);
             } else {
-                Logger.recordOutput("Limelights/" + (i + 1), Pose2d.kZero);
+                // Logger.recordOutput("Limelights/" + (i + 1), Pose2d.kZero);
             }
         }
     }
