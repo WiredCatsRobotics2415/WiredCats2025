@@ -9,9 +9,19 @@ public class VisionIOSim implements VisionIO {
 
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        inputs.poseEstimates = new Pose2d[0];
-        inputs.poseLatencies = new double[0];
-        inputs.poseTagCounts = new int[0];
-        inputs.poseTimestampsSeconds = new double[0];
+        inputs.frontLeft_poseTimestampsSeconds = 0.0d;
+        inputs.frontLeft_poseEstimate = new Pose2d();
+        inputs.frontLeft_poseLatency = 0.0d;
+        inputs.frontLeft_poseTagCount = 0;
+
+        inputs.frontRight_poseTimestampsSeconds = 0.0d;
+        inputs.frontRight_poseEstimate = new Pose2d();
+        inputs.frontRight_poseLatency = 0.0d;
+        inputs.frontRight_poseTagCount = 0;
+
+        inputs.backCenter_poseTimestampsSeconds = 0.0d;
+        inputs.backCenter_poseEstimate = new Pose2d();
+        inputs.backCenter_poseLatency = 0.0d;
+        inputs.backCenter_poseTagCount = 0;
     }
 }

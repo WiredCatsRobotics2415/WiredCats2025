@@ -13,18 +13,19 @@ public class TuningModeTab {
     private static TuningModeTab instance;
     private ShuffleboardTab thisTab;
 
-    private int ELASTIC_SIZE_WIDTH = 10;
-    private int ELASTIC_SIZE_HEIGHT = 6;
+    private final int ElasticSizeWidth = 10;
+    private final int ElasticSizeHeight = 6;
+
+    private int currentWidth = 0;
+    private int currentHeight = 0;
 
     private TuningModeTab() {
         thisTab = Shuffleboard.getTab("Tuning");
-        int currentWidth = 0;
-        int currentHeight = 0;
 
         for (String subsystemName : Characterizer.getCharacterizers().keySet()) {
             Characterizer characterizer = Characterizer.getCharacterizers().get(subsystemName);
             ShuffleboardLayout layout = thisTab.getLayout(subsystemName, BuiltInLayouts.kList)
-                .withSize(currentWidth, ELASTIC_SIZE_HEIGHT / 2).withPosition(currentWidth, currentHeight)
+                .withSize(currentWidth, ElasticSizeHeight / 2).withPosition(currentWidth, currentHeight)
                 .withProperties(Map.of("Label position", "HIDDEN"));
 
             for (Command command : characterizer.commands) {
@@ -32,7 +33,7 @@ public class TuningModeTab {
             }
 
             currentWidth += 2;
-            if (currentWidth > ELASTIC_SIZE_WIDTH) {
+            if (currentWidth > ElasticSizeWidth) {
                 currentHeight = 3;
                 currentWidth = 0;
             }
@@ -51,6 +52,11 @@ public class TuningModeTab {
     }
 
     public void addBoolSupplier(String title, BooleanSupplier supplier) {
-        thisTab.addBoolean(title, supplier).withWidget("Boolean Box");
+        if (currentWidth == ElasticSizeWidth) {
+            currentHeight += 1;
+            currentWidth = 0;
+        }
+        currentWidth = currentWidth + 1;
+        thisTab.addBoolean(title, supplier).withWidget("Boolean Box").withPosition(currentWidth, currentHeight);
     }
 }

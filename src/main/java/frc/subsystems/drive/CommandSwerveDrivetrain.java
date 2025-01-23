@@ -143,11 +143,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public void updateLimelights() {
         vision.sendOrientation(this.getState().Pose.getRotation());
-        for (PoseEstimate estimate : vision.getPoseEstimates()) {
+        PoseEstimate[] estimates = vision.getPoseEstimates();
+
+        for (int i = 0; i < estimates.length; i++) {
+            PoseEstimate estimate = estimates[i];
+            boolean measurementWasUsed = false;
             if (Math.abs((Units.radiansToRotations(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
+                measurementWasUsed = true;
+            }
+            if (measurementWasUsed) {
+                Logger.recordOutput("Limelights/" + (i + 1), estimate.pose);
+            } else {
+                Logger.recordOutput("Limelights/" + (i + 1), Pose2d.kZero);
             }
         }
     }

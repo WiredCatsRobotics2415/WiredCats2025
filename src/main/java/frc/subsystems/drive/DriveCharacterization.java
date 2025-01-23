@@ -3,6 +3,7 @@ package frc.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveModule;
@@ -12,6 +13,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -74,6 +77,7 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
+        commands.add(new CurrentLimitCharacterization(driveSubsystem).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -137,7 +141,7 @@ public class DriveCharacterization extends Characterizer {
 
             drive.setControl(new SwerveRequest.ApplyRobotSpeeds()
                 .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
-                    2 * Math.PI * ((double) execution / radii.length), Rotation2d.fromRadians(currentGyroDegrees)))
+                    2 * Math.PI * ((double) execution / radii.length), Rotation2d.fromRadians(-currentGyroDegrees)))
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo)
                 .withDriveRequestType(DriveRequestType.Velocity));
 
@@ -152,6 +156,58 @@ public class DriveCharacterization extends Characterizer {
             drive.setControl(new SwerveRequest.SwerveDriveBrake());
             double average = DoubleStream.of(radii).filter(d -> Double.isFinite(d)).average().getAsDouble();
             System.out.println("CHARACTERIZED RADIUS (INCHES): " + average);
+        }
+    }
+
+    public class CurrentLimitCharacterization extends Command {
+        private CommandSwerveDrivetrain drive;
+        private SwerveRequest.RobotCentric driveForwardAtFullEffort = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo)
+            .withVelocityX(TunerConstants.kSpeedAt12Volts);
+        private CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
+            .withStatorCurrentLimitEnable(true);
+        private Timer timer;
+        private int secondsCounter = 1;
+        private int currentCounter = 1;
+
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive) {
+            this.drive = drive;
+            timer = new Timer();
+        }
+
+        private void applyCurrentToAll(Current current) {
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : driveSubsystem.getModules()) {
+                m.getDriveMotor().getConfigurator().apply(currentLimitsConfigs.withStatorCurrentLimit(current));
+            }
+        }
+
+        @Override
+        public void initialize() {
+            applyCurrentToAll(Amps.of(currentCounter));
+            driveSubsystem.setControl(driveForwardAtFullEffort);
+            timer.start();
+            System.out.println("YOU must end the command when the wheels start turning");
+        }
+
+        @Override
+        public void execute() {
+            if (timer.hasElapsed(secondsCounter)) {
+                currentCounter += 1;
+                System.out.println("Current Limit: " + currentCounter);
+                applyCurrentToAll(Amps.of(currentCounter));
+                secondsCounter += 1;
+            }
+        }
+
+        @Override
+        public boolean isFinished() { return (secondsCounter == 80); }
+
+        @Override
+        public void end(boolean interrupted) {
+            System.out.println("Current Characterization ended, current limit: " + currentCounter);
+            System.out.println("Please restart robot code to apply correct current limit to swerve");
+            timer.stop();
+            timer.reset();
         }
     }
 

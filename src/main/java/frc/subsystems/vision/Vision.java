@@ -25,11 +25,15 @@ public class Vision extends SubsystemBase {
     }
 
     public PoseEstimate[] getPoseEstimates() {
-        PoseEstimate[] estimates = new PoseEstimate[inputs.poseEstimates.length];
-        for (int i = 0; i < inputs.poseEstimates.length; i++) {
-            estimates[i] = new PoseEstimate(inputs.poseEstimates[i], inputs.poseTimestampsSeconds[i],
-                inputs.poseLatencies[i], inputs.poseTagCounts[i], 0.0d, 0.0d, 0.0d, null, true);
-        }
+        PoseEstimate[] estimates = new PoseEstimate[3];
+
+        estimates[0] = new PoseEstimate(inputs.frontLeft_poseEstimate, inputs.frontLeft_poseTimestampsSeconds,
+            inputs.frontLeft_poseLatency, inputs.frontLeft_poseTagCount, 0.0d, 0.0d, 0.0d, null, true);
+        estimates[1] = new PoseEstimate(inputs.frontRight_poseEstimate, inputs.frontRight_poseTimestampsSeconds,
+            inputs.frontRight_poseLatency, inputs.frontRight_poseTagCount, 0.0d, 0.0d, 0.0d, null, true);
+        estimates[2] = new PoseEstimate(inputs.backCenter_poseEstimate, inputs.backCenter_poseTimestampsSeconds,
+            inputs.backCenter_poseLatency, inputs.backCenter_poseTagCount, 0.0d, 0.0d, 0.0d, null, true);
+
         return estimates;
     }
 

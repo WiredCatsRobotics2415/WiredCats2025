@@ -1,28 +1,36 @@
 package frc.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers;
+import frc.utils.LimelightHelpers.PoseEstimate;
 
 public class VisionIOReal implements VisionIO {
-    String[] poseEstimationLimelightNames;
+    private String[] poseEstimationLimelightNames;
 
     public VisionIOReal() {
-        poseEstimationLimelightNames = new String[] { VisionConstants.FirstLL3GName, VisionConstants.SecondLL3GName,
-            VisionConstants.ThirdLL3GName };
+        poseEstimationLimelightNames = new String[] { VisionConstants.FrontRightName, VisionConstants.FrontLeftName,
+            VisionConstants.BackCenterName };
     }
 
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        /*
-         * inputs.poseEstimates = new Pose2d[poseEstimationLimelightNames.length]; inputs.poseTimestampsSeconds = new double[poseEstimationLimelightNames.length]; inputs.poseLatencies = new double[poseEstimationLimelightNames.length]; inputs.poseTagCounts = new int[poseEstimationLimelightNames.length];
-         *
-         * for (int i = 0; i < poseEstimationLimelightNames.length; i++) { PoseEstimate poseEstimate = LimelightHelpers .getBotPoseEstimate_wpiBlue_MegaTag2(poseEstimationLimelightNames[i]); if (poseEstimate == null) continue; inputs.poseEstimates[i] = poseEstimate.pose; inputs.poseTimestampsSeconds[i] = poseEstimate.timestampSeconds; inputs.poseLatencies[i] = poseEstimate.latency; inputs.poseTagCounts[i] = poseEstimate.tagCount; }
-         */
-        inputs.poseEstimates = new Pose2d[0];
-        inputs.poseLatencies = new double[0];
-        inputs.poseTagCounts = new int[0];
-        inputs.poseTimestampsSeconds = new double[0];
+        PoseEstimate frontLeft = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontLeftName);
+        inputs.frontLeft_poseTimestampsSeconds = frontLeft.timestampSeconds;
+        inputs.frontLeft_poseEstimate = frontLeft.pose;
+        inputs.frontLeft_poseLatency = frontLeft.latency;
+        inputs.frontLeft_poseTagCount = frontLeft.tagCount;
+
+        PoseEstimate frontRight = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontRightName);
+        inputs.frontRight_poseTimestampsSeconds = frontRight.timestampSeconds;
+        inputs.frontRight_poseEstimate = frontRight.pose;
+        inputs.frontRight_poseLatency = frontRight.latency;
+        inputs.frontRight_poseTagCount = frontRight.tagCount;
+
+        PoseEstimate backCenter = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.BackCenterName);
+        inputs.backCenter_poseTimestampsSeconds = backCenter.timestampSeconds;
+        inputs.backCenter_poseEstimate = backCenter.pose;
+        inputs.backCenter_poseLatency = backCenter.latency;
+        inputs.backCenter_poseTagCount = backCenter.tagCount;
     }
 
     @Override
