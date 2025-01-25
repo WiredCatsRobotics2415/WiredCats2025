@@ -13,22 +13,22 @@ public class VisionIOReal implements VisionIO {
     }
 
     @Override
-    public void updateInputs(VisionIOInputs inputs) {
+    public void updateInputs(VisionIOInputsAutoLogged inputs) {
         PoseEstimate frontLeft = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontLeftName);
         inputs.frontLeft_poseTimestampsSeconds = frontLeft.timestampSeconds;
-        inputs.frontLeft_poseEstimate = frontLeft.pose;
+        inputs.frontLeft_poseEstimate = frontLeft.pose.getTranslation();
         inputs.frontLeft_poseLatency = frontLeft.latency;
         inputs.frontLeft_poseTagCount = frontLeft.tagCount;
 
         PoseEstimate frontRight = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontRightName);
         inputs.frontRight_poseTimestampsSeconds = frontRight.timestampSeconds;
-        inputs.frontRight_poseEstimate = frontRight.pose;
+        inputs.frontRight_poseEstimate = frontRight.pose.getTranslation();
         inputs.frontRight_poseLatency = frontRight.latency;
         inputs.frontRight_poseTagCount = frontRight.tagCount;
 
         PoseEstimate backCenter = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.BackCenterName);
         inputs.backCenter_poseTimestampsSeconds = backCenter.timestampSeconds;
-        inputs.backCenter_poseEstimate = backCenter.pose;
+        inputs.backCenter_poseEstimate = backCenter.pose.getTranslation();
         inputs.backCenter_poseLatency = backCenter.latency;
         inputs.backCenter_poseTagCount = backCenter.tagCount;
     }

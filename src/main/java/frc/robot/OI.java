@@ -18,7 +18,7 @@ public class OI {
     public enum Bind {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, PresetIntakeFromSource, AutoScoreLeftL1,
         AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3,
-        AutoScoreRightL4
+        AutoScoreRightL4, SeedFieldCentric
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -37,6 +37,8 @@ public class OI {
     private OI() {
         controller = new CommandXboxController(0);
         numpad = new CommandJoystick(1);
+
+        binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
 
         binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());

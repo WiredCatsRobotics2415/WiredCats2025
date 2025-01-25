@@ -3,6 +3,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
@@ -49,11 +50,15 @@ public class RobotContainer {
     }
 
     private void configureControls() {
+        oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(new InstantCommand(() -> {
+            drive.seedFieldCentric();
+        }, drive));
+
         drive.setDefaultCommand(drive.applyRequest(() -> {
             double[] input = oi.getXY();
-            return drive.drive.withVelocityX(input[0] * Controls.MaxDriveMeterS)
-                .withVelocityY(input[1] * Controls.MaxDriveMeterS)
-                .withRotationalRate(oi.getRotation() * Controls.MaxAngularRadS);
+            return drive.drive.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
+                .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
+                .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
         }));
 
         oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(1));
