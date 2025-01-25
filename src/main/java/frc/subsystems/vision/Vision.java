@@ -4,6 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Utils;
+import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
     private VisionIO io;
@@ -38,7 +39,7 @@ public class Vision extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // io.updateInputs(inputs);
-        // Logger.processInputs("Vision", inputs);
+        io.updateInputs(inputs);
+        Logger.processInputs("Vision", inputs);
     }
 }

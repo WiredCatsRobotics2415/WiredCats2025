@@ -52,10 +52,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private boolean hasAppliedOperatorPerspective = false;
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds()
-        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
+        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position);
     public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05) // Add a 5% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.Position)
         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
     private Vision vision = Vision.getInstance();

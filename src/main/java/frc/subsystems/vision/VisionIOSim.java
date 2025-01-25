@@ -8,7 +8,7 @@ public class VisionIOSim implements VisionIO {
     }
 
     @Override
-    public void updateInputs(VisionIOInputsAutoLogged inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         inputs.frontLeft_poseTimestampsSeconds = 0.0d;
         inputs.frontLeft_poseEstimate = new Pose2d();
         inputs.frontLeft_poseLatency = 0.0d;

@@ -5,7 +5,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
     @AutoLog
-    abstract class VisionIOInputs {
+    public static class VisionIOInputs {
         public Pose2d frontLeft_poseEstimate;
         public double frontLeft_poseTimestampsSeconds;
         public double frontLeft_poseLatency;
@@ -22,7 +22,7 @@ public interface VisionIO {
         public int backCenter_poseTagCount;
     }
 
-    public default void updateInputs(VisionIOInputsAutoLogged inputs) {}
+    public default void updateInputs(VisionIOInputs inputs) {}
 
     public default void setRobotOrientation(double yaw) {}
 }

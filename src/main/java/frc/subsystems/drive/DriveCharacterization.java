@@ -176,7 +176,7 @@ public class DriveCharacterization extends Characterizer {
         }
 
         private void applyCurrentToAll(Current current) {
-            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : driveSubsystem.getModules()) {
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : drive.getModules()) {
                 m.getDriveMotor().getConfigurator().apply(currentLimitsConfigs.withStatorCurrentLimit(current));
             }
         }
@@ -184,7 +184,7 @@ public class DriveCharacterization extends Characterizer {
         @Override
         public void initialize() {
             applyCurrentToAll(Amps.of(currentCounter));
-            driveSubsystem.setControl(driveForwardAtFullEffort);
+            drive.setControl(driveForwardAtFullEffort);
             timer.start();
             System.out.println("YOU must end the command when the wheels start turning");
         }
