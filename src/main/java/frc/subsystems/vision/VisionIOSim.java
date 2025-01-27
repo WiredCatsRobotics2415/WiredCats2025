@@ -1,6 +1,6 @@
 package frc.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
+import frc.utils.LimelightHelpers.PoseEstimate;
 
 public class VisionIOSim implements VisionIO {
     public VisionIOSim() {
@@ -9,19 +9,12 @@ public class VisionIOSim implements VisionIO {
 
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        inputs.frontLeft_poseTimestampsSeconds = 0.0d;
-        inputs.frontLeft_poseEstimate = Pose2d.kZero.getTranslation();
-        inputs.frontLeft_poseLatency = 0.0d;
-        inputs.frontLeft_poseTagCount = 0;
-
-        inputs.frontRight_poseTimestampsSeconds = 0.0d;
-        inputs.frontRight_poseEstimate = Pose2d.kZero.getTranslation();
-        inputs.frontRight_poseLatency = 0.0d;
-        inputs.frontRight_poseTagCount = 0;
-
-        inputs.backCenter_poseTimestampsSeconds = 0.0d;
-        inputs.backCenter_poseEstimate = Pose2d.kZero.getTranslation();
-        inputs.backCenter_poseLatency = 0.0d;
-        inputs.backCenter_poseTagCount = 0;
+        for (int i = 0; i < 3; i++) {
+            PoseEstimate estimate = PoseEstimate.zero;
+            inputs.poseEstimates[i] = estimate.pose;
+            inputs.poseLatencies[i] = estimate.latency;
+            inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
+            inputs.poseTagCounts[i] = estimate.tagCount;
+        }
     }
 }

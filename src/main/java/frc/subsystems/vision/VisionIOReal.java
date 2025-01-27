@@ -1,5 +1,6 @@
 package frc.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
@@ -14,23 +15,20 @@ public class VisionIOReal implements VisionIO {
 
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        PoseEstimate frontLeft = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontLeftName);
-        inputs.frontLeft_poseTimestampsSeconds = frontLeft.timestampSeconds;
-        inputs.frontLeft_poseEstimate = frontLeft.pose.getTranslation();
-        inputs.frontLeft_poseLatency = frontLeft.latency;
-        inputs.frontLeft_poseTagCount = frontLeft.tagCount;
+        inputs.poseEstimates = new Pose2d[poseEstimationLimelightNames.length];
+        inputs.poseLatencies = new double[poseEstimationLimelightNames.length];
+        inputs.poseTimestampsSeconds = new double[poseEstimationLimelightNames.length];
+        inputs.poseTagCounts = new int[poseEstimationLimelightNames.length];
 
-        PoseEstimate frontRight = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.FrontRightName);
-        inputs.frontRight_poseTimestampsSeconds = frontRight.timestampSeconds;
-        inputs.frontRight_poseEstimate = frontRight.pose.getTranslation();
-        inputs.frontRight_poseLatency = frontRight.latency;
-        inputs.frontRight_poseTagCount = frontRight.tagCount;
-
-        PoseEstimate backCenter = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.BackCenterName);
-        inputs.backCenter_poseTimestampsSeconds = backCenter.timestampSeconds;
-        inputs.backCenter_poseEstimate = backCenter.pose.getTranslation();
-        inputs.backCenter_poseLatency = backCenter.latency;
-        inputs.backCenter_poseTagCount = backCenter.tagCount;
+        for (int i = 0; i < poseEstimationLimelightNames.length; i++) {
+            PoseEstimate estimate = LimelightHelpers
+                .getBotPoseEstimate_wpiBlue_MegaTag2(poseEstimationLimelightNames[i]);
+            if (estimate == null) estimate = PoseEstimate.zero;
+            inputs.poseEstimates[i] = estimate.pose;
+            inputs.poseLatencies[i] = estimate.latency;
+            inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
+            inputs.poseTagCounts[i] = estimate.tagCount;
+        }
     }
 
     @Override

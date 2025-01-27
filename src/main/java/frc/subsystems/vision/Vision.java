@@ -1,6 +1,5 @@
 package frc.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.LimelightHelpers.PoseEstimate;
@@ -28,15 +27,10 @@ public class Vision extends SubsystemBase {
     public PoseEstimate[] getPoseEstimates() {
         PoseEstimate[] estimates = new PoseEstimate[3];
 
-        estimates[0] = new PoseEstimate(new Pose2d(inputs.frontLeft_poseEstimate, new Rotation2d()),
-            inputs.frontLeft_poseTimestampsSeconds, inputs.frontLeft_poseLatency, inputs.frontLeft_poseTagCount, 0.0d,
-            0.0d, 0.0d, null, true);
-        estimates[1] = new PoseEstimate(new Pose2d(inputs.frontRight_poseEstimate, new Rotation2d()),
-            inputs.frontRight_poseTimestampsSeconds, inputs.frontRight_poseLatency, inputs.frontRight_poseTagCount,
-            0.0d, 0.0d, 0.0d, null, true);
-        estimates[2] = new PoseEstimate(new Pose2d(inputs.backCenter_poseEstimate, new Rotation2d()),
-            inputs.backCenter_poseTimestampsSeconds, inputs.backCenter_poseLatency, inputs.backCenter_poseTagCount,
-            0.0d, 0.0d, 0.0d, null, true);
+        for (int i = 0; i < estimates.length; i++) {
+            estimates[i] = new PoseEstimate(inputs.poseEstimates[i], inputs.poseTimestampsSeconds[i],
+                inputs.poseLatencies[i], inputs.poseTagCounts[i], 0, 0, 0, null, true);
+        }
 
         return estimates;
     }

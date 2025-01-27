@@ -78,12 +78,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                         RobotMeasurements.CenterToPerpendicularFrame.times(-1), Meters.of(0), new Rotation2d())));
                 }));
         }
-
-        this.registerTelemetry((SwerveDriveState state) -> {
-            Logger.recordOutput("Drive/Pose", state.Pose);
-            Logger.recordOutput("Drive/ModuleStates", state.ModuleStates);
-            Logger.recordOutput("Drive/ModuleTargets", state.ModuleTargets);
-        });
     }
 
     public static CommandSwerveDrivetrain getInstance() {
@@ -137,6 +131,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         updateLimelights();
+
+        SwerveDriveState currentState = getState();
+        Logger.recordOutput("Drive/Pose", currentState.Pose);
+        Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
+        Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
     }
 
     public Command pathfindTo(Pose2d goalPose) {
@@ -161,17 +160,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         for (int i = 0; i < estimates.length; i++) {
             PoseEstimate estimate = estimates[i];
-            boolean measurementWasUsed = false;
             if (Math.abs((Units.radiansToRotations(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
-                measurementWasUsed = true;
-            }
-            if (measurementWasUsed) {
-                // Logger.recordOutput("Limelights/" + (i + 1), estimate.pose);
-            } else {
-                // Logger.recordOutput("Limelights/" + (i + 1), Pose2d.kZero);
             }
         }
     }
