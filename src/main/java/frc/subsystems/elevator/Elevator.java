@@ -42,14 +42,11 @@ public class Elevator extends SubsystemBase {
                     new TrapezoidProfile.Constraints(
                             ElevatorConstants.VELO_MAX, ElevatorConstants.ACCEL_MAX));
 
-    
-    private TalonFX leftMotor;
-    private TalonFX rightMotor;
 
     private Elevator() {
         input = new AnalogInput(ElevatorConstants.ANALOG_POT_PORT); 
 
-        configureMotors(); 
+        // configureMotors(); 
 
         setGoal(getMeasurement()); 
     }
@@ -57,22 +54,6 @@ public class Elevator extends SubsystemBase {
     // get current potentiometer angle
     public double getPotentiometerAngle(AnalogPotentiometer pot) {
         return pot.get(); 
-    }
-
-    public void configureMotors() {
-        // two talon FXs, neither inverted
-        FeedbackConfigs feedbackConfigs =
-                new FeedbackConfigs()
-                        .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
-
-        leftMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR_PORT); 
-        leftMotor.getConfigurator().apply(feedbackConfigs); 
-        
-        rightMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR_PORT); 
-        rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID())); 
-        
-        leftMotor.setNeutralMode(NeutralModeValue.Brake);
-        rightMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public double getMeasurement() {
@@ -86,12 +67,13 @@ public class Elevator extends SubsystemBase {
         return instance;
     }
 
+    // how to adjust useOutput for real file? 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.position, setpoint.velocity); 
         double voltOut = output + feedforward; 
         // set motors based on voltOut
         if (!isCoasting) {
-            leftMotor.setVoltage(voltOut); 
+            // leftMotor.setVoltage(voltOut); 
         }
         SmartDashboard.putNumber("Elevator Volt out", voltOut); 
     }
@@ -110,11 +92,6 @@ public class Elevator extends SubsystemBase {
         this.goalInches = goalInches;
         // do I need to convert from goalInches to goal degrees?
         pid.setGoal(new TrapezoidProfile.State(goalInches, 0)); 
-    }
-
-    public void brake() {
-        rightMotor.setNeutralMode(NeutralModeValue.Brake);
-        leftMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public boolean atGoal() {
