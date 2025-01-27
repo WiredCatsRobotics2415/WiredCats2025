@@ -67,8 +67,7 @@ public class Elevator extends SubsystemBase {
         return instance;
     }
 
-    // how to adjust useOutput for real file? 
-    private void useOutput(double output, TrapezoidProfile.State setpoint) {
+    public void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.position, setpoint.velocity); 
         double voltOut = output + feedforward; 
         // set motors based on voltOut
