@@ -109,7 +109,7 @@ public class TunerConstants {
     private static final Distance kFrontLeftXPos = Inches.of(13);
     private static final Distance kFrontLeftYPos = Inches.of(11);
     private static final double FrontLeftInchesFromCenter = Math
-        .sqrt(Math.pow(kFrontLeftXPos.magnitude(), 2) + Math.pow(kFrontLeftYPos.magnitude(), 2));
+        .sqrt(Math.pow(kFrontLeftXPos.in(Inches), 2) + Math.pow(kFrontLeftYPos.in(Inches), 2));
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;
@@ -122,7 +122,7 @@ public class TunerConstants {
     private static final Distance kFrontRightXPos = Inches.of(13);
     private static final Distance kFrontRightYPos = Inches.of(-11);
     private static final double FrontRightInchesFromCenter = Math
-        .sqrt(Math.pow(kFrontRightXPos.magnitude(), 2) + Math.pow(kFrontRightYPos.magnitude(), 2));
+        .sqrt(Math.pow(kFrontRightXPos.in(Inches), 2) + Math.pow(kFrontRightYPos.in(Inches), 2));
 
     // Back Left
     private static final int kBackLeftDriveMotorId = 1;
@@ -135,7 +135,7 @@ public class TunerConstants {
     private static final Distance kBackLeftXPos = Inches.of(-13);
     private static final Distance kBackLeftYPos = Inches.of(11);
     private static final double BackLeftInchesFromCenter = Math
-        .sqrt(Math.pow(kBackLeftXPos.magnitude(), 2) + Math.pow(kBackLeftYPos.magnitude(), 2));
+        .sqrt(Math.pow(kBackLeftXPos.in(Inches), 2) + Math.pow(kBackLeftYPos.in(Inches), 2));
 
     // Back Right
     private static final int kBackRightDriveMotorId = 3;
@@ -148,7 +148,7 @@ public class TunerConstants {
     private static final Distance kBackRightXPos = Inches.of(-13);
     private static final Distance kBackRightYPos = Inches.of(-11);
     private static final double BackRightInchesFromCenter = Math
-        .sqrt(Math.pow(kBackRightXPos.magnitude(), 2) + Math.pow(kBackRightYPos.magnitude(), 2));
+        .sqrt(Math.pow(kBackRightXPos.in(Inches), 2) + Math.pow(kBackRightYPos.in(Inches), 2));
 
     public static final double DriveBaseRadiusInches = (FrontLeftInchesFromCenter + FrontRightInchesFromCenter +
         BackLeftInchesFromCenter + BackRightInchesFromCenter) / 4;

@@ -128,7 +128,7 @@ public class DriveCharacterization extends Characterizer {
             }
             double deltaSum = 0;
             for (int j = 0; j < 4; j++) {
-                deltaSum += currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j];
+                deltaSum += Math.abs(currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j]);
             }
             System.out.println("--------");
             System.out.println("    delta gyro: " + (currentGyroDegrees - lastGyroDegrees));
@@ -168,7 +168,7 @@ public class DriveCharacterization extends Characterizer {
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
         private int secondsCounter = 1;
-        private int currentCounter = 1;
+        private int currentCounter = 41;
 
         public CurrentLimitCharacterization(CommandSwerveDrivetrain drive) {
             this.drive = drive;

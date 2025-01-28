@@ -2,9 +2,12 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import java.util.List;
 
@@ -52,6 +55,29 @@ public class Measurements {
         static {
             reefRedApriltags = List.of(redReefABApriltag, redReefCDApriltag, redReefEFApriltag, redReefGHApriltag,
                 redReefIJApriltag, redReefKLApriltag);
+        }
+    }
+
+    public class MotorConstants {
+        // The number of seconds to subtract from all times in BreakerCurrentAndTripTimes just to be careful
+        public static final double timeSafetyTolerace = 0.1;
+        public static final InterpolatingDoubleTreeMap BreakerCurrentAndTripTimes = new InterpolatingDoubleTreeMap();
+        static {
+            BreakerCurrentAndTripTimes.put(1.0, 70.0);
+            BreakerCurrentAndTripTimes.put(1.5, 10.5 - timeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.0, 4.5 - timeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.5, 1.25 - timeSafetyTolerace);
+        }
+
+        public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
+            CurrentLimitsConfigs config = new CurrentLimitsConfigs();
+            config.SupplyCurrentLimitEnable = true;
+            config.SupplyCurrentLimit = targetSupply.in(Amps);
+            config.SupplyCurrentLowerLimit = 40;
+            config.SupplyCurrentLowerTime = BreakerCurrentAndTripTimes.get(targetSupply.in(Amps) / 40);
+            config.StatorCurrentLimitEnable = true;
+            config.StatorCurrentLimit = targetStator.in(Amps);
+            return config;
         }
     }
 }
