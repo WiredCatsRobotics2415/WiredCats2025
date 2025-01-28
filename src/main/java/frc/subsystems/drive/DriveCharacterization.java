@@ -10,14 +10,13 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.constants.Controls;
 import frc.constants.TunerConstants;
 import frc.utils.tuning.Characterizer;
 import java.util.stream.DoubleStream;
@@ -99,6 +98,7 @@ public class DriveCharacterization extends Characterizer {
 
         public WheelRadiusCharacterization(CommandSwerveDrivetrain drive, int runtimeSeconds) {
             this.drive = drive;
+            addRequirements(drive);
             runForSeconds = runtimeSeconds;
             radii = new double[runtimeSeconds * 20];
         }
@@ -139,9 +139,8 @@ public class DriveCharacterization extends Characterizer {
             lastGyroDegrees = currentGyroDegrees;
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
-            drive.setControl(new SwerveRequest.ApplyRobotSpeeds()
-                .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
-                    2 * Math.PI * ((double) execution / radii.length), Rotation2d.fromRadians(-currentGyroDegrees)))
+            drive.setControl(new SwerveRequest.RobotCentric()
+                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / radii.length))
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo)
                 .withDriveRequestType(DriveRequestType.Velocity));
 

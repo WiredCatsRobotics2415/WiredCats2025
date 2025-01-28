@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.DriveConstants;
+import frc.constants.Subsystems.DriveAutoConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
@@ -67,7 +67,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight", resetPoseFromLimelight());
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+                resetPoseFromLimelight().ignoringDisable(true));
         }
     }
 
@@ -88,7 +89,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, config,
+                DriveAutoConstants.PathFollowingController, config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this // Subsystem for requirements
             );
@@ -131,13 +132,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command pathfindTo(Pose2d goalPose) {
         try {
-            return new PathfindingCommand(goalPose, DriveConstants.DefaultPathConstraints, () -> getState().Pose,
+            return new PathfindingCommand(goalPose, DriveAutoConstants.DefaultPathConstraints, () -> getState().Pose,
                 () -> getState().Speeds,
                 (speeds,
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
+                DriveAutoConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
@@ -170,7 +171,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     sumX += pose.getX();
                     sumY += pose.getY();
                 }
-                resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), new Rotation2d()));
+                resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
+                poses.clear();
             }));
     }
 

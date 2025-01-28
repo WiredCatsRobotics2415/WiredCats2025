@@ -30,7 +30,7 @@ public class Subsystems {
         public static final Color WestminsterGreen = new Color(30, 72, 47);
     }
 
-    public class DriveConstants {
+    public class DriveAutoConstants {
         public static final PIDConstants TranslationPID = new PIDConstants(10, 0, 0);
         public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
         public static final PathFollowingController PathFollowingController = new PPHolonomicDriveController(
