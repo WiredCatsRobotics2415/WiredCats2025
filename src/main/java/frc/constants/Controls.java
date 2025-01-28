@@ -14,7 +14,7 @@ public class Controls {
     public static final double RumbleHardValue = 0.6d;
     public static final boolean UseCurve = true;
     public static final double CurveExponent = 3;
-    public static final double SlewRate = 4; // ie. 4 units/sec, so 0.25 acceleration
+    public static final double SlewRate = 4; // ie. 4 units/sec, so 0.25 acceleration limit
     public static final double Deadband = 0.05d;
 
     public class GulikitButtons {

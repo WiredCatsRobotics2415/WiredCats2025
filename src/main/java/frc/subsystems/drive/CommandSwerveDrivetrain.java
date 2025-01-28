@@ -36,6 +36,8 @@ import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.tuning.TuningModeTab;
+
+import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -70,13 +72,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Set Pose: 3in from Apriltag 18 facing towards it",
-                new InstantCommand(() ->
-                {
-                    System.out.println("Reset pose");
-                    resetPose(ReefMeasurements.blueReefABApriltag.plus(new Transform2d(
-                        RobotMeasurements.CenterToPerpendicularFrame.times(-1), Meters.of(0), new Rotation2d())));
-                }));
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight", resetPoseFromLimelight());
         }
     }
 
@@ -166,6 +162,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
             }
         }
+    }
+
+    private Command resetPoseFromLimelight() {
+        ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
+
+        return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20).andThen(runOnce(() -> {
+            double sumX = 0.0d, sumY = 0.0d;
+            for (Pose2d pose : poses) {
+                sumX += pose.getX();
+                sumY += pose.getY();
+            }
+            resetPose(new Pose2d(sumX/poses.size(), sumY/poses.size(), new Rotation2d()));
+        }));
     }
 
     private void startSimThread() {

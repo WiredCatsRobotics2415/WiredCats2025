@@ -1,5 +1,6 @@
 package frc.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.LimelightHelpers.PoseEstimate;
@@ -33,6 +34,13 @@ public class Vision extends SubsystemBase {
         }
 
         return estimates;
+    }
+
+    /** Averages together the pose from all apriltag limelights and returns that average, with NO ROTATION component */
+    public Pose2d getCurrentAveragePose() {
+        double averageX = (inputs.poseEstimates[0].getX() + inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX());
+        double averageY = (inputs.poseEstimates[0].getY() + inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY());
+        return new Pose2d(averageX, averageY, new Rotation2d());
     }
 
     @Override
