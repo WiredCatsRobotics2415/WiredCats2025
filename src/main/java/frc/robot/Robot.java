@@ -77,4 +77,9 @@ public class Robot extends LoggedRobot {
         if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
         CommandScheduler.getInstance().run();
     }
+
+    @Override
+    public void autonomousInit() {
+        RobotContainer.getInstance().getAutonomousCommand().schedule();
+    }
 }
