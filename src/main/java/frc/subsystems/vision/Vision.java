@@ -38,8 +38,10 @@ public class Vision extends SubsystemBase {
 
     /** Averages together the pose from all apriltag limelights and returns that average, with NO ROTATION component */
     public Pose2d getCurrentAveragePose() {
-        double averageX = (inputs.poseEstimates[0].getX() + inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX());
-        double averageY = (inputs.poseEstimates[0].getY() + inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY());
+        double averageX = (inputs.poseEstimates[0].getX() + inputs.poseEstimates[1].getX() +
+            inputs.poseEstimates[2].getX());
+        double averageY = (inputs.poseEstimates[0].getY() + inputs.poseEstimates[1].getY() +
+            inputs.poseEstimates[2].getY());
         return new Pose2d(averageX, averageY, new Rotation2d());
     }
 

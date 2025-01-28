@@ -21,8 +21,8 @@ public class TunerConstants {
         .withKV(2.66).withKA(0).withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
     // When using closed-loop control, the drive motor uses the control
     // output type specified by SwerveModuleConstants.DriveMotorClosedLoopOutput
-    private static final Slot0Configs driveGains = new Slot0Configs().withKP(0.1).withKI(0).withKD(0).withKS(0)
-        .withKV(0.124);
+    private static final Slot0Configs driveGains = new Slot0Configs().withKP(0.16698).withKI(0).withKD(0).withKS(0)
+        .withKV(0.11261).withKA(0.014946).withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // The closed-loop output type to use for the steer motors;
     // This affects the PID/FF gains for the steer motors
@@ -100,7 +100,7 @@ public class TunerConstants {
 
     // Front Left
     private static final int kFrontLeftDriveMotorId = 4;
-    private static final int kFrontLeftSteerMotorId = 13;
+    private static final int kFrontLeftSteerMotorId = 8;
     private static final int kFrontLeftEncoderId = 5;
     private static final Angle kFrontLeftEncoderOffset = Rotations.of(0.409912109375);
     private static final boolean kFrontLeftSteerMotorInverted = true;
@@ -113,7 +113,7 @@ public class TunerConstants {
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;
-    private static final int kFrontRightSteerMotorId = 23;
+    private static final int kFrontRightSteerMotorId = 6;
     private static final int kFrontRightEncoderId = 6;
     private static final Angle kFrontRightEncoderOffset = Rotations.of(0.08544921875);
     private static final boolean kFrontRightSteerMotorInverted = true;
@@ -139,7 +139,7 @@ public class TunerConstants {
 
     // Back Right
     private static final int kBackRightDriveMotorId = 3;
-    private static final int kBackRightSteerMotorId = 10;
+    private static final int kBackRightSteerMotorId = 7;
     private static final int kBackRightEncoderId = 3;
     private static final Angle kBackRightEncoderOffset = Rotations.of(-0.288818359375);
     private static final boolean kBackRightSteerMotorInverted = true;
