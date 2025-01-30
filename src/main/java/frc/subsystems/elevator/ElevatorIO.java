@@ -7,6 +7,8 @@ public class ElevatorIO {
     
 
     public class ElevatorIOInputs {
+
+        // I don't think I ever updated these variables...
         public double wirePotentiometerValue; 
         
         
