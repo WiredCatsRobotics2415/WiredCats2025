@@ -44,9 +44,12 @@ public class Elevator extends SubsystemBase {
 
 
     private Elevator() {
+
+        io = (ElevatorIO) Utils.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+
         input = new AnalogInput(ElevatorConstants.ANALOG_POT_PORT); 
 
-        // configureMotors(); 
+        io.configureMotors(); 
 
         setGoal(getMeasurement()); 
     }
@@ -72,7 +75,7 @@ public class Elevator extends SubsystemBase {
         double voltOut = output + feedforward; 
         // set motors based on voltOut
         if (!isCoasting) {
-            // leftMotor.setVoltage(voltOut); 
+            io.setVoltage(voltOut); 
         }
         SmartDashboard.putNumber("Elevator Volt out", voltOut); 
     }

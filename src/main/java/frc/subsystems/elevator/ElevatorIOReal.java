@@ -34,4 +34,8 @@ public class ElevatorIOReal {
         rightMotor.setNeutralMode(NeutralModeValue.Brake);
         leftMotor.setNeutralMode(NeutralModeValue.Brake);
     }
+
+    public void setVoltage(voltOut) {
+        leftMotor.setVoltage(voltOut); 
+    }
 }

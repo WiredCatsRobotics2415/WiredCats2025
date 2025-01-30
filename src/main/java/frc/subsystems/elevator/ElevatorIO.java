@@ -19,19 +19,5 @@ public class ElevatorIO {
         public double currentDrawRight; 
     }
 
-    public void setVoltage(double volts) {
-
-    }
-    // function from elevator code (to-be altered here): 
-    /* 
-    public void setVoltage(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity); 
-        double voltOut = output + feedforward; 
-        // set motors based on voltOut
-        if (!isCoasting) {
-            // leftMotor.setVoltage(voltOut); 
-        }
-        SmartDashboard.putNumber("Elevator Volt out", voltOut); 
-    }
-        */
+    public void setVoltage(double volts) {}
 }
