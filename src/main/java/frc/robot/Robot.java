@@ -6,8 +6,6 @@ import frc.constants.RuntimeConstants;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.tuning.TuningModeTab;
-
-import org.dyn4j.dynamics.Torque;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;

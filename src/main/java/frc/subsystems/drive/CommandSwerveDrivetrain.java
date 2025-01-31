@@ -25,7 +25,6 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
 import frc.constants.RuntimeConstants;
@@ -34,8 +33,8 @@ import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
-import frc.utils.TorqueSafety;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -74,13 +73,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriveCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
                 resetPoseFromLimelight().ignoringDisable(true));
-            //Add torque safety to motors
-            Command brakeSwerve = new RepeatCommand(applyRequest(() -> new SwerveRequest.Idle()));
-            String[] names = new String[] {"Front Left", "Front Right", "Back Left", "Back Right"};
+            // Add torque safety to motors
+            SwerveRequest stopSwerve = new SwerveRequest.Idle();
+            String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" };
             int i = 0;
             for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
-                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getStatorCurrent().asSupplier(), brakeSwerve.withName(names[i] + " Drive"));
-                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getStatorCurrent().asSupplier(), brakeSwerve.withName(names[i] + " Steer"));
+                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getStatorCurrent().asSupplier(),
+                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Drive"));
+                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getStatorCurrent().asSupplier(),
+                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Steer"));
                 i++;
             }
         }
