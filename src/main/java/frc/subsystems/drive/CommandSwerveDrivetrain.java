@@ -3,7 +3,10 @@ package frc.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -14,7 +17,6 @@ import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -23,20 +25,17 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
-import frc.constants.Measurements.ReefMeasurements;
-import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.DriveConstants;
+import frc.constants.Subsystems.DriveAutoConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
-
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -72,7 +71,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight", resetPoseFromLimelight());
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+                resetPoseFromLimelight().ignoringDisable(true));
+            // Add torque safety to motors
+            SwerveRequest stopSwerve = new SwerveRequest.Idle();
+            String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" };
+            int i = 0;
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
+                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getStatorCurrent().asSupplier(),
+                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Drive"));
+                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getStatorCurrent().asSupplier(),
+                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Steer"));
+                i++;
+            }
         }
     }
 
@@ -93,7 +104,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, config,
+                DriveAutoConstants.PathFollowingController, config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this // Subsystem for requirements
             );
@@ -136,13 +147,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command pathfindTo(Pose2d goalPose) {
         try {
-            return new PathfindingCommand(goalPose, DriveConstants.DefaultPathConstraints, () -> getState().Pose,
+            return new PathfindingCommand(goalPose, DriveAutoConstants.DefaultPathConstraints, () -> getState().Pose,
                 () -> getState().Speeds,
                 (speeds,
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
+                DriveAutoConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
@@ -167,14 +178,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Command resetPoseFromLimelight() {
         ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
 
-        return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20).andThen(runOnce(() -> {
-            double sumX = 0.0d, sumY = 0.0d;
-            for (Pose2d pose : poses) {
-                sumX += pose.getX();
-                sumY += pose.getY();
-            }
-            resetPose(new Pose2d(sumX/poses.size(), sumY/poses.size(), new Rotation2d()));
-        }));
+        return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20)
+            .andThen(runOnce(() ->
+            {
+                double sumX = 0.0d, sumY = 0.0d;
+                for (Pose2d pose : poses) {
+                    sumX += pose.getX();
+                    sumY += pose.getY();
+                }
+                resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
+                poses.clear();
+            }));
     }
 
     private void startSimThread() {

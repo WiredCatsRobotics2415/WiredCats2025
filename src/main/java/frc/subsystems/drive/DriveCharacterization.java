@@ -10,14 +10,13 @@ import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.constants.Controls;
 import frc.constants.TunerConstants;
 import frc.utils.tuning.Characterizer;
 import java.util.stream.DoubleStream;
@@ -77,7 +76,7 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
-        commands.add(new CurrentLimitCharacterization(driveSubsystem).withName("Slip Current Characterization"));
+        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -99,6 +98,7 @@ public class DriveCharacterization extends Characterizer {
 
         public WheelRadiusCharacterization(CommandSwerveDrivetrain drive, int runtimeSeconds) {
             this.drive = drive;
+            addRequirements(drive);
             runForSeconds = runtimeSeconds;
             radii = new double[runtimeSeconds * 20];
         }
@@ -139,9 +139,8 @@ public class DriveCharacterization extends Characterizer {
             lastGyroDegrees = currentGyroDegrees;
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
-            drive.setControl(new SwerveRequest.ApplyRobotSpeeds()
-                .withSpeeds(ChassisSpeeds.fromRobotRelativeSpeeds(0, 0,
-                    2 * Math.PI * ((double) execution / radii.length), Rotation2d.fromRadians(-currentGyroDegrees)))
+            drive.setControl(new SwerveRequest.RobotCentric()
+                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / radii.length))
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo)
                 .withDriveRequestType(DriveRequestType.Velocity));
 
@@ -167,12 +166,15 @@ public class DriveCharacterization extends Characterizer {
         private CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
-        private int secondsCounter = 1;
-        private int currentCounter = 41;
+        private int secondsCounter;
+        private int currentCounter = 40;
 
-        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive) {
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent) {
             this.drive = drive;
+            addRequirements(drive);
             timer = new Timer();
+            secondsCounter = 1;
+            currentCounter = startingCurrent;
         }
 
         private void applyCurrentToAll(Current current) {
