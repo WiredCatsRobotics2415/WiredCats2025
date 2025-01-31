@@ -3,8 +3,11 @@ package frc.robot;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
+import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.tuning.TuningModeTab;
+
+import org.dyn4j.dynamics.Torque;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -75,6 +78,7 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
+        TorqueSafety.getInstance().periodic();
         CommandScheduler.getInstance().run();
     }
 

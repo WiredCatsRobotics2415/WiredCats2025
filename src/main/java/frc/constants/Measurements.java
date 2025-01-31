@@ -79,5 +79,7 @@ public class Measurements {
             config.StatorCurrentLimit = targetStator.in(Amps);
             return config;
         }
+
+        public static final double UniversalTorqueCutoffCurrentSeconds = 40/0.02; //No current spike greater than 40 amps in one robot loop, 0.02
     }
 }

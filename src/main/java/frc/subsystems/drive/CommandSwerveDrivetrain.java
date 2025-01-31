@@ -3,7 +3,10 @@ package frc.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
 import frc.constants.RuntimeConstants;
@@ -30,6 +34,7 @@ import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
+import frc.utils.TorqueSafety;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
@@ -69,6 +74,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriveCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
                 resetPoseFromLimelight().ignoringDisable(true));
+            //Add torque safety to motors
+            Command brakeSwerve = new RepeatCommand(applyRequest(() -> new SwerveRequest.Idle()));
+            String[] names = new String[] {"Front Left", "Front Right", "Back Left", "Back Right"};
+            int i = 0;
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
+                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getStatorCurrent().asSupplier(), brakeSwerve.withName(names[i] + " Drive"));
+                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getStatorCurrent().asSupplier(), brakeSwerve.withName(names[i] + " Steer"));
+                i++;
+            }
         }
     }
 
