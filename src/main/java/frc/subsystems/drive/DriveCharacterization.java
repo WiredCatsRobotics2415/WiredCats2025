@@ -76,7 +76,7 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
-        commands.add(new CurrentLimitCharacterization(driveSubsystem).withName("Slip Current Characterization"));
+        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -166,12 +166,15 @@ public class DriveCharacterization extends Characterizer {
         private CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
-        private int secondsCounter = 1;
-        private int currentCounter = 41;
+        private int secondsCounter;
+        private int currentCounter = 40;
 
-        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive) {
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent) {
             this.drive = drive;
+            addRequirements(drive);
             timer = new Timer();
+            secondsCounter = 1;
+            currentCounter = startingCurrent;
         }
 
         private void applyCurrentToAll(Current current) {
