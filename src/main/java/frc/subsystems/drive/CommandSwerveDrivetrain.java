@@ -64,8 +64,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Vision vision = Vision.getInstance();
     private static CommandSwerveDrivetrain instance;
 
-    private Rotation2d currentOffset = new Rotation2d();
-
     private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
@@ -180,23 +178,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void seedFieldCentricWithLLOffset() {
-        currentOffset = this.getState().Pose.getRotation();
         this.seedFieldCentric();
     }
 
     public void updateLimelights() {
         Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
-        vision.sendOrientation(currentRobotHeading.plus(currentOffset));
+        vision.sendOrientation(currentRobotHeading);
         PoseEstimate[] estimates = vision.getPoseEstimates();
 
         for (int i = 0; i < estimates.length; i++) {
             PoseEstimate estimate = estimates[i];
             if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
-
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
-                Pose2d toAdd = new Pose2d(estimate.pose.getTranslation(), currentRobotHeading);
-                addVisionMeasurement(toAdd, estimate.timestampSeconds);
+                addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
             }
         }
     }
