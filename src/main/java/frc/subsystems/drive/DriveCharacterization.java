@@ -76,7 +76,7 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
-        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20).withName("Slip Current Characterization"));
+        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20, 5).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -167,13 +167,15 @@ public class DriveCharacterization extends Characterizer {
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
         private int secondsCounter;
-        private int currentCounter = 40;
+        private int currentCounter = 20;
+        private int currentStep = 5;
 
-        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent) {
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent, int currentStep) {
             this.drive = drive;
             addRequirements(drive);
             timer = new Timer();
             secondsCounter = 1;
+            this.currentStep = currentStep;
             currentCounter = startingCurrent;
         }
 
@@ -187,6 +189,7 @@ public class DriveCharacterization extends Characterizer {
         public void initialize() {
             applyCurrentToAll(Amps.of(currentCounter));
             drive.setControl(driveForwardAtFullEffort);
+            System.out.println("Starting at current Limit: " + currentCounter);
             timer.start();
             System.out.println("YOU must end the command when the wheels start turning");
         }
@@ -194,7 +197,7 @@ public class DriveCharacterization extends Characterizer {
         @Override
         public void execute() {
             if (timer.hasElapsed(secondsCounter)) {
-                currentCounter += 1;
+                currentCounter += currentStep;
                 System.out.println("Current Limit: " + currentCounter);
                 applyCurrentToAll(Amps.of(currentCounter));
                 secondsCounter += 1;
