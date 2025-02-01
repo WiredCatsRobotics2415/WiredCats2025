@@ -21,6 +21,7 @@ public class TorqueSafety {
 
     private LinkedHashMap<Supplier<Current>, Command> currentSuppliersAndSubsystems = new LinkedHashMap<Supplier<Current>, Command>();
     private ArrayList<Double> lastCurrents = new ArrayList<Double>();
+    private ArrayList<Alert> alerts = new ArrayList<Alert>();
     private double lastTime;
 
     private TorqueSafety() {
@@ -34,27 +35,30 @@ public class TorqueSafety {
 
     public void periodic() {
         int i = 0;
+        double time = Timer.getFPGATimestamp();
         for (Entry<Supplier<Current>, Command> entry : currentSuppliersAndSubsystems.entrySet()) {
             double current = entry.getKey().get().in(Amps);
             double currentDifference = current - lastCurrents.get(i);
-            double time = Timer.getFPGATimestamp();
             double timeDifference = time - lastTime;
             if ((currentDifference / timeDifference) > MotorConstants.UniversalTorqueCutoffCurrentSeconds) {
                 entry.getValue().schedule();
-                String statusString = "TORQUE SAFETY TRIPPED BY " + entry.getValue().getName()
-                    + " with current difference " + currentDifference;
-                new Alert(statusString, AlertType.kError).set(true);
-                System.out.println(statusString);
+                Alert currentAlert = alerts.get(i);
+
+                currentAlert.setText(currentAlert.getText() + currentDifference + ", ");
+                currentAlert.set(true);
+                System.out.println(currentAlert.getText());
                 System.out.println("Robot code must be restarted.");
             }
-            lastTime = time;
             lastCurrents.set(i, current);
             i++;
         }
+        lastTime = time;
     }
 
     public void addMotor(Supplier<Current> currentSupplier, Command stopSubsystem) {
         currentSuppliersAndSubsystems.put(currentSupplier, stopSubsystem);
         lastCurrents.add(currentSupplier.get().in(Amps));
+        String statusString = "TORQUE SAFETY TRIPPED BY " + stopSubsystem.getName() + " with current diff ";
+        alerts.add(new Alert(statusString, AlertType.kError));
     }
 }

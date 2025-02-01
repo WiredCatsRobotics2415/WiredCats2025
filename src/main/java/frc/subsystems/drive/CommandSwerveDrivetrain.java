@@ -2,9 +2,11 @@ package frc.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
@@ -62,6 +64,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Vision vision = Vision.getInstance();
     private static CommandSwerveDrivetrain instance;
 
+    private Rotation2d currentOffset = new Rotation2d();
+
     private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
@@ -74,14 +78,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
                 resetPoseFromLimelight().ignoringDisable(true));
             // Add torque safety to motors
-            SwerveRequest stopSwerve = new SwerveRequest.Idle();
+            SwerveRequest coastAllSwerve = new SwerveRequest() {
+                boolean sentMotorConfigs = false;
+
+                @Override
+                public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
+                    for (SwerveModule<?, ?, ?> m : modulesToApply) {
+                        if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast);
+                        ((TalonFX) m.getDriveMotor()).set(0);
+                        if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast);
+                        ((TalonFX) m.getSteerMotor()).set(0);
+                    }
+                    sentMotorConfigs = true;
+                    return StatusCode.OK;
+                }
+            };
             String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" };
             int i = 0;
             for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
-                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getStatorCurrent().asSupplier(),
-                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Drive"));
-                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getStatorCurrent().asSupplier(),
-                    applyRequest(() -> stopSwerve).repeatedly().withName(names[i] + " Steer"));
+                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(),
+                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive"));
+                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(),
+                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer"));
                 i++;
             }
         }
@@ -111,7 +129,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
-            new Alert("Failed to load PathPlanner config and configure AutoBuilder", AlertType.kError);
+            new Alert("Failed to load PathPlanner config and configure AutoBuilder", AlertType.kError).set(true);
         }
     }
 
@@ -161,16 +179,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    public void seedFieldCentricWithLLOffset() {
+        currentOffset = this.getState().Pose.getRotation();
+        this.seedFieldCentric();
+    }
+
     public void updateLimelights() {
-        vision.sendOrientation(this.getState().Pose.getRotation());
+        Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
+        vision.sendOrientation(currentRobotHeading.plus(currentOffset));
         PoseEstimate[] estimates = vision.getPoseEstimates();
 
         for (int i = 0; i < estimates.length; i++) {
             PoseEstimate estimate = estimates[i];
-            if (Math.abs((Units.radiansToRotations(this.getState().Speeds.omegaRadiansPerSecond))) < 720
+            if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
+
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
-                addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
+                Pose2d toAdd = new Pose2d(estimate.pose.getTranslation(), currentRobotHeading);
+                addVisionMeasurement(toAdd, estimate.timestampSeconds);
             }
         }
     }

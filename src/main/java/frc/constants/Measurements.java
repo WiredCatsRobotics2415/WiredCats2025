@@ -80,6 +80,6 @@ public class Measurements {
             return config;
         }
 
-        public static final double UniversalTorqueCutoffCurrentSeconds = 40 / 0.02; // No current spike greater than 40 amps in one robot loop, 0.02
+        public static final double UniversalTorqueCutoffCurrentSeconds = 45 / 0.02; // No current spike greater than 40 amps in one robot loop, 0.02
     }
 }
