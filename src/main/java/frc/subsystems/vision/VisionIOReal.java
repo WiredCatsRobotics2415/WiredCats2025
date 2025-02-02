@@ -7,7 +7,7 @@ import frc.utils.LimelightHelpers.PoseEstimate;
 
 public class VisionIOReal implements VisionIO {
     public VisionIOReal() {
-        LimelightHelpers.setPythonScriptData(VisionConstants.FrontLeftName, new double[] { 0.0d });
+        
     }
 
     @Override
@@ -33,5 +33,10 @@ public class VisionIOReal implements VisionIO {
         for (String llName : VisionConstants.PoseEstimationLLNames) {
             LimelightHelpers.SetRobotOrientation(llName, yaw, 0, 0, 0, 0, 0);
         }
+    }
+
+    @Override
+    public void setEndEffectorStreamOrientation(boolean upsideDown) {
+        LimelightHelpers.setPythonScriptData(VisionConstants.FrontLeftName, new double[] { upsideDown ? 1.0d : -1.0d });
     }
 }

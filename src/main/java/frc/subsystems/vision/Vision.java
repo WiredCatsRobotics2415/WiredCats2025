@@ -51,6 +51,10 @@ public class Vision extends SubsystemBase {
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 
+    public void setEndEffectorStreamOrientation(boolean upsideDown) {
+        io.setEndEffectorStreamOrientation(upsideDown);
+    }
+
     @Override
     public void periodic() {
         io.updateInputs(inputs);
