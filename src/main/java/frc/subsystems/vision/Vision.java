@@ -3,6 +3,7 @@ package frc.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Utils;
 import org.littletonrobotics.junction.Logger;
@@ -26,7 +27,7 @@ public class Vision extends SubsystemBase {
     }
 
     public PoseEstimate[] getPoseEstimates() {
-        PoseEstimate[] estimates = new PoseEstimate[3];
+        PoseEstimate[] estimates = new PoseEstimate[VisionConstants.PoseEstimationLLNames.length];
 
         for (int i = 0; i < estimates.length; i++) {
             estimates[i] = new PoseEstimate(inputs.poseEstimates[i], inputs.poseTimestampsSeconds[i],

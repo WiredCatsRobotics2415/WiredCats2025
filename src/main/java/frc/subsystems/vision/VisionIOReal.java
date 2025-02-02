@@ -6,23 +6,20 @@ import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
 
 public class VisionIOReal implements VisionIO {
-    private String[] poseEstimationLimelightNames;
-
     public VisionIOReal() {
-        poseEstimationLimelightNames = new String[] { VisionConstants.FrontRightName, VisionConstants.FrontLeftName,
-            VisionConstants.BackCenterName };
+        LimelightHelpers.setPythonScriptData(VisionConstants.FrontLeftName, new double[] { 0.0d });
     }
 
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        inputs.poseEstimates = new Pose2d[poseEstimationLimelightNames.length];
-        inputs.poseLatencies = new double[poseEstimationLimelightNames.length];
-        inputs.poseTimestampsSeconds = new double[poseEstimationLimelightNames.length];
-        inputs.poseTagCounts = new int[poseEstimationLimelightNames.length];
+        inputs.poseEstimates = new Pose2d[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
 
-        for (int i = 0; i < poseEstimationLimelightNames.length; i++) {
+        for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = LimelightHelpers
-                .getBotPoseEstimate_wpiBlue_MegaTag2(poseEstimationLimelightNames[i]);
+                .getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.PoseEstimationLLNames[i]);
             if (estimate == null) estimate = PoseEstimate.zero;
             inputs.poseEstimates[i] = estimate.pose;
             inputs.poseLatencies[i] = estimate.latency;
@@ -33,7 +30,7 @@ public class VisionIOReal implements VisionIO {
 
     @Override
     public void setRobotOrientation(double yaw) {
-        for (String llName : poseEstimationLimelightNames) {
+        for (String llName : VisionConstants.PoseEstimationLLNames) {
             LimelightHelpers.SetRobotOrientation(llName, yaw, 0, 0, 0, 0, 0);
         }
     }

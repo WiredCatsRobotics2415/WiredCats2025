@@ -19,6 +19,9 @@ public class Subsystems {
         public static final String FrontRightName = "limelight-right";
         public static final String BackCenterName = "limelight-back";
 
+        public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
+            BackCenterName };
+
         public static final Matrix<N3, N1> megatag2StdDev = VecBuilder.fill(.7, .7, 9999999);
     }
 

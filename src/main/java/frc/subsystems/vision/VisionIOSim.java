@@ -13,8 +13,6 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
 public class VisionIOSim implements VisionIO {
-    private String[] poseEstimationLimelightNames;
-
     private VisionSystemSim visionSystemSim;
     private PhotonCameraSim frontLeftSimCam;
     private PhotonCamera frontLeftCam;
@@ -24,9 +22,6 @@ public class VisionIOSim implements VisionIO {
     private PhotonCamera backCam;
 
     public VisionIOSim() {
-        poseEstimationLimelightNames = new String[] { VisionConstants.FrontRightName, VisionConstants.FrontLeftName,
-            VisionConstants.BackCenterName };
-
         visionSystemSim = new VisionSystemSim("main");
         visionSystemSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
 
@@ -58,11 +53,11 @@ public class VisionIOSim implements VisionIO {
     // paths in sim, adjust options, goes again and again
     @Override
     public void updateInputs(VisionIOInputsAutoLogged inputs) {
-        inputs.poseEstimates = new Pose2d[poseEstimationLimelightNames.length];
-        inputs.poseLatencies = new double[poseEstimationLimelightNames.length];
-        inputs.poseTimestampsSeconds = new double[poseEstimationLimelightNames.length];
-        inputs.poseTagCounts = new int[poseEstimationLimelightNames.length];
-        for (int i = 0; i < poseEstimationLimelightNames.length; i++) {
+        inputs.poseEstimates = new Pose2d[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
+        for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = PoseEstimate.zero;
             inputs.poseEstimates[i] = estimate.pose;
             inputs.poseLatencies[i] = estimate.latency;
