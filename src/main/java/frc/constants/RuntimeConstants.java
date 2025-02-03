@@ -21,4 +21,7 @@ public final class RuntimeConstants {
         /** Replaying from a log file. */
         REPLAY
     }
+
+    public static final boolean tuningMode = false;
+
 }

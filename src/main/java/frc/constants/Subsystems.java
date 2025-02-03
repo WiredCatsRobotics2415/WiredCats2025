@@ -2,6 +2,9 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -58,4 +61,18 @@ public class Subsystems {
     public class EndEffectorConstants {
         public static final double EffectiveLengthInches = 8;
     }
+
+    public class AlgaeIntakeConstants {
+        //Temporary values for constants
+        public static final int AlgaeIntakeMotorID = 0;
+        public static final int LimitSwitchID = 0;
+
+        public static final double IntakeSpeed = 0.6;
+        public static final double OuttakeSpeed = -0.35;
+        
+        public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
+        // Default to counter clockwise positive, is this correct?
+        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive);
+    }
+
 }
