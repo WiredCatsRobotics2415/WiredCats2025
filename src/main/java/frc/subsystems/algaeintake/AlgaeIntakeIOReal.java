@@ -7,11 +7,9 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 import frc.constants.Subsystems.AlgaeIntakeConstants;
-import frc.utils.io.RealIO;
 
-public class AlgaeIntakeIOReal extends RealIO implements AlgaeIntakeIO {
+public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
     private TalonFX motor = new TalonFX(AlgaeIntakeConstants.AlgaeIntakeMotorID);
     private DigitalInput limitSwitchInput;
 
@@ -32,8 +30,6 @@ public class AlgaeIntakeIOReal extends RealIO implements AlgaeIntakeIO {
         motor.getConfigurator().apply(AlgaeIntakeConstants.CurrentLimit);
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, motorStatorCurrent, motorSupplyCurrent, motorTemp);
-        // Is this right? Manually convert the TalonFX motor to a MotorController type to avoid the error...
-        registerMotors((MotorController)motor);
     }
 
     @Override
@@ -49,13 +45,11 @@ public class AlgaeIntakeIOReal extends RealIO implements AlgaeIntakeIO {
 
     @Override
     public void setPower(double speed) {
-        if (!areMotorsEnabled()) return;
         motor.set(speed);
     }
 
     @Override
     public void off() {
-        if (!areMotorsEnabled()) return;
         motor.set(0);
     }
 }
