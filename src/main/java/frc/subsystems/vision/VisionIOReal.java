@@ -7,7 +7,7 @@ import frc.utils.LimelightHelpers.PoseEstimate;
 
 public class VisionIOReal implements VisionIO {
     public VisionIOReal() {
-        
+
     }
 
     @Override

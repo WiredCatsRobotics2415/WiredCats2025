@@ -1,7 +1,5 @@
 package frc.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
-
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -14,9 +12,13 @@ import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
+
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
@@ -38,6 +40,10 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
+
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -175,6 +181,39 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 ex.getStackTrace());
             return null;
         }
+    }
+
+    public Command driveTo(Pose2d goalPose) {
+        PIDController xController = new PIDController(DriveAutoConstants.TranslationPID.kP,
+            DriveAutoConstants.TranslationPID.kI, DriveAutoConstants.TranslationPID.kD);
+        PIDController yController = new PIDController(DriveAutoConstants.TranslationPID.kP,
+            DriveAutoConstants.TranslationPID.kI, DriveAutoConstants.TranslationPID.kD);
+
+        xController.setTolerance(0.051);
+        yController.setTolerance(0.051);
+
+        SwerveRequest.FieldCentricFacingAngle angleFacingRequest = new SwerveRequest.FieldCentricFacingAngle()
+            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position)
+            .withTargetDirection(goalPose.getRotation());
+        angleFacingRequest.HeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
+            DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
+        angleFacingRequest.HeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
+
+        return applyRequest(() -> {
+            Pose2d currentPose = getState().Pose;
+            double velocityX = MathUtil.clamp(xController.calculate(currentPose.getX(), goalPose.getX()), 0, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+            double velocityY = MathUtil.clamp(yController.calculate(currentPose.getY(), goalPose.getY()), 0, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+
+            return angleFacingRequest.withVelocityX(velocityX)
+                .withVelocityY(velocityY);
+        }).until(() -> {
+            return xController.atSetpoint() && yController.atSetpoint()
+                && angleFacingRequest.HeadingController.atSetpoint();
+        }).andThen(runOnce(() -> {
+            xController.reset();
+            yController.reset();
+            angleFacingRequest.HeadingController.reset();
+        }));
     }
 
     public void seedFieldCentricWithLLOffset() {

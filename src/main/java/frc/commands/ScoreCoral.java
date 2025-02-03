@@ -86,7 +86,7 @@ public class ScoreCoral extends Command {
     @Override
     public void initialize() {
         Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
-        driveCommand = drive.pathfindTo(driveTo);
+        driveCommand = drive.driveTo(driveTo);
         driveCommand.schedule();
 
         superStructureCommand = superStructure.runToPositionCommand(goalHeightInches, goalArmDegrees);

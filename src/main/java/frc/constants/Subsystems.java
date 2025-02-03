@@ -2,6 +2,7 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -42,6 +43,11 @@ public class Subsystems {
             MetersPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 2),
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
             RadiansPerSecond.of(Math.PI), RadiansPerSecondPerSecond.of(Math.PI / 2));
+
+        public static final double HeadingkP = 3;
+        public static final double HeadingkI = 0;
+        public static final double HeadingkD = 0.3;
+        public static final double HeadingTolerance = 5;
     }
 
     public class ElevatorConstants {
