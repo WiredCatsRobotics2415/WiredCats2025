@@ -1,6 +1,7 @@
 package frc.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
@@ -33,6 +34,13 @@ public class VisionIOReal implements VisionIO {
         for (String llName : VisionConstants.PoseEstimationLLNames) {
             LimelightHelpers.SetRobotOrientation(llName, yaw, 0, 0, 0, 0, 0);
         }
+    }
+
+    @Override
+    public Rotation2d getMT1RotationOf(int index) {
+        Rotation2d rotation = LimelightHelpers
+            .getBotPoseEstimate_wpiBlue(VisionConstants.PoseEstimationLLNames[index]).pose.getRotation();
+        return rotation;
     }
 
     @Override

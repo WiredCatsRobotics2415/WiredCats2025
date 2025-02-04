@@ -53,9 +53,7 @@ public class RobotContainer {
     }
 
     private void configureControls() {
-        oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(new InstantCommand(() -> {
-            drive.seedFieldCentricWithLLOffset();
-        }, drive).ignoringDisable(true));
+        oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
             double[] input = oi.getXY();

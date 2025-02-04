@@ -1,5 +1,8 @@
 package frc.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
+
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.CANcoder;
@@ -16,7 +19,6 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -40,10 +42,6 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
-
-import static edu.wpi.first.units.Units.Meter;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-
 import java.util.ArrayList;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
@@ -81,6 +79,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriveCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
                 resetPoseFromLimelight().ignoringDisable(true));
+            TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
+                resetRotationFromLimelightMT1().ignoringDisable(true));
             // Add torque safety to motors
             SwerveRequest coastAllSwerve = new SwerveRequest() {
                 boolean sentMotorConfigs = false;
@@ -184,10 +184,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public Command driveTo(Pose2d goalPose) {
-        PIDController xController = new PIDController(DriveAutoConstants.TranslationPID.kP,
-            DriveAutoConstants.TranslationPID.kI, DriveAutoConstants.TranslationPID.kD);
-        PIDController yController = new PIDController(DriveAutoConstants.TranslationPID.kP,
-            DriveAutoConstants.TranslationPID.kI, DriveAutoConstants.TranslationPID.kD);
+        PIDController xController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+        PIDController yController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
 
         xController.setTolerance(0.051);
         yController.setTolerance(0.051);
@@ -199,25 +199,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
         angleFacingRequest.HeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
 
+        double maxSpeedMS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
         return applyRequest(() -> {
             Pose2d currentPose = getState().Pose;
-            double velocityX = MathUtil.clamp(xController.calculate(currentPose.getX(), goalPose.getX()), 0, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
-            double velocityY = MathUtil.clamp(yController.calculate(currentPose.getY(), goalPose.getY()), 0, TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+            double velocityX = MathUtil.clamp(xController.calculate(currentPose.getX(), goalPose.getX()), -maxSpeedMS,
+                maxSpeedMS);
+            double velocityY = MathUtil.clamp(yController.calculate(currentPose.getY(), goalPose.getY()), -maxSpeedMS,
+                maxSpeedMS);
 
-            return angleFacingRequest.withVelocityX(velocityX)
-                .withVelocityY(velocityY);
+            return angleFacingRequest.withVelocityX(velocityX).withVelocityY(velocityY);
         }).until(() -> {
+            System.out.println("xcontroller: " + xController.atSetpoint() + " | ycontroller: "
+                + yController.atSetpoint() + " | headcon: " + angleFacingRequest.HeadingController.atSetpoint());
             return xController.atSetpoint() && yController.atSetpoint()
                 && angleFacingRequest.HeadingController.atSetpoint();
-        }).andThen(runOnce(() -> {
+        }).finallyDo(() -> {
+            System.out.println("driveTo has been interrupted");
             xController.reset();
             yController.reset();
             angleFacingRequest.HeadingController.reset();
-        }));
-    }
-
-    public void seedFieldCentricWithLLOffset() {
-        this.seedFieldCentric();
+        });
     }
 
     public void updateLimelights() {
@@ -235,7 +236,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    private Command resetPoseFromLimelight() {
+    public Command resetPoseFromLimelight() {
         ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
 
         return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20)
@@ -248,6 +249,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 }
                 resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
                 poses.clear();
+            }));
+    }
+
+    public Command resetRotationFromLimelightMT1() {
+        ArrayList<Rotation2d> rotations = new ArrayList<Rotation2d>();
+
+        return run(() -> rotations.add(vision.getCurrentAverageRotation())).until(() -> rotations.size() == 20)
+            .andThen(runOnce(() ->
+            {
+                double theta = 0.0d;
+                for (Rotation2d rotation : rotations) {
+                    theta += rotation.getDegrees();
+                }
+                System.out.println("Setting to " + theta / rotations.size());
+                resetRotation(Rotation2d.fromDegrees(theta / rotations.size()));
+                rotations.clear();
             }));
     }
 

@@ -51,6 +51,19 @@ public class Vision extends SubsystemBase {
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 
+    public Rotation2d getCurrentAverageRotation() {
+        double averageTheta = 0.0d;
+        int usedPoses = 0;
+        for (int i = 0; i < 3; i++) {
+            if (inputs.poseTagCounts[i] > 0) {
+                averageTheta += io.getMT1RotationOf(i).getDegrees();
+                usedPoses += 1;
+            }
+        }
+        System.out.println(averageTheta / usedPoses);
+        return Rotation2d.fromDegrees(averageTheta / usedPoses);
+    }
+
     public void setEndEffectorStreamOrientation(boolean upsideDown) {
         io.setEndEffectorStreamOrientation(upsideDown);
     }

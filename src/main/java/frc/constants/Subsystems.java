@@ -35,10 +35,11 @@ public class Subsystems {
     }
 
     public class DriveAutoConstants {
-        public static final PIDConstants TranslationPID = new PIDConstants(10, 0, 0);
+        public static final PIDConstants PPTranslationPID = new PIDConstants(10, 0, 0);
+        public static final PIDConstants DTTranslationPID = new PIDConstants(10, 0, 0);
         public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
         public static final PathFollowingController PathFollowingController = new PPHolonomicDriveController(
-            TranslationPID, RotationPID);
+            PPTranslationPID, RotationPID);
         public static final PathConstraints DefaultPathConstraints = new PathConstraints(
             MetersPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 2),
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
@@ -47,7 +48,7 @@ public class Subsystems {
         public static final double HeadingkP = 3;
         public static final double HeadingkI = 0;
         public static final double HeadingkD = 0.3;
-        public static final double HeadingTolerance = 5;
+        public static final double HeadingTolerance = 4;
     }
 
     public class ElevatorConstants {
