@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Measurements {
     public class RobotMeasurements {
-        public static final Distance BumperLength = Inches.of(3);
+        public static final Distance BumperLength = Inches.of(0);
 
         public static final Distance CenterToPerpendicularFrame = Inches.of(15.375); // Krayon: 14, 24': 15.375
     }

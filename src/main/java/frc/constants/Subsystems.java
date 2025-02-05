@@ -36,7 +36,7 @@ public class Subsystems {
 
     public class DriveAutoConstants {
         public static final PIDConstants PPTranslationPID = new PIDConstants(10, 0, 0);
-        public static final PIDConstants DTTranslationPID = new PIDConstants(10, 0, 0);
+        public static final PIDConstants DTTranslationPID = new PIDConstants(5, 0, 0.5);
         public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
         public static final PathFollowingController PathFollowingController = new PPHolonomicDriveController(
             PPTranslationPID, RotationPID);
