@@ -51,6 +51,9 @@ public class Vision extends SubsystemBase {
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 
+    /**
+     * Returns the current average rotation reported by megatag 1. Will return null if no limelights can see any tags.
+     */
     public Rotation2d getCurrentAverageRotation() {
         double averageTheta = 0.0d;
         int usedPoses = 0;
@@ -60,7 +63,7 @@ public class Vision extends SubsystemBase {
                 usedPoses += 1;
             }
         }
-        System.out.println(averageTheta / usedPoses);
+        if (usedPoses == 0) return null;
         return Rotation2d.fromDegrees(averageTheta / usedPoses);
     }
 

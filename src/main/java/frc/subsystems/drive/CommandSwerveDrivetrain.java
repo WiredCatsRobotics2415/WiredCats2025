@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
@@ -40,10 +41,12 @@ import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.Statistics;
 import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -231,7 +234,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
-                addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
+                addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
             }
         }
     }
@@ -255,17 +258,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command resetRotationFromLimelightMT1() {
         ArrayList<Rotation2d> rotations = new ArrayList<Rotation2d>();
 
-        return run(() -> rotations.add(vision.getCurrentAverageRotation())).until(() -> rotations.size() == 20)
-            .andThen(runOnce(() ->
-            {
-                double theta = 0.0d;
-                for (Rotation2d rotation : rotations) {
-                    theta += rotation.getDegrees();
-                }
-                System.out.println("Setting to " + theta / rotations.size());
-                resetRotation(Rotation2d.fromDegrees(theta / rotations.size()));
-                rotations.clear();
-            }));
+        return run(() -> {
+            Rotation2d avgRotation = vision.getCurrentAverageRotation();
+            if (avgRotation != null) rotations.add(avgRotation);
+        }).until(() -> rotations.size() == 20).andThen(runOnce(() -> {
+            resetRotation(Statistics.circularMeanRemoveOutliers(rotations, rotations.size()));
+            rotations.clear();
+        }));
     }
 
     private void startSimThread() {

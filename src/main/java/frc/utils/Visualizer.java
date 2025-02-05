@@ -43,16 +43,16 @@ public class Visualizer {
                 Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
             new Rotation3d(0, angleRads, 0));
 
-        Logger.recordOutput("Visualization/Arm", arm);
+        Logger.recordOutput("Visualization/ArmAndEndEffector", arm);
 
         // End effector
-        Pose3d endEffector = new Pose3d(
-            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches), 0,
-            Units.inchesToMeters(height) +
-                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches) +
-                Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
-            new Rotation3d(0, angleRads, 0));
+        // Pose3d endEffector = new Pose3d(
+        // Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches), 0,
+        // Units.inchesToMeters(height) +
+        // Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches) +
+        // Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
+        // new Rotation3d(0, angleRads, 0));
 
-        Logger.recordOutput("Visualization/EndEffector", endEffector);
+        // Logger.recordOutput("Visualization/EndEffector", endEffector);
     }
 }
