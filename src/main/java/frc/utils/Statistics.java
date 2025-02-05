@@ -1,14 +1,14 @@
 package frc.utils;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.DoubleStream;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-
 public class Statistics {
     /**
      * Gets the length of a list or an array.
+     *
      * @param obj the list or array, throws IllegalArgumentException if obj is not a list or array
      * @return the length
      */
@@ -25,11 +25,11 @@ public class Statistics {
         double index = (percentile / 100.0) * (sortedData.length - 1);
         int lower = (int) Math.floor(index);
         int upper = (int) Math.ceil(index);
-        
+
         if (lower == upper) {
             return sortedData[lower];
         }
-        
+
         return sortedData[lower] + (index - lower) * (sortedData[upper] - sortedData[lower]);
     }
 
@@ -37,15 +37,15 @@ public class Statistics {
         Arrays.sort(data);
         double q1 = getPercentile(data, 25);
         double q3 = getPercentile(data, 75);
-        double iqr = q3-q1;
+        double iqr = q3 - q1;
         int outOfIQR = 0;
         for (double d : data) {
-            if (d < q3-(1.5*iqr) || d > q1+(1.5*iqr)) outOfIQR++;
+            if (d < q3 - (1.5 * iqr) || d > q1 + (1.5 * iqr)) outOfIQR++;
         }
-        double[] filtered = new double[data.length-outOfIQR];
+        double[] filtered = new double[data.length - outOfIQR];
         int i = 0;
         for (double d : data) {
-            boolean outlier = (d < q3-(1.5*iqr) || d > q1+(1.5*iqr));
+            boolean outlier = (d < q3 - (1.5 * iqr) || d > q1 + (1.5 * iqr));
             if (outlier) continue;
             filtered[i] = d;
             i++;
@@ -55,7 +55,8 @@ public class Statistics {
 
     /**
      * Preforms a circular mean on a set of rotation2ds
-     * @param data an iteratable of rotation2ds
+     *
+     * @param data           an iteratable of rotation2ds
      * @param removeOutliers whether or not to remove outliers based on 1.5 IQR
      * @return the rotation2d of the circular mean
      */
@@ -82,7 +83,8 @@ public class Statistics {
         cosValues = removeOutliersIQR(cosValues);
         sinValues = removeOutliersIQR(sinValues);
 
-        double meanX = DoubleStream.of(cosValues).average().getAsDouble(), meanY = DoubleStream.of(sinValues).average().getAsDouble();
+        double meanX = DoubleStream.of(cosValues).average().getAsDouble(),
+            meanY = DoubleStream.of(sinValues).average().getAsDouble();
         return Rotation2d.fromRadians(Math.atan2(meanY, meanX));
     }
 }

@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8319318181818183,
-        "y": 4.020014204545454
+        "x": 1.755,
+        "y": 5.874730113636364
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7849147727272727,
-        "y": 4.020014204545454
+        "x": 2.9220201687573377,
+        "y": 5.643112139741006
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LGround"
     },
     {
       "anchor": {
-        "x": 1.186619318181818,
-        "y": 7.031434659090909
+        "x": 3.6196875,
+        "y": 5.146803977272728
       },
       "prevControl": {
-        "x": 1.0769318181862466,
-        "y": 6.383281250003723
+        "x": 2.4242979271132117,
+        "y": 5.5668838040387945
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BottomLeftSpeaker"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 125.00000000000001
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "tests",
+  "folder": "CenterLGround",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0

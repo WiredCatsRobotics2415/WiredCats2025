@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.8319318181818183,
-        "y": 4.020014204545454
+        "x": 3.061,
+        "y": 4.2
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7849147727272727,
-        "y": 4.020014204545454
+        "x": 2.921676136368622,
+        "y": 6.443110795449559
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "BackSpeaker"
     },
     {
       "anchor": {
         "x": 1.186619318181818,
-        "y": 7.031434659090909
+        "y": 7.0114914772727275
       },
       "prevControl": {
-        "x": 1.0769318181862466,
-        "y": 6.383281250003723
+        "x": 0.9800087730820981,
+        "y": 7.267771708222062
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LeftSource"
     }
   ],
   "rotationTargets": [],
@@ -45,7 +45,7 @@
     "rotation": 125.00000000000001
   },
   "reversed": false,
-  "folder": "tests",
+  "folder": "LeftSourceSpeaker",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 180.0
