@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ElevatorConstants;
+import frc.utils.Utils;
 import lombok.Getter;
 // from using AnalogPotentiometer before
 import edu.wpi.first.wpilibj.AnalogPotentiometer;
@@ -31,6 +32,7 @@ public class Elevator extends SubsystemBase {
     private AnalogInput input; 
 
     private static boolean isCoasting = false;
+    private ElevatorIO io;
 
     private ElevatorFeedforward ff =
             new ElevatorFeedforward(ElevatorConstants.KS, ElevatorConstants.KG, ElevatorConstants.KV, ElevatorConstants.KA);
@@ -49,8 +51,6 @@ public class Elevator extends SubsystemBase {
         io = (ElevatorIO) Utils.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
 
         input = new AnalogInput(ElevatorConstants.ANALOG_POT_PORT); 
-
-        io.configureMotors(); 
 
         setGoal(getMeasurement()); 
     }
