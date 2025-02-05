@@ -2,6 +2,7 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -19,6 +20,9 @@ public class Subsystems {
         public static final String FrontRightName = "limelight-right";
         public static final String BackCenterName = "limelight-back";
 
+        public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
+            BackCenterName };
+
         public static final Matrix<N3, N1> megatag2StdDev = VecBuilder.fill(.7, .7, 9999999);
     }
 
@@ -30,15 +34,21 @@ public class Subsystems {
         public static final Color WestminsterGreen = new Color(30, 72, 47);
     }
 
-    public class DriveConstants {
-        public static final PIDConstants TranslationPID = new PIDConstants(10, 0, 0);
+    public class DriveAutoConstants {
+        public static final PIDConstants PPTranslationPID = new PIDConstants(10, 0, 0);
+        public static final PIDConstants DTTranslationPID = new PIDConstants(5, 0, 0.5);
         public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
         public static final PathFollowingController PathFollowingController = new PPHolonomicDriveController(
-            TranslationPID, RotationPID);
+            PPTranslationPID, RotationPID);
         public static final PathConstraints DefaultPathConstraints = new PathConstraints(
             MetersPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 2),
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
             RadiansPerSecond.of(Math.PI), RadiansPerSecondPerSecond.of(Math.PI / 2));
+
+        public static final double HeadingkP = 3;
+        public static final double HeadingkI = 0;
+        public static final double HeadingkD = 0.3;
+        public static final double HeadingTolerance = 4;
     }
 
     public class ElevatorConstants {

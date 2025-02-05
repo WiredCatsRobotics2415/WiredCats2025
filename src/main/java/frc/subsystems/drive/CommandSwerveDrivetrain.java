@@ -1,20 +1,28 @@
 package frc.subsystems.drive;
 
-import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
+import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
+import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -22,21 +30,23 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
-import frc.constants.Measurements.ReefMeasurements;
-import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.DriveConstants;
+import frc.constants.Subsystems.DriveAutoConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.Statistics;
+import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
+import java.util.ArrayList;
 import java.util.function.Supplier;
+import java.util.stream.DoubleStream;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -52,10 +62,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private boolean hasAppliedOperatorPerspective = false;
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds()
-        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
+        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position);
     public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
         .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05) // Add a 5% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.Position)
         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
 
     private Vision vision = Vision.getInstance();
@@ -70,20 +80,36 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Set Pose: 3in from Apriltag 18 facing towards it",
-                new InstantCommand(() ->
-                {
-                    System.out.println("Reset pose");
-                    resetPose(ReefMeasurements.blueReefABApriltag.plus(new Transform2d(
-                        RobotMeasurements.CenterToPerpendicularFrame.times(-1), Meters.of(0), new Rotation2d())));
-                }));
-        }
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+                resetPoseFromLimelight().ignoringDisable(true));
+            TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
+                resetRotationFromLimelightMT1().ignoringDisable(true));
+            // Add torque safety to motors
+            SwerveRequest coastAllSwerve = new SwerveRequest() {
+                boolean sentMotorConfigs = false;
 
-        this.registerTelemetry((SwerveDriveState state) -> {
-            Logger.recordOutput("Drive/Pose", state.Pose);
-            Logger.recordOutput("Drive/ModuleStates", state.ModuleStates);
-            Logger.recordOutput("Drive/ModuleTargets", state.ModuleTargets);
-        });
+                @Override
+                public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
+                    for (SwerveModule<?, ?, ?> m : modulesToApply) {
+                        if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast);
+                        ((TalonFX) m.getDriveMotor()).set(0);
+                        if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast);
+                        ((TalonFX) m.getSteerMotor()).set(0);
+                    }
+                    sentMotorConfigs = true;
+                    return StatusCode.OK;
+                }
+            };
+            String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" };
+            int i = 0;
+            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
+                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(),
+                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive"));
+                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(),
+                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer"));
+                i++;
+            }
+        }
     }
 
     public static CommandSwerveDrivetrain getInstance() {
@@ -103,14 +129,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, config,
+                DriveAutoConstants.PathFollowingController, config,
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this // Subsystem for requirements
             );
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
-            new Alert("Failed to load PathPlanner config and configure AutoBuilder", AlertType.kError);
+            new Alert("Failed to load PathPlanner config and configure AutoBuilder", AlertType.kError).set(true);
         }
     }
 
@@ -137,17 +163,22 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         updateLimelights();
+
+        SwerveDriveState currentState = getState();
+        Logger.recordOutput("Drive/Pose", currentState.Pose);
+        Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
+        Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
     }
 
     public Command pathfindTo(Pose2d goalPose) {
         try {
-            return new PathfindingCommand(goalPose, DriveConstants.DefaultPathConstraints, () -> getState().Pose,
+            return new PathfindingCommand(goalPose, DriveAutoConstants.DefaultPathConstraints, () -> getState().Pose,
                 () -> getState().Speeds,
                 (speeds,
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
+                DriveAutoConstants.PathFollowingController, RobotConfig.fromGUISettings(), this);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
@@ -155,25 +186,85 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
+    public Command driveTo(Pose2d goalPose) {
+        PIDController xController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+        PIDController yController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+
+        xController.setTolerance(0.051);
+        yController.setTolerance(0.051);
+
+        SwerveRequest.FieldCentricFacingAngle angleFacingRequest = new SwerveRequest.FieldCentricFacingAngle()
+            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position)
+            .withTargetDirection(goalPose.getRotation());
+        angleFacingRequest.HeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
+            DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
+        angleFacingRequest.HeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
+
+        double maxSpeedMS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
+        return applyRequest(() -> {
+            Pose2d currentPose = getState().Pose;
+            double velocityX = MathUtil.clamp(xController.calculate(currentPose.getX(), goalPose.getX()), -maxSpeedMS,
+                maxSpeedMS);
+            double velocityY = MathUtil.clamp(yController.calculate(currentPose.getY(), goalPose.getY()), -maxSpeedMS,
+                maxSpeedMS);
+
+            return angleFacingRequest.withVelocityX(velocityX).withVelocityY(velocityY);
+        }).until(() -> {
+            System.out.println("xcontroller: " + xController.atSetpoint() + " | ycontroller: "
+                + yController.atSetpoint() + " | headcon: " + angleFacingRequest.HeadingController.atSetpoint());
+            return xController.atSetpoint() && yController.atSetpoint()
+                && angleFacingRequest.HeadingController.atSetpoint();
+        }).finallyDo(() -> {
+            System.out.println("driveTo has been interrupted");
+            xController.reset();
+            yController.reset();
+            angleFacingRequest.HeadingController.reset();
+        });
+    }
+
     public void updateLimelights() {
-        vision.sendOrientation(this.getState().Pose.getRotation());
+        Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
+        vision.sendOrientation(currentRobotHeading);
         PoseEstimate[] estimates = vision.getPoseEstimates();
 
         for (int i = 0; i < estimates.length; i++) {
             PoseEstimate estimate = estimates[i];
-            boolean measurementWasUsed = false;
-            if (Math.abs((Units.radiansToRotations(this.getState().Speeds.omegaRadiansPerSecond))) < 720
+            if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
                 && estimate.tagCount > 0) {
                 setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
-                addVisionMeasurement(estimate.pose, estimate.timestampSeconds);
-                measurementWasUsed = true;
-            }
-            if (measurementWasUsed) {
-                // Logger.recordOutput("Limelights/" + (i + 1), estimate.pose);
-            } else {
-                // Logger.recordOutput("Limelights/" + (i + 1), Pose2d.kZero);
+                addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
             }
         }
+    }
+
+    public Command resetPoseFromLimelight() {
+        ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
+
+        return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20)
+            .andThen(runOnce(() ->
+            {
+                double sumX = 0.0d, sumY = 0.0d;
+                for (Pose2d pose : poses) {
+                    sumX += pose.getX();
+                    sumY += pose.getY();
+                }
+                resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
+                poses.clear();
+            }));
+    }
+
+    public Command resetRotationFromLimelightMT1() {
+        ArrayList<Rotation2d> rotations = new ArrayList<Rotation2d>();
+
+        return run(() -> {
+            Rotation2d avgRotation = vision.getCurrentAverageRotation();
+            if (avgRotation != null) rotations.add(avgRotation);
+        }).until(() -> rotations.size() == 20).andThen(runOnce(() -> {
+            resetRotation(Statistics.circularMeanRemoveOutliers(rotations, rotations.size()));
+            rotations.clear();
+        }));
     }
 
     private void startSimThread() {

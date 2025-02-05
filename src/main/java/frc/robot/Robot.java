@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
+import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.tuning.TuningModeTab;
 import org.ironmaple.simulation.SimulatedArena;
@@ -42,7 +43,7 @@ public class Robot extends LoggedRobot {
         switch (RuntimeConstants.currentMode) {
             case REAL:
                 // Running on a real robot, log to a USB stick ("/U/logs")
-                Logger.addDataReceiver(new WPILOGWriter());
+                Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
 
@@ -75,6 +76,12 @@ public class Robot extends LoggedRobot {
     @Override
     public void robotPeriodic() {
         if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
+        TorqueSafety.getInstance().periodic();
         CommandScheduler.getInstance().run();
+    }
+
+    @Override
+    public void autonomousInit() {
+        RobotContainer.getInstance().getAutonomousCommand().schedule();
     }
 }

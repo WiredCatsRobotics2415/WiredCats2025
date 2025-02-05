@@ -18,7 +18,7 @@ public class OI {
     public enum Bind {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, PresetIntakeFromSource, AutoScoreLeftL1,
         AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3,
-        AutoScoreRightL4
+        AutoScoreRightL4, SeedFieldCentric
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -38,6 +38,8 @@ public class OI {
         controller = new CommandXboxController(0);
         numpad = new CommandJoystick(1);
 
+        binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
+
         binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
         binds.put(Bind.ManualArmForward, controller.povUp());
@@ -54,6 +56,14 @@ public class OI {
         binds.put(Bind.AutoScoreRightL4, numpad.button(11)); // Asterisk
     }
 
+    private double deadbandCompensation(double r) {
+        return (r - Controls.Deadband) / (1 - Controls.Deadband);
+    }
+
+    private double minimumPowerCompensation(double r) {
+        return r * (1 - Controls.MinimumDrivePower) + Controls.MinimumDrivePower;
+    }
+
     public double[] getXY() {
         double x = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickX), Controls.Deadband);
         double y = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickY), Controls.Deadband);
@@ -62,25 +72,25 @@ public class OI {
             double angle = Math.atan2(y, x);
             double magInitial = Math.sqrt(x * x + y * y);
             if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
-            double magCurved = Math.pow(magInitial, Controls.CurveExponent);
-            newX = Math.cos(angle) * magCurved;
-            newY = Math.sin(angle) * magCurved;
-        } else {
-            newX = xLimiter.calculate(x);
-            newY = yLimiter.calculate(y);
+            double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
+            double powerCompensated = minimumPowerCompensation(magCurved);
+            newX = Math.cos(angle) * powerCompensated;
+            newY = Math.sin(angle) * powerCompensated;
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;
-        return new double[] { newX, newY };
+        double rateLimitedX = xLimiter.calculate(x);
+        double rateLimitedY = yLimiter.calculate(y);
+        return new double[] { rateLimitedX, rateLimitedY };
     }
 
     public double getRotation() {
-        double deadbanded = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX),
-            Controls.Deadband);
+        double deadbanded = deadbandCompensation(
+            MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX), Controls.Deadband));
         if (Controls.UseCurve) {
-            return Math.pow(deadbanded, Controls.CurveExponent);
+            return Math.pow(minimumPowerCompensation(deadbanded), Controls.CurveExponent);
         } else {
-            return deadbanded;
+            return minimumPowerCompensation(deadbanded);
         }
     }
 
