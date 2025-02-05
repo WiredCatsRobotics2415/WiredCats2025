@@ -58,6 +58,11 @@ public class Measurements {
         }
     }
 
+    public class BalanceConstants {
+        public static final double yawThreshold = 0;
+        public static final double rollThreshold = 0;
+    }
+
     public class MotorConstants {
         // The number of seconds to subtract from all times in BreakerCurrentAndTripTimes just to be careful
         public static final double timeSafetyTolerace = 0.1;

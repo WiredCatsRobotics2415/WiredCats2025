@@ -1,14 +1,11 @@
 package frc.subsystems.elevator;
 
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import frc.constants.Subsystems.ElevatorConstants;
-
-import com.ctre.phoenix6.configs.FeedbackConfigs;
-import com.ctre.phoenix6.controls.StrictFollower;
-
 
 public class ElevatorIOReal {
     private TalonFX leftMotor;
@@ -16,16 +13,15 @@ public class ElevatorIOReal {
 
     public void configureMotors() {
         // two talon FXs, neither inverted
-        FeedbackConfigs feedbackConfigs =
-                new FeedbackConfigs()
-                        .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
+        FeedbackConfigs feedbackConfigs = new FeedbackConfigs()
+            .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
 
-        leftMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR_PORT); 
-        leftMotor.getConfigurator().apply(feedbackConfigs); 
-        
-        rightMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR_PORT); 
-        rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID())); 
-        
+        leftMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR_PORT);
+        leftMotor.getConfigurator().apply(feedbackConfigs);
+
+        rightMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR_PORT);
+        rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
+
         leftMotor.setNeutralMode(NeutralModeValue.Brake);
         rightMotor.setNeutralMode(NeutralModeValue.Brake);
     }
@@ -36,6 +32,6 @@ public class ElevatorIOReal {
     }
 
     public void setVoltage(double voltOut) {
-        leftMotor.setVoltage(voltOut); 
+        leftMotor.setVoltage(voltOut);
     }
 }
