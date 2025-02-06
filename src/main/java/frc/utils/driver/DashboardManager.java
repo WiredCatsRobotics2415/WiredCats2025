@@ -15,12 +15,6 @@ public class DashboardManager {
 
         public static final LayoutInfo MatchTime = new LayoutInfo(0, 0, 3, 2);
         public static final LayoutInfo IntakeStatus = new LayoutInfo(0, 2, 3, 2);
-        public static final LayoutInfo FlywheelStatus = new LayoutInfo(0, 4, 3, 2);
-
-        public static final LayoutInfo FlywheelUpToSpeed = new LayoutInfo(3, 0, 4, 2);
-        public static final LayoutInfo Intook = new LayoutInfo(3, 2, 4, 2);
-        public static final LayoutInfo CoastCommand = new LayoutInfo(3, 4, 2, 2);
-        public static final LayoutInfo LimitSwitch = new LayoutInfo(5, 4, 2, 2);
 
         public static final LayoutInfo Alerts = new LayoutInfo(7, 0, 3, 6);
 

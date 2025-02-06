@@ -1,11 +1,9 @@
 package frc.robot;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
@@ -16,7 +14,6 @@ import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.driver.DashboardManager;
 import frc.utils.driver.DashboardManager.LayoutConstants;
-import java.util.function.Supplier;
 import lombok.Getter;
 
 public class RobotContainer {

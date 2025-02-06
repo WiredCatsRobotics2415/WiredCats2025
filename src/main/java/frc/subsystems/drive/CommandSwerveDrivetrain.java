@@ -1,6 +1,5 @@
 package frc.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.StatusCode;
@@ -30,7 +29,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
@@ -46,7 +44,6 @@ import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
-import java.util.stream.DoubleStream;
 import org.littletonrobotics.junction.Logger;
 
 /**

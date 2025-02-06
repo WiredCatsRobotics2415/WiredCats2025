@@ -7,28 +7,26 @@ import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import frc.constants.Subsystems.ElevatorConstants;
 
-public class ElevatorIOReal {
+public class ElevatorIOReal implements ElevatorIO {
     private TalonFX leftMotor;
     private TalonFX rightMotor;
 
+    public ElevatorIOReal() {
+        // configureMotors();
+    }
+
     public void configureMotors() {
-        // two talon FXs, neither inverted
         FeedbackConfigs feedbackConfigs = new FeedbackConfigs()
             .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
 
-        leftMotor = new TalonFX(ElevatorConstants.LEFT_MOTOR_PORT);
+        leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
         leftMotor.getConfigurator().apply(feedbackConfigs);
 
-        rightMotor = new TalonFX(ElevatorConstants.RIGHT_MOTOR_PORT);
+        rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
         leftMotor.setNeutralMode(NeutralModeValue.Brake);
         rightMotor.setNeutralMode(NeutralModeValue.Brake);
-    }
-
-    public void brake() {
-        rightMotor.setNeutralMode(NeutralModeValue.Brake);
-        leftMotor.setNeutralMode(NeutralModeValue.Brake);
     }
 
     public void setVoltage(double voltOut) {

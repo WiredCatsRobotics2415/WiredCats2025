@@ -16,5 +16,7 @@ public interface ElevatorIO {
         public double currentDrawRight;
     }
 
+    public default void updateInputs(ElevatorIOInputs inputs) {};
+
     public default void setVoltage(double volts) {};
 }

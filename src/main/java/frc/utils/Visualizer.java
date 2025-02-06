@@ -22,11 +22,10 @@ public class Visualizer {
         double height = elevatorSubsystem.getGoalInches();
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
         Pose3d elevatorStage2 = new Pose3d(0, 0,
-            Units.inchesToMeters((height / ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage2Height)),
+            Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) * (ElevatorConstants.Stage2Height)),
             Rotation3d.kZero);
-        Pose3d elevatorStage3 = new Pose3d(0, 0, Units.inchesToMeters(
-            (height / ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage2Height + ElevatorConstants.Stage3Height)),
-            Rotation3d.kZero);
+        Pose3d elevatorStage3 = new Pose3d(0, 0, Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) *
+            (ElevatorConstants.Stage2Height + ElevatorConstants.Stage3Height)), Rotation3d.kZero);
         Pose3d carriage = new Pose3d(0, 0, Units.inchesToMeters(height), Rotation3d.kZero);
 
         Logger.recordOutput("Visualization/ElevatorBase", elevatorBase);

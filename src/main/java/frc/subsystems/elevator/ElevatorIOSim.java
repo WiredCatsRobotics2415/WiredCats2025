@@ -1,5 +1,5 @@
 package frc.subsystems.elevator;
 
-public class ElevatorIOSim {
+public class ElevatorIOSim implements ElevatorIO {
 
 }

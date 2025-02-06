@@ -39,4 +39,16 @@ public class Utils {
         }
         return new Object();
     }
+
+    /**
+     * Changes the range of an input linearly, exactly like Arduino's "map()" function
+     *
+     * @param inputMin  minimum (lowest number on number line) input can take
+     * @param inputMax  maximum (highest number on number line) input can take
+     * @param outputMin min value of output
+     * @param outputMax max value of output
+     */
+    public static double linearMap(double input, double inputMin, double inputMax, double outputMin, double outputMax) {
+        return (input / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+    }
 }

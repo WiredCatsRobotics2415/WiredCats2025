@@ -2,7 +2,6 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -52,24 +51,28 @@ public class Subsystems {
     }
 
     public class ElevatorConstants {
+        public static final int AnalogPotentiometerPort = 1;
+        public static final int LeftMotorPort = 2;
+        public static final int RightMotorPort = 3;
+
+        public static final double PotentiometerMinVolt = 0;
+        public static final double PotentiometerMaxVolt = 0;
+        public static final double MinHeightInches = 0;
+        public static final double MaxHeightInches = 75.0;
+
+        public static final double kS = 0;
+        public static final double kG = 0;
+        public static final double kV = 0;
+        public static final double kA = 0;
+        public static final double kP = 0;
+        public static final double kD = 0;
+
+        public static final double VelocityMax = 0;
+        public static final double AccelerationMax = 0;
+
         public static final double BaseHeight = 30;
         public static final double Stage2Height = 24;
         public static final double Stage3Height = 23;
-        public static final double MaxHeight = 75;
-        public static final int ANALOG_POT_PORT = 1;
-        public static final double KS = 0;
-        public static final double KG = 0;
-        public static final double KV = 0;
-        public static final double KA = 0;
-        public static final double MIN_VOLT = 0;
-        public static final double MAX_VOLT = 1;
-        // I don't know what any of these are but they are for PID I think
-        public static final double KP = 0;
-        public static final double KD = 0;
-        public static final double VELO_MAX = 0;
-        public static final double ACCEL_MAX = 0;
-        public static final int LEFT_MOTOR_PORT = 2;
-        public static final int RIGHT_MOTOR_PORT = 3;
     }
 
     public class ArmConstants {

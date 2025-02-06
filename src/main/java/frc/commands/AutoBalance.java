@@ -1,7 +1,5 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Degree;
-
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import edu.wpi.first.units.measure.Angle;
