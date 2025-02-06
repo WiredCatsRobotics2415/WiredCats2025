@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Inches;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -32,8 +33,9 @@ public class ScoreCoral extends Command {
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToPerpendicularFrame
         .plus(RobotMeasurements.BumperLength).times(-1);
-    private static final Transform2d leftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
-    private static final Transform2d rightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
+    private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
+    private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
+    private static final double ToleranceMetersInches = Units.inchesToMeters(2);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
@@ -80,13 +82,13 @@ public class ScoreCoral extends Command {
                 break;
         }
 
-        offset = reefSide.equals(Side.Left) ? leftOffset : rightOffset;
+        offset = reefSide.equals(Side.Left) ? LeftOffset : RightOffset;
     }
 
     @Override
     public void initialize() {
         Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
-        driveCommand = drive.driveTo(driveTo);
+        driveCommand = drive.driveTo(driveTo, ToleranceMetersInches);
         driveCommand.schedule();
 
         superStructureCommand = superStructure.runToPositionCommand(goalHeightInches, goalArmDegrees);

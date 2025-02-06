@@ -167,6 +167,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
     }
 
+    public void updateLimelights() {
+        Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
+        vision.sendOrientation(currentRobotHeading);
+        PoseEstimate[] estimates = vision.getPoseEstimates();
+
+        for (int i = 0; i < estimates.length; i++) {
+            PoseEstimate estimate = estimates[i];
+            if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
+                && estimate.tagCount > 0) {
+                setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
+                addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
+            }
+        }
+    }
+
+    /**
+     * Uses Pathplanner's pathfinding (obstactle avoiding trajectory generation) to drive to a pose
+     * w/ same constants and smoothing as autonomous
+     * @param goalPose The pose to drive to
+     */
     public Command pathfindTo(Pose2d goalPose) {
         try {
             return new PathfindingCommand(goalPose, DriveAutoConstants.DefaultPathConstraints, () -> getState().Pose,
@@ -183,14 +203,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
     }
 
-    public Command driveTo(Pose2d goalPose) {
+    /**
+     * Uses simple PID control to drive the robot to a position, with different translation PID constants than Pathplanner.
+     * and using Phoenix's FieldCentricFacingAngle SwerveRequest
+     * @param goalPose The pose to drive to
+     * @param translationToleranceMeters The tolerance allowed for the translation controllers
+     */
+    public Command driveTo(Pose2d goalPose, double translationToleranceMeters) {
         PIDController xController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
             DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
         PIDController yController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
             DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
 
-        xController.setTolerance(0.051);
-        yController.setTolerance(0.051);
+        xController.setTolerance(translationToleranceMeters);
+        yController.setTolerance(translationToleranceMeters);
 
         SwerveRequest.FieldCentricFacingAngle angleFacingRequest = new SwerveRequest.FieldCentricFacingAngle()
             .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position)
@@ -219,21 +245,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             yController.reset();
             angleFacingRequest.HeadingController.reset();
         });
-    }
-
-    public void updateLimelights() {
-        Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
-        vision.sendOrientation(currentRobotHeading);
-        PoseEstimate[] estimates = vision.getPoseEstimates();
-
-        for (int i = 0; i < estimates.length; i++) {
-            PoseEstimate estimate = estimates[i];
-            if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
-                && estimate.tagCount > 0) {
-                setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
-                addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
-            }
-        }
     }
 
     public Command resetPoseFromLimelight() {
