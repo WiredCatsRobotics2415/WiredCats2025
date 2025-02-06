@@ -25,10 +25,8 @@ public class AlgaeIntake extends SubsystemBase {
         io = (AlgaeIntakeIO) Utils.getIOImplementation(AlgaeIntakeIOReal.class, AlgaeIntakeIOSim.class,
             AlgaeIntakeIO.class);
 
-        DashboardManager.getInstance().addBoolSupplier(true, "Intaking", () -> state,
-            LayoutConstants.IntakeStatus);
-        DashboardManager.getInstance().addBoolSupplier(true, "Intook",
-            () -> sensorTrigger(), LayoutConstants.Intook);
+        DashboardManager.getInstance().addBoolSupplier(true, "Intaking", () -> state, LayoutConstants.IntakeStatus);
+        DashboardManager.getInstance().addBoolSupplier(true, "Intook", () -> sensorTrigger(), LayoutConstants.Intook);
     }
 
     public static AlgaeIntake getInstance() {
@@ -78,8 +76,7 @@ public class AlgaeIntake extends SubsystemBase {
             state = true;
         }), new WaitUntilCommand(() -> hasAlgae()), new InstantCommand(() -> {
             state = false;
-        }),
-            off());
+        }), off());
     }
 
     /**

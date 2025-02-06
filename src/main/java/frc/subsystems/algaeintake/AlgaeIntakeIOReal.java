@@ -25,7 +25,7 @@ public class AlgaeIntakeIOReal implements AlgaeIntakeIO {
 
     private void configureMotor() {
         motor.setNeutralMode(NeutralModeValue.Brake);
-        //set to counter clockwise positive
+        // set to counter clockwise positive
         motor.getConfigurator().apply(AlgaeIntakeConstants.MotorOutput);
         motor.getConfigurator().apply(AlgaeIntakeConstants.CurrentLimit);
 

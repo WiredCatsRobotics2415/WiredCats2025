@@ -63,16 +63,17 @@ public class Subsystems {
     }
 
     public class AlgaeIntakeConstants {
-        //Temporary values for constants
+        // Temporary values for constants
         public static final int AlgaeIntakeMotorID = 0;
         public static final int LimitSwitchID = 0;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
-        
+
         public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
         // Default to counter clockwise positive, is this correct?
-        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive);
+        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
+            .withInverted(InvertedValue.CounterClockwise_Positive);
     }
 
 }
