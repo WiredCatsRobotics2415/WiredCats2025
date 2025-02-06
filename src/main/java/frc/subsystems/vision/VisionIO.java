@@ -6,7 +6,7 @@ import org.littletonrobotics.junction.AutoLog;
 
 public interface VisionIO {
     @AutoLog
-    abstract class VisionIOInputs {
+    class VisionIOInputs {
         public Pose2d[] poseEstimates;
         public double[] poseTimestampsSeconds;
         public double[] poseLatencies;

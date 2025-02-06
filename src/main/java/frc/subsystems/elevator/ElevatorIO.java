@@ -1,13 +1,10 @@
 package frc.subsystems.elevator;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import org.littletonrobotics.junction.AutoLog;
 
-public class ElevatorIO {
-
-    public class ElevatorIOInputs {
-
-        // I don't think I ever updated these variables...
+public interface ElevatorIO {
+    @AutoLog
+    class ElevatorIOInputs {
         public double wirePotentiometerValue;
 
         public boolean isConnectedLeft;
@@ -19,5 +16,5 @@ public class ElevatorIO {
         public double currentDrawRight;
     }
 
-    public void setVoltage(double volts) {}
+    public default void setVoltage(double volts) {};
 }
