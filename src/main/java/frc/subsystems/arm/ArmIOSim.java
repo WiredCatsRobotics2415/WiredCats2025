@@ -8,13 +8,12 @@ import frc.constants.Subsystems.ArmConstants;
 public class ArmIOSim implements ArmIO {
     private double appliedVoltage;
 
-    private final SingleJointedArmSim simArm = new SingleJointedArmSim(
-        DCMotor.getFalcon500(1), ArmConstants.RotorToArmGearRatio,
-        //Should the length be in meters?
-        SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches/39.37009424,
+    private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getFalcon500(1),
+        ArmConstants.RotorToArmGearRatio,
+        // Should the length be in meters?
+        SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches / 39.37009424,
             ArmConstants.ApproximateMassKg),
-        ArmConstants.EffectiveLengthInches/39.37009424,
-        Units.degreesToRadians(ArmConstants.MaxDegreesBack),
+        ArmConstants.EffectiveLengthInches / 39.37009424, Units.degreesToRadians(ArmConstants.MaxDegreesBack),
         Units.degreesToRadians(ArmConstants.MaxDegreesFront), true,
         Units.degreesToRadians(ArmConstants.MaxDegreesBack));
 

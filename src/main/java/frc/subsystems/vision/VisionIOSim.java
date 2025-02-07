@@ -57,12 +57,15 @@ public class VisionIOSim implements VisionIO {
         inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
+
         for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = PoseEstimate.zero;
             inputs.poseEstimates[i] = estimate.pose;
             inputs.poseLatencies[i] = estimate.latency;
             inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
             inputs.poseTagCounts[i] = estimate.tagCount;
+            inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
         }
     }
 }
