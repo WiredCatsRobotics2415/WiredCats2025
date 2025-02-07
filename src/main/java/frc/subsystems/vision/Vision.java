@@ -48,6 +48,7 @@ public class Vision extends SubsystemBase {
                 usedPoses += 1;
             }
         }
+        if (usedPoses == 0) return null;
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 

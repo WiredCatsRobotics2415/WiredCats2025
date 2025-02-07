@@ -30,6 +30,6 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     public void setVoltage(double voltOut) {
-        leftMotor.setVoltage(voltOut);
+        // leftMotor.setVoltage(voltOut);
     }
 }
