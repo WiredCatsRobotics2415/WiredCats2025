@@ -9,7 +9,7 @@ public class ArmIOSim implements ArmIO {
     private double appliedVoltage;
 
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(
-        DCMotor.getFalcon500(2), ArmConstants.RotorToArmGearRatio,
+        DCMotor.getFalcon500(1), ArmConstants.RotorToArmGearRatio,
         //Should the length be in meters?
         SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches/39.37009424,
             ArmConstants.ApproximateMassKg),
@@ -26,8 +26,7 @@ public class ArmIOSim implements ArmIO {
     public void updateInputs(ArmIOInputsAutoLogged inputs) {
         simArm.update(0.02);
 
-        inputs.leftConnected = true;
-        inputs.rightConnected = true;
+        inputs.motorConnected = true;
         inputs.appliedVoltage = appliedVoltage;
         inputs.position = Units.radiansToDegrees(simArm.getAngleRads());
     }

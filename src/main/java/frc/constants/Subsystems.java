@@ -79,8 +79,7 @@ public class Subsystems {
 
     public class ArmConstants {
         //Setting temporary values
-        public static final int LeftMotorID = 32;
-        public static final int RightMotorID = 14;
+        public static final int MotorID = 32;
         public static final int ThroughborePort = 19;
 
         // With 0 degrees being up
