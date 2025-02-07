@@ -1,5 +1,6 @@
 package frc.subsystems.drive;
 
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.StatusCode;
@@ -19,6 +20,7 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,9 +34,9 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.DriveAutoConstants;
-import frc.constants.Subsystems.VisionConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
@@ -168,23 +170,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     public void updateLimelights() {
-        Rotation2d currentRobotHeading = this.getState().Pose.getRotation();
-        vision.sendOrientation(currentRobotHeading);
+        SwerveDriveState currentState = this.getState();
+        Pose2d currentRobotPose = currentState.Pose;
+        vision.sendOrientation(currentRobotPose.getRotation());
         PoseEstimate[] estimates = vision.getPoseEstimates();
 
         for (int i = 0; i < estimates.length; i++) {
             PoseEstimate estimate = estimates[i];
+            double twoDDistance = currentRobotPose.getTranslation().getDistance(estimate.pose.getTranslation());
             if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
-                && estimate.tagCount > 0) {
-                setVisionMeasurementStdDevs(VisionConstants.megatag2StdDev);
+                && estimate.tagCount > 0 && twoDDistance < (RobotMeasurements.CenterToPerpendicularFrame.in(Meters))) {
+                setVisionMeasurementStdDevs(VecBuilder.fill(.85 + 0.5 * currentState.Speeds.vxMetersPerSecond,
+                    .85 + 0.5 * currentState.Speeds.vyMetersPerSecond, 9999999));
                 addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
             }
         }
     }
 
     /**
-     * Uses Pathplanner's pathfinding (obstactle avoiding trajectory generation) to drive to a pose
-     * w/ same constants and smoothing as autonomous
+     * Uses Pathplanner's pathfinding (obstactle avoiding trajectory generation) to drive to a pose w/ same constants and smoothing as autonomous
+     *
      * @param goalPose The pose to drive to
      */
     public Command pathfindTo(Pose2d goalPose) {
@@ -204,9 +209,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Uses simple PID control to drive the robot to a position, with different translation PID constants than Pathplanner.
-     * and using Phoenix's FieldCentricFacingAngle SwerveRequest
-     * @param goalPose The pose to drive to
+     * Uses simple PID control to drive the robot to a position, with different translation PID constants than Pathplanner. and using Phoenix's FieldCentricFacingAngle SwerveRequest
+     *
+     * @param goalPose                   The pose to drive to
      * @param translationToleranceMeters The tolerance allowed for the translation controllers
      */
     public Command driveTo(Pose2d goalPose, double translationToleranceMeters) {
@@ -250,17 +255,18 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public Command resetPoseFromLimelight() {
         ArrayList<Pose2d> poses = new ArrayList<Pose2d>();
 
-        return run(() -> poses.add(vision.getCurrentAveragePose())).until(() -> poses.size() == 20)
-            .andThen(runOnce(() ->
-            {
-                double sumX = 0.0d, sumY = 0.0d;
-                for (Pose2d pose : poses) {
-                    sumX += pose.getX();
-                    sumY += pose.getY();
-                }
-                resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
-                poses.clear();
-            }));
+        return run(() -> {
+            Pose2d currentAvg = vision.getCurrentAveragePose();
+            if (currentAvg != null) poses.add(currentAvg);
+        }).until(() -> poses.size() == 40).andThen(runOnce(() -> {
+            double sumX = 0.0d, sumY = 0.0d;
+            for (Pose2d pose : poses) {
+                sumX += pose.getX();
+                sumY += pose.getY();
+            }
+            resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
+            poses.clear();
+        }));
     }
 
     public Command resetRotationFromLimelightMT1() {
@@ -269,7 +275,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> {
             Rotation2d avgRotation = vision.getCurrentAverageRotation();
             if (avgRotation != null) rotations.add(avgRotation);
-        }).until(() -> rotations.size() == 20).andThen(runOnce(() -> {
+        }).until(() -> rotations.size() == 40).andThen(runOnce(() -> {
             resetRotation(Statistics.circularMeanRemoveOutliers(rotations, rotations.size()));
             rotations.clear();
         }));

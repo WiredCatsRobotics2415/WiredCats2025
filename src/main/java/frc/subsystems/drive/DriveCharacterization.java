@@ -112,7 +112,6 @@ public class DriveCharacterization extends Characterizer {
                 i++;
             }
             lastGyroDegrees = drive.getPigeon2().getYaw().getValueAsDouble();
-            System.out.println("Initialization");
         }
 
         @Override
@@ -130,9 +129,6 @@ public class DriveCharacterization extends Characterizer {
             for (int j = 0; j < 4; j++) {
                 deltaSum += Math.abs(currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j]);
             }
-            System.out.println("--------");
-            System.out.println("    delta gyro: " + (currentGyroDegrees - lastGyroDegrees));
-            System.out.println("    delta wheels: " + (deltaSum / 4));
             // inches = (degrees * inches)/degrees
             radii[execution] = ((currentGyroDegrees - lastGyroDegrees) * (driveBaseRadius)) / (deltaSum / 4);
 
