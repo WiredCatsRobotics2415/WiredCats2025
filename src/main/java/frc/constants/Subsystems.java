@@ -83,9 +83,10 @@ public class Subsystems {
         public static final int ThroughborePort = 19;
 
         // With 0 degrees being up
+        public static final double ThroughboreMin = 0;
+        public static final double ThroughboreMax = 0;
         public static final double MaxDegreesBack = -135;
         public static final double MaxDegreesFront = 135;
-        public static final double EffectiveLengthInches = 12;
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -97,9 +98,9 @@ public class Subsystems {
         public static final double kP = 0;
         public static final double kD = 0;
 
-        //Copied from 2024, need to be changed
-        public static final double ApproximateMassKg = 12.42;
-        public static final float RotorToArmGearRatio = 280 / 1;
+        public static final double ApproximateMassKg = 1.5; //Approximated from CAD at 2/7
+        public static final float RotorToArmGearRatio = 50 / 1; //Planetaries amount unknown as of 2/7
+        public static final double EffectiveLengthInches = 12;
 
     }
 
