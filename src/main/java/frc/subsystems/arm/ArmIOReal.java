@@ -42,10 +42,10 @@ public class ArmIOReal implements ArmIO {
     public void updateInputs(ArmIOInputsAutoLogged inputs) {
         BaseStatusSignal.refreshAll(motorStator, motorSupply, motorTemp);
 
-        inputs.leftConnected = motor.isAlive();
-        inputs.leftStatorCurrent = motorStator.getValue();
-        inputs.leftSupplyCurrent = motorSupply.getValue();
-        inputs.leftTemp = motorTemp.getValue();
+        inputs.motorConnected = motor.isAlive();
+        inputs.motorStatorCurrent = motorStator.getValue();
+        inputs.motorSupplyCurrent = motorSupply.getValue();
+        inputs.motorTemp = motorTemp.getValue();
 
         inputs.appliedVoltage = appliedVoltage;
         //I'm not sure this is correct
