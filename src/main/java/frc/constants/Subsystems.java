@@ -2,6 +2,8 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -76,10 +78,30 @@ public class Subsystems {
     }
 
     public class ArmConstants {
+        //Setting temporary values
+        public static final int LeftMotorID = 32;
+        public static final int RightMotorID = 14;
+        public static final int ThroughborePort = 19;
+
         // With 0 degrees being up
         public static final double MaxDegreesBack = -135;
         public static final double MaxDegreesFront = 135;
         public static final double EffectiveLengthInches = 12;
+
+        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
+            .withInverted(InvertedValue.CounterClockwise_Positive);
+
+        public static final double kS = 0;
+        public static final double kV = 0;
+        public static final double kA = 0; 
+        public static final double kG = 0;
+        public static final double kP = 0;
+        public static final double kD = 0;
+
+        //Copied from 2024, need to be changed
+        public static final double ApproximateMassKg = 12.42;
+        public static final float RotorToArmGearRatio = 280 / 1;
+
     }
 
     public class EndEffectorConstants {
