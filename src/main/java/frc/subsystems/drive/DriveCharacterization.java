@@ -136,7 +136,7 @@ public class DriveCharacterization extends Characterizer {
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
             drive.setControl(new SwerveRequest.RobotCentric()
-                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / radii.length))
+                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / (radii.length / 1.5)))
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo)
                 .withDriveRequestType(DriveRequestType.Velocity));
 

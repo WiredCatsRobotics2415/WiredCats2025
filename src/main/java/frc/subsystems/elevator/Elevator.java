@@ -33,7 +33,7 @@ public class Elevator extends SubsystemBase {
     public void setGoal(double goalInches) {
         if (goalInches > ElevatorConstants.MaxHeightInches || goalInches < ElevatorConstants.MinHeightInches) return;
         this.goalInches = goalInches;
-        pid.setGoal(new TrapezoidProfile.State(goalInches, 0));
+        pid.setGoal(goalInches);
     }
 
     public boolean atGoal() {
@@ -47,7 +47,7 @@ public class Elevator extends SubsystemBase {
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+        double feedforward = ff.calculate(setpoint.position);
         double voltOut = output + feedforward;
         io.setVoltage(voltOut);
     }
