@@ -19,6 +19,9 @@ public class DashboardManager {
         public static final LayoutInfo Alerts = new LayoutInfo(7, 0, 3, 6);
 
         public static final LayoutInfo AutoSelector = new LayoutInfo(0, 0, 2, 1);
+
+        //Added for arm
+        public static final LayoutInfo CoastCommand = new LayoutInfo(3, 4, 2, 2);
     }
 
     private ShuffleboardTab teleopTab = Shuffleboard.getTab("Teleoperated");
