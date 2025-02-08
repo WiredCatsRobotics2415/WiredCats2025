@@ -91,6 +91,9 @@ public class Subsystems {
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
+        public static final double veloMax = 0;
+        public static final double accelMax = 0;
+
         public static final double kS = 0;
         public static final double kV = 0;
         public static final double kA = 0; 
@@ -101,6 +104,7 @@ public class Subsystems {
         public static final double ApproximateMassKg = 1.5; //Approximated from CAD at 2/7
         public static final float RotorToArmGearRatio = 50 / 1; //Planetaries amount unknown as of 2/7
         public static final double EffectiveLengthInches = 12;
+        public static final double GoalTolerance = 3;
 
     }
 
