@@ -183,8 +183,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Uses Pathplanner's pathfinding (obstactle avoiding trajectory generation) to drive to a pose
-     * w/ same constants and smoothing as autonomous
+     * Uses Pathplanner's pathfinding (obstactle avoiding trajectory generation) to drive to a pose w/ same constants and smoothing as autonomous
+     *
      * @param goalPose The pose to drive to
      */
     public Command pathfindTo(Pose2d goalPose) {
@@ -204,9 +204,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     }
 
     /**
-     * Uses simple PID control to drive the robot to a position, with different translation PID constants than Pathplanner.
-     * and using Phoenix's FieldCentricFacingAngle SwerveRequest
-     * @param goalPose The pose to drive to
+     * Uses simple PID control to drive the robot to a position, with different translation PID constants than Pathplanner. and using Phoenix's FieldCentricFacingAngle SwerveRequest
+     *
+     * @param goalPose                   The pose to drive to
      * @param translationToleranceMeters The tolerance allowed for the translation controllers
      */
     public Command driveTo(Pose2d goalPose, double translationToleranceMeters) {
