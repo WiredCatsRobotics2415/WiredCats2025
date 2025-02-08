@@ -1,6 +1,5 @@
 package frc.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.ctre.phoenix6.StatusCode;
@@ -20,11 +19,9 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -34,13 +31,11 @@ import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.constants.Controls;
-import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.DriveAutoConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
-import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Statistics;
 import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
@@ -161,30 +156,12 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 hasAppliedOperatorPerspective = true;
             });
         }
-        updateLimelights();
-
         SwerveDriveState currentState = getState();
+        vision.globalPoseEstimation(currentState, this);
+
         Logger.recordOutput("Drive/Pose", currentState.Pose);
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
         Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
-    }
-
-    public void updateLimelights() {
-        SwerveDriveState currentState = this.getState();
-        Pose2d currentRobotPose = currentState.Pose;
-        vision.sendOrientation(currentRobotPose.getRotation());
-        PoseEstimate[] estimates = vision.getPoseEstimates();
-
-        for (int i = 0; i < estimates.length; i++) {
-            PoseEstimate estimate = estimates[i];
-            double twoDDistance = currentRobotPose.getTranslation().getDistance(estimate.pose.getTranslation());
-            if (Math.abs((Units.radiansToDegrees(this.getState().Speeds.omegaRadiansPerSecond))) < 720
-                && estimate.tagCount > 0 && twoDDistance < (RobotMeasurements.CenterToPerpendicularFrame.in(Meters))) {
-                setVisionMeasurementStdDevs(VecBuilder.fill(.85 + 0.5 * currentState.Speeds.vxMetersPerSecond,
-                    .85 + 0.5 * currentState.Speeds.vyMetersPerSecond, 9999999));
-                addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds));
-            }
-        }
     }
 
     /**

@@ -5,7 +5,7 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.utils.Utils;
+import frc.utils.Util;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
@@ -21,7 +21,7 @@ public class Elevator extends SubsystemBase {
     private static Elevator instance;
 
     private Elevator() {
-        io = (ElevatorIO) Utils.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+        io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
     }
 
     public static Elevator getInstance() {
@@ -41,7 +41,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public double getMeasurement() {
-        return Utils.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt,
+        return Util.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt,
             ElevatorConstants.PotentiometerMaxVolt, ElevatorConstants.MinHeightInches,
             ElevatorConstants.MaxHeightInches);
     }

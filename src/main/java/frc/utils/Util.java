@@ -7,7 +7,7 @@ import frc.constants.RuntimeConstants.Mode;
 import frc.robot.Robot;
 import java.lang.reflect.InvocationTargetException;
 
-public class Utils {
+public class Util {
     /**
      * Select the correct IO implementation based on the runtime mode.
      *

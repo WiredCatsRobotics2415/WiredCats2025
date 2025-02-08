@@ -78,7 +78,7 @@ public class Subsystems {
     }
 
     public class ArmConstants {
-        //Setting temporary values
+        // Setting temporary values
         public static final int MotorID = 32;
         public static final int ThroughborePort = 19;
 
@@ -96,13 +96,13 @@ public class Subsystems {
 
         public static final double kS = 0;
         public static final double kV = 0;
-        public static final double kA = 0; 
+        public static final double kA = 0;
         public static final double kG = 0;
         public static final double kP = 0;
         public static final double kD = 0;
 
-        public static final double ApproximateMassKg = 1.5; //Approximated from CAD at 2/7
-        public static final float RotorToArmGearRatio = 50 / 1; //Planetaries amount unknown as of 2/7
+        public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
+        public static final float RotorToArmGearRatio = 50 / 1; // Planetaries amount unknown as of 2/7
         public static final double EffectiveLengthInches = 12;
         public static final double GoalTolerance = 3;
 
