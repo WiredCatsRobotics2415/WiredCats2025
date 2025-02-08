@@ -74,6 +74,7 @@ public class Measurements {
             BreakerCurrentAndTripTimes.put(2.5, 1.25 - timeSafetyTolerace);
         }
 
+        //TODO: look back at this
         public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
             CurrentLimitsConfigs config = new CurrentLimitsConfigs();
             config.SupplyCurrentLimitEnable = true;

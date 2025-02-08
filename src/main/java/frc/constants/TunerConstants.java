@@ -44,6 +44,7 @@ public class TunerConstants {
     // The stator current at which the wheels start to slip;
     // This needs to be tuned to your individual robot
     // 1/31 - keep this at 40 until it is tuned, for safety reasons
+    // 2/7 - tuned: this is 40 (on 24 robot)
     private static final Current kSlipCurrent = Amps.of(40.0);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
@@ -71,6 +72,7 @@ public class TunerConstants {
     // This may need to be tuned to your individual robot
     private static final double kCoupleRatio = 3.5714285714285716;
 
+    //TODO: account for drive motor being a kraken w/ a different spline
     private static final double kDriveGearRatio = 6.746031746031747;
     private static final double kSteerGearRatio = 21.428571428571427;
     public static final Distance kWheelRadius = Inches.of(1.75);
