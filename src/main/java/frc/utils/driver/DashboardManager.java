@@ -20,7 +20,7 @@ public class DashboardManager {
 
         public static final LayoutInfo AutoSelector = new LayoutInfo(0, 0, 2, 1);
 
-        //Added for arm
+        // Added for arm
         public static final LayoutInfo CoastCommand = new LayoutInfo(3, 4, 2, 2);
     }
 

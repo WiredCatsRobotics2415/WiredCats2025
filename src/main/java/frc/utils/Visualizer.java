@@ -1,5 +1,8 @@
 package frc.utils;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.util.Units;
@@ -19,7 +22,7 @@ public class Visualizer {
 
     public static void update() {
         // Elevator
-        double height = elevatorSubsystem.getGoalInches();
+        double height = elevatorSubsystem.getGoalInches().in(Inches);
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
         Pose3d elevatorStage2 = new Pose3d(0, 0,
             Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) * (ElevatorConstants.Stage2Height)),
@@ -34,12 +37,14 @@ public class Visualizer {
         Logger.recordOutput("Visualization/Carriage", carriage);
 
         // Arm
-        double angleRads = Units.degreesToRadians(armSubsystem.getGoalDegrees());
+        double angleRads = (armSubsystem.getGoalDegrees()).in(Radians);
         Pose3d arm = new Pose3d(
-            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches), 0,
+            Units.inchesToMeters(-Math.cos((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches.in(Inches)),
+            0,
             Units.inchesToMeters(height) +
-                Units.inchesToMeters(-Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches) +
-                Units.inchesToMeters(ArmConstants.EffectiveLengthInches),
+                Units.inchesToMeters(
+                    -Math.sin((Math.PI / 2) - angleRads) * ArmConstants.EffectiveLengthInches.in(Inches)) +
+                Units.inchesToMeters(ArmConstants.EffectiveLengthInches.in(Inches)),
             new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/ArmAndEndEffector", arm);

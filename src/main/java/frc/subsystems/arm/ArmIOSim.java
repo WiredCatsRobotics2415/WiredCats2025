@@ -1,5 +1,8 @@
 package frc.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radians;
+
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
@@ -11,14 +14,13 @@ public class ArmIOSim implements ArmIO {
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getFalcon500(1),
         ArmConstants.RotorToArmGearRatio,
         // Should the length be in meters?
-        SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches / 39.37009424,
+        SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches.div(39.37009424).in(Inches),
             ArmConstants.ApproximateMassKg),
-        ArmConstants.EffectiveLengthInches / 39.37009424, Units.degreesToRadians(ArmConstants.MaxDegreesBack),
-        Units.degreesToRadians(ArmConstants.MaxDegreesFront), true,
-        Units.degreesToRadians(ArmConstants.MaxDegreesBack));
+        ArmConstants.EffectiveLengthInches.div(39.37009424).in(Inches), ArmConstants.MaxDegreesBack.in(Radians),
+        ArmConstants.MaxDegreesFront.in(Radians), true, ArmConstants.MaxDegreesBack.in(Radians));
 
     public ArmIOSim() {
-        simArm.setState(Units.degreesToRadians(ArmConstants.MaxDegreesBack), 0);
+        simArm.setState(ArmConstants.MaxDegreesBack.in(Radians), 0);
     }
 
     @Override

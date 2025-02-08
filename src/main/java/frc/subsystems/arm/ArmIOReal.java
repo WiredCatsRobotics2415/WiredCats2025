@@ -1,5 +1,7 @@
 package frc.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -22,8 +24,8 @@ public class ArmIOReal implements ArmIO {
     public ArmIOReal() {
         // I'm not sure this is correct
         throughbore = new DutyCycleEncoder(ArmConstants.ThroughborePort,
-            ArmConstants.MaxDegreesFront - ArmConstants.MaxDegreesBack,
-            (ArmConstants.MaxDegreesFront - ArmConstants.MaxDegreesBack) / 2);
+            (ArmConstants.MaxDegreesFront.minus(ArmConstants.MaxDegreesBack)).in(Degrees),
+            ((ArmConstants.MaxDegreesFront.minus(ArmConstants.MaxDegreesBack).div(2))).in(Degrees));
 
         configureMotors();
     }

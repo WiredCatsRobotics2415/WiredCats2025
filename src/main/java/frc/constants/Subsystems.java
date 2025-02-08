@@ -12,6 +12,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.util.Color;
 
@@ -85,8 +86,8 @@ public class Subsystems {
         // With 0 degrees being up
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 0;
-        public static final double MaxDegreesBack = -135;
-        public static final double MaxDegreesFront = 135;
+        public static final Angle MaxDegreesBack = Degrees.of(-135);
+        public static final Angle MaxDegreesFront = Degrees.of(135);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -103,7 +104,7 @@ public class Subsystems {
 
         public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
         public static final float RotorToArmGearRatio = 50 / 1; // Planetaries amount unknown as of 2/7
-        public static final double EffectiveLengthInches = 12;
+        public static final Distance EffectiveLengthInches = Inches.of(12);
         public static final double GoalTolerance = 3;
 
     }

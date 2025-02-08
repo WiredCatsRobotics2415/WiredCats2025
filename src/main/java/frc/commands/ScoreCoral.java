@@ -91,7 +91,8 @@ public class ScoreCoral extends Command {
         driveCommand = drive.driveTo(driveTo, ToleranceMetersInches);
         driveCommand.schedule();
 
-        superStructureCommand = superStructure.runToPositionCommand(goalHeightInches, goalArmDegrees);
+        superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
+            Degrees.of(goalArmDegrees));
         superStructureCommand.schedule();
     }
 

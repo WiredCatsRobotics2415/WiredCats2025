@@ -1,9 +1,12 @@
 package frc.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
@@ -21,7 +24,7 @@ public class Arm extends SubsystemBase {
     private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
         new TrapezoidProfile.Constraints(ArmConstants.veloMax, ArmConstants.accelMax));
 
-    @Getter private double goalDegrees = 0.0;
+    @Getter private Angle goalDegrees = Degrees.of(0.0);
 
     private boolean isCoasting = false;
 
@@ -61,10 +64,11 @@ public class Arm extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(double goalDegrees) {
-        if (goalDegrees > ArmConstants.MaxDegreesFront || goalDegrees < ArmConstants.MaxDegreesBack) return;
+    public void setGoal(Angle goalDegrees) {
+        if (ArmConstants.MaxDegreesFront.compareTo(goalDegrees) == 1
+            || ArmConstants.MaxDegreesBack.compareTo(goalDegrees) == 1) return;
         this.goalDegrees = goalDegrees;
-        pid.setGoal(new TrapezoidProfile.State(goalDegrees, 0));
+        pid.setGoal(new TrapezoidProfile.State(goalDegrees.in(Degrees), 0.0d));
     }
 
     public boolean atGoal() {
@@ -76,11 +80,11 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (goalDegrees >= ArmConstants.MaxDegreesFront) {
+            if (ArmConstants.MaxDegreesFront.compareTo(goalDegrees) <= 0) {
                 goalDegrees = ArmConstants.MaxDegreesFront;
                 return;
             }
-            goalDegrees += 0.5;
+            goalDegrees = goalDegrees.plus(Degrees.of(0.5));
             this.setGoal(goalDegrees);
         }));
     }
@@ -90,11 +94,11 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (goalDegrees <= ArmConstants.MaxDegreesBack) {
+            if (ArmConstants.MaxDegreesBack.compareTo(goalDegrees) <= 0) {
                 goalDegrees = ArmConstants.MaxDegreesBack;
                 return;
             }
-            goalDegrees -= 0.5;
+            goalDegrees = goalDegrees.minus(Degrees.of(0.5));
             this.setGoal(goalDegrees);
         }));
     }
@@ -110,7 +114,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean withinSetGoalTolerance() {
-        return MathUtil.isNear(goalDegrees, inputs.position, ArmConstants.GoalTolerance);
+        return MathUtil.isNear(goalDegrees.in(Degrees), inputs.position, ArmConstants.GoalTolerance);
     }
 
     // Is this still needed?

@@ -1,15 +1,18 @@
 package frc.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
-    @Getter private double goalInches = 0.0;
+    @Getter private Distance goalInches = Inches.of(0.0);
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA);
@@ -30,10 +33,11 @@ public class Elevator extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(double goalInches) {
-        if (goalInches > ElevatorConstants.MaxHeightInches || goalInches < ElevatorConstants.MinHeightInches) return;
+    public void setGoal(Distance goalInches) {
+        if (goalInches.in(Inches) > ElevatorConstants.MaxHeightInches
+            || goalInches.in(Inches) < ElevatorConstants.MinHeightInches) return;
         this.goalInches = goalInches;
-        pid.setGoal(goalInches);
+        pid.setGoal(goalInches.in(Inches));
     }
 
     public boolean atGoal() {
