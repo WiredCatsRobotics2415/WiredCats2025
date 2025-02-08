@@ -85,5 +85,6 @@ public class Subsystems {
     public class EndEffectorConstants {
         public static final double EffectiveLengthInches = 8;
         public static final int MotorPort = 4;
+        public static final int EndEffectorIR = 5; 
     }
 }
