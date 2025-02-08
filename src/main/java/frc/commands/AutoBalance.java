@@ -9,15 +9,15 @@ public class AutoBalance extends Command {
     CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     Pigeon2 pigeon = drive.getPigeon2();
 
-    public void balanceYaw() {
+    public void balanceRoll() {
         // requires testing of how to balance subsystems
     }
     public void balancePitch() {
         // requires testing of how to balance subsystems
     }
 
-    public boolean checkYaw() {
-        if (Math.abs(pigeon.getYaw().getValueAsDouble()) > BalanceConstants.yawThreshold) {
+    public boolean checkRoll() {
+        if (Math.abs(pigeon.getRoll().getValueAsDouble()) > BalanceConstants.rollThreshold) {
             return false;
         } else {
             return true;
@@ -39,11 +39,11 @@ public class AutoBalance extends Command {
 
     @Override
     public void execute() {
-        if (!checkYaw() | !checkPitch()) {
-            if (!checkYaw()) {
-                //this should change our yaw by very small increments depending on which direction it is tilted
+        if (!checkRoll() | !checkPitch()) {
+            if (!checkRoll()) {
+                //this should change our roll by very small increments depending on which direction it is tilted
                 //how this works will be tested by driver first
-                balanceYaw();
+                balanceRoll();
             }
             if (!checkPitch()) {
                 //this should change our pitch by very small increments depending on which direction it is tilted
