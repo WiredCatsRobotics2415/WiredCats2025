@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ArmConstants;
-import frc.utils.Utils;
+import frc.utils.Util;
 import frc.utils.driver.DashboardManager;
 import frc.utils.driver.DashboardManager.LayoutConstants;
 import frc.utils.Visualizer;
@@ -32,7 +32,7 @@ public class Arm extends SubsystemBase {
     private static Arm instance;
 
     private Arm() {
-        io = (ArmIO) Utils.getIOImplementation(ArmIOReal.class, ArmIOSim.class,
+        io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class,
             ArmIO.class);
 
         DashboardManager.getInstance().addCommand(true, "Coast or Brake",
