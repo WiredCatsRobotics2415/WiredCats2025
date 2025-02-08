@@ -59,8 +59,8 @@ public class Measurements {
     }
 
     public class BalanceConstants {
-        public static final double yawThreshold = 0;
         public static final double rollThreshold = 0;
+        public static final double pitchThreshold = 0;
     }
 
     public class MotorConstants {

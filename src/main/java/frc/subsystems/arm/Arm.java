@@ -2,6 +2,10 @@ package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
 
+import static edu.wpi.first.units.Units.Degrees;
+import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -27,10 +31,9 @@ public class Arm extends SubsystemBase {
     @Getter private Angle goalDegrees = Degrees.of(0.0);
 
     private boolean isCoasting = false;
-
+    private static Arm instance;
     private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
-    private static Arm instance;
 
     private Arm() {
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, ArmIO.class);

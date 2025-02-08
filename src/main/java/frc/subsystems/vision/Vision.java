@@ -25,10 +25,11 @@ public class Vision extends SubsystemBase {
     private static Vision instance;
 
     private final TuneableNumber BaseDistrust = new TuneableNumber(0.7, "BaseDistrust");
-    private final TuneableNumber DistanceDistrustScalar = new TuneableNumber(0.3, "DistanceDistrustScalar");
+    private final TuneableNumber DistanceFromCurrentScalar = new TuneableNumber(2, "DistanceFromCurrentScalar");
+    private final TuneableNumber DistanceDistrustScalar = new TuneableNumber(15, "DistanceDistrustScalar");
     private final TuneableNumber RotationSpeedDiscardThreshold = new TuneableNumber(720,
         "RotationSpeedDiscardThreshold");
-    private final TuneableBoolean AddYawRate = new TuneableBoolean(false, "AddYawRate");
+    private final TuneableBoolean AddYawRate = new TuneableBoolean(true, "AddYawRate");
 
     private Vision() {
         io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, VisionIO.class);
@@ -116,10 +117,12 @@ public class Vision extends SubsystemBase {
                     .get())
                 rejectUpdate = true;
             if (estimate.tagCount > 0) rejectUpdate = true;
-            if (twoDDistance < RobotMeasurements.CenterToPerpendicularFrame.in(Meters)) rejectUpdate = true;
+            if (twoDDistance > 2 * RobotMeasurements.CenterToPerpendicularFrame.in(Meters)) rejectUpdate = true; // test 1-10: inequality was unintentionally flipped, test 20: added 2x
             if (!rejectUpdate) {
-                double xSTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist);
-                double ySTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist);
+                double xSTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist) +
+                    (DistanceFromCurrentScalar.get() * twoDDistance);
+                double ySTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist) +
+                    (DistanceFromCurrentScalar.get() * twoDDistance);
 
                 driveInstance.addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds),
                     VecBuilder.fill(xSTDEV, ySTDEV, 9999999));
