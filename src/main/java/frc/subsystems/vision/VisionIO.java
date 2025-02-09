@@ -14,7 +14,7 @@ public interface VisionIO {
         public int[] poseTagCounts;
     }
 
-    public default void updateInputs(VisionIOInputsAutoLogged inputs) {}
+    public default void updateInputs(VisionIOInputs inputs) {}
 
     public default void setRobotOrientation(double yaw, double yawRate) {}
 

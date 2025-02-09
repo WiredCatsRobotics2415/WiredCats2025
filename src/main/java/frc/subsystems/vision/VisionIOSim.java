@@ -52,7 +52,7 @@ public class VisionIOSim implements VisionIO {
     // then we should have one tuning command in a new visioncharacterization class that runs
     // paths in sim, adjust options, goes again and again
     @Override
-    public void updateInputs(VisionIOInputsAutoLogged inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         inputs.poseEstimates = new Pose2d[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];

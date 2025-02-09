@@ -117,7 +117,7 @@ public class Vision extends SubsystemBase {
                     .get())
                 rejectUpdate = true;
             if (estimate.tagCount > 0) rejectUpdate = true;
-            if (twoDDistance > 2 * RobotMeasurements.CenterToPerpendicularFrame.in(Meters)) rejectUpdate = true; // test 1-10: inequality was unintentionally flipped, test 20: added 2x
+            if (twoDDistance > 2 * RobotMeasurements.CenterToFrameRadius.in(Meters)) rejectUpdate = true; // test 1-10: inequality was unintentionally flipped, test 20: added 2x
             if (!rejectUpdate) {
                 double xSTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist) +
                     (DistanceFromCurrentScalar.get() * twoDDistance);

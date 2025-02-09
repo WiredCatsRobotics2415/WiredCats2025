@@ -2,10 +2,6 @@ package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import static edu.wpi.first.units.Units.Degrees;
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,10 +12,9 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ArmConstants;
+import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
 import frc.utils.Visualizer;
-import frc.utils.driver.DashboardManager;
-import frc.utils.driver.DashboardManager.LayoutConstants;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -36,15 +31,8 @@ public class Arm extends SubsystemBase {
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
     private Arm() {
+        pid.setTolerance(ArmConstants.GoalTolerance);
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, ArmIO.class);
-
-        DashboardManager.getInstance().addCommand(true, "Coast or Brake", new InstantCommand(() -> {
-            if (isCoasting) {
-                coast();
-            } else {
-                brake();
-            }
-        }, this), LayoutConstants.CoastCommand);
     }
 
     public static Arm getInstance() {
@@ -52,30 +40,11 @@ public class Arm extends SubsystemBase {
         return instance;
     }
 
-    /**
-     * Sets the left arm's motor to the desired voltage, calculated by the feedforward object and PID subsystem.
-     *
-     * @param output   the output of the ProfiledPIDController
-     * @param setpoint the setpoint state of the ProfiledPIDController, for feedforward
-     */
-    private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
-        double voltOut = output + feedforward;
-        if (!isCoasting) {
-            io.setVoltage(voltOut);
-        }
-    }
-
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
     public void setGoal(Angle goalDegrees) {
-        if (ArmConstants.MaxDegreesFront.compareTo(goalDegrees) == 1
-            || ArmConstants.MaxDegreesBack.compareTo(goalDegrees) == 1) return;
+        if (goalDegrees.gt(ArmConstants.MaxDegreesFront) || goalDegrees.lt(ArmConstants.MaxDegreesBack)) return;
         this.goalDegrees = goalDegrees;
         pid.setGoal(new TrapezoidProfile.State(goalDegrees.in(Degrees), 0.0d));
-    }
-
-    public boolean atGoal() {
-        return pid.atSetpoint();
     }
 
     /**
@@ -83,7 +52,7 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (ArmConstants.MaxDegreesFront.compareTo(goalDegrees) <= 0) {
+            if (goalDegrees.gt(ArmConstants.MaxDegreesFront)) {
                 goalDegrees = ArmConstants.MaxDegreesFront;
                 return;
             }
@@ -97,7 +66,7 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (ArmConstants.MaxDegreesBack.compareTo(goalDegrees) <= 0) {
+            if (goalDegrees.lt(ArmConstants.MaxDegreesBack)) {
                 goalDegrees = ArmConstants.MaxDegreesBack;
                 return;
             }
@@ -116,23 +85,30 @@ public class Arm extends SubsystemBase {
         isCoasting = false;
     }
 
-    public boolean withinSetGoalTolerance() {
-        return MathUtil.isNear(goalDegrees.in(Degrees), inputs.position, ArmConstants.GoalTolerance);
+    public boolean atGoal() {
+        return pid.atSetpoint();
     }
 
-    // Is this still needed?
-    // public void resetPotentiometerAndArm() {
-    // io.setPotentiometerBounds(ArmConstants.ThroughboreMin,
-    // ArmConstants.ThroughboreMax);
-    // }
+    public double getMeasurement() {
+        return Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin,
+            ArmConstants.ThroughboreMax, ArmConstants.MaxDegreesBack.in(Degrees),
+            ArmConstants.MaxDegreesFront.in(Degrees));
+    }
+
+    private void useOutput(double output, TrapezoidProfile.State setpoint) {
+        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+        double voltOut = output + feedforward;
+        if (!isCoasting) {
+            io.setVoltage(voltOut);
+        }
+    }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        useOutput(pid.calculate(inputs.position), pid.getSetpoint());
-
-        Visualizer.update();
+        double measurement = getMeasurement();
+        useOutput(pid.calculate(measurement), pid.getSetpoint());
     }
 }

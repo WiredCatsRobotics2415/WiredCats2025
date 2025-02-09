@@ -12,7 +12,7 @@ public class VisionIOReal implements VisionIO {
     }
 
     @Override
-    public void updateInputs(VisionIOInputsAutoLogged inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         inputs.poseEstimates = new Pose2d[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];

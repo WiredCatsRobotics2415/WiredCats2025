@@ -104,8 +104,8 @@ public class Subsystems {
 
         public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
         public static final float RotorToArmGearRatio = 50 / 1; // Planetaries amount unknown as of 2/7
-        public static final Distance EffectiveLengthInches = Inches.of(26.784);
-        public static final double GoalTolerance = 3;
+        public static final Distance EffectiveLengthInches = Inches.of(28);
+        public static final double GoalTolerance = 0.5;
 
     }
 

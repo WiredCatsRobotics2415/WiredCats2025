@@ -13,11 +13,11 @@ public interface ArmIO {
         public Current motorSupplyCurrent = Current.ofBaseUnits(0.0, Units.Amps);
         public Temperature motorTemp = Temperature.ofBaseUnits(0.0, Units.Celsius);
 
-        public double position = 0.0d;
+        public double throughborePosition = 0.0d;
         public double appliedVoltage = 0.0d;
     }
 
-    public default void updateInputs(ArmIOInputsAutoLogged inputs) {}
+    public default void updateInputs(ArmIOInputs inputs) {}
 
     public default void setVoltage(double voltage) {}
 

@@ -24,12 +24,12 @@ public class ArmIOSim implements ArmIO {
     }
 
     @Override
-    public void updateInputs(ArmIOInputsAutoLogged inputs) {
+    public void updateInputs(ArmIOInputs inputs) {
         simArm.update(0.02);
 
         inputs.motorConnected = true;
         inputs.appliedVoltage = appliedVoltage;
-        inputs.position = Units.radiansToDegrees(simArm.getAngleRads());
+        inputs.throughborePosition = Units.radiansToRotations(simArm.getAngleRads());
     }
 
     @Override

@@ -30,11 +30,11 @@ public class TuneableBoolean {
         if (RuntimeConstants.TuningMode) {
             boolean entry = thisEntry.get();
             if (entry != previousValue) {
-                Logger.recordOutput("TuneableBooleans/" + name, entry);
                 previousValue = entry;
                 for (Runnable r : listeners)
                     r.run();
             }
+            Logger.recordOutput("TuneableBooleans/" + name, entry);
             return entry;
         }
         return previousValue;

@@ -12,6 +12,7 @@ public class AutoBalance extends Command {
     public void balanceRoll() {
         // requires testing of how to balance subsystems
     }
+
     public void balancePitch() {
         // requires testing of how to balance subsystems
     }
@@ -41,13 +42,13 @@ public class AutoBalance extends Command {
     public void execute() {
         if (!checkRoll() | !checkPitch()) {
             if (!checkRoll()) {
-                //this should change our roll by very small increments depending on which direction it is tilted
-                //how this works will be tested by driver first
+                // this should change our roll by very small increments depending on which direction it is tilted
+                // how this works will be tested by driver first
                 balanceRoll();
             }
             if (!checkPitch()) {
-                //this should change our pitch by very small increments depending on which direction it is tilted
-                //how this works will be tested by driver first
+                // this should change our pitch by very small increments depending on which direction it is tilted
+                // how this works will be tested by driver first
                 balancePitch();
             }
         } else {

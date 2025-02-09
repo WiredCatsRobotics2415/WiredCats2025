@@ -30,11 +30,11 @@ public class TuneableNumber {
         if (RuntimeConstants.TuningMode) {
             double entry = thisEntry.get();
             if (entry != previousNumber) {
-                Logger.recordOutput("TuneableNumbers/" + name, entry);
                 previousNumber = entry;
                 for (Runnable r : listeners)
                     r.run();
             }
+            Logger.recordOutput("TuneableNumbers/" + name, entry);
             return entry;
         }
         return previousNumber;

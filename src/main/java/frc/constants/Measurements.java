@@ -7,15 +7,18 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import java.util.List;
 
 public class Measurements {
     public class RobotMeasurements {
-        public static final Distance BumperLength = Inches.of(0);
+        public static final Distance BumperLength = Inches.of(3);
 
-        public static final Distance CenterToPerpendicularFrame = Inches.of(15.375); // Krayon: 14, 24': 15.375
+        public static final Distance CenterToFrameRadius = Inches.of(21.313);
+
+        public static final Angle ElevatorTilt = Degrees.of(3.7);
     }
 
     public class ReefMeasurements {
@@ -65,16 +68,16 @@ public class Measurements {
 
     public class MotorConstants {
         // The number of seconds to subtract from all times in BreakerCurrentAndTripTimes just to be careful
-        public static final double timeSafetyTolerace = 0.1;
+        public static final double TimeSafetyTolerace = 0.1;
         public static final InterpolatingDoubleTreeMap BreakerCurrentAndTripTimes = new InterpolatingDoubleTreeMap();
         static {
             BreakerCurrentAndTripTimes.put(1.0, 70.0);
-            BreakerCurrentAndTripTimes.put(1.5, 10.5 - timeSafetyTolerace);
-            BreakerCurrentAndTripTimes.put(2.0, 4.5 - timeSafetyTolerace);
-            BreakerCurrentAndTripTimes.put(2.5, 1.25 - timeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(1.5, 10.5 - TimeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.0, 4.5 - TimeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.5, 1.25 - TimeSafetyTolerace);
         }
 
-        //TODO: look back at this
+        // TODO: look back at this
         public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
             CurrentLimitsConfigs config = new CurrentLimitsConfigs();
             config.SupplyCurrentLimitEnable = true;

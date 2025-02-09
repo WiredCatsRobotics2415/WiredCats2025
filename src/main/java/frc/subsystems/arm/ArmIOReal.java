@@ -39,7 +39,7 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
-    public void updateInputs(ArmIOInputsAutoLogged inputs) {
+    public void updateInputs(ArmIOInputs inputs) {
         BaseStatusSignal.refreshAll(motorStator, motorSupply, motorTemp);
 
         inputs.motorConnected = motor.isAlive();
@@ -48,8 +48,7 @@ public class ArmIOReal implements ArmIO {
         inputs.motorTemp = motorTemp.getValue();
 
         inputs.appliedVoltage = appliedVoltage;
-        // I'm not sure this is correct
-        inputs.position = throughbore.get();
+        inputs.throughborePosition = throughbore.get();
     }
 
     @Override

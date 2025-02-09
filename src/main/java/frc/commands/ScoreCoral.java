@@ -31,7 +31,7 @@ public class ScoreCoral extends Command {
         L1, L2, L3, L4,
     }
 
-    private static final Distance CenterToBumper = RobotMeasurements.CenterToPerpendicularFrame
+    private static final Distance CenterToBumper = RobotMeasurements.CenterToFrameRadius
         .plus(RobotMeasurements.BumperLength).times(-1);
     private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
     private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
