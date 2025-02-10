@@ -8,11 +8,13 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ElevatorConstants;
+import frc.utils.DoubleDifferentiableValue;
 import frc.utils.Util;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
-    @Getter private Distance goalInches = Inches.of(0.0);
+    @Getter private Distance goal = Inches.of(0.0);
+    @Getter private DoubleDifferentiableValue measurementInches = new DoubleDifferentiableValue();
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA);
@@ -33,11 +35,11 @@ public class Elevator extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(Distance goalInches) {
-        if (goalInches.in(Inches) > ElevatorConstants.MaxHeightInches
-            || goalInches.in(Inches) < ElevatorConstants.MinHeightInches) return;
-        this.goalInches = goalInches;
-        pid.setGoal(goalInches.in(Inches));
+    public void setGoal(Distance setGoal) {
+        if (setGoal.in(Inches) > ElevatorConstants.MaxHeightInches
+            || setGoal.in(Inches) < ElevatorConstants.MinHeightInches) return;
+        this.goal = setGoal;
+        pid.setGoal(setGoal.in(Inches));
     }
 
     public boolean atGoal() {
@@ -61,6 +63,7 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
 
         double measurement = getMeasurement();
+        measurementInches.update(measurement);
         useOutput(pid.calculate(measurement), pid.getSetpoint());
     }
 }

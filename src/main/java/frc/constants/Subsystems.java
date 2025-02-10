@@ -110,6 +110,6 @@ public class Subsystems {
     }
 
     public class EndEffectorConstants {
-        public static final double EffectiveLengthInches = 8;
+        public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
     }
 }

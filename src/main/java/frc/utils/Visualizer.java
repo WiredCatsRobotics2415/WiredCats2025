@@ -10,6 +10,7 @@ import edu.wpi.first.math.util.Units;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
+import frc.utils.tuning.TuneableNumber;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -20,9 +21,11 @@ public class Visualizer {
     private static Elevator elevatorSubsystem = Elevator.getInstance();
     private static Arm armSubsystem = Arm.getInstance();
 
+    private static TuneableNumber armHeight = new TuneableNumber(0.25, "ArmHeight");
+
     public static void update() {
         // Elevator
-        double height = elevatorSubsystem.getGoalInches().in(Inches);
+        double height = elevatorSubsystem.getGoal().in(Inches);
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
         Pose3d elevatorStage2 = new Pose3d(0, 0,
             Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) * (ElevatorConstants.Stage2Height)),
@@ -37,8 +40,8 @@ public class Visualizer {
         Logger.recordOutput("Visualization/Carriage", carriage);
 
         // Arm
-        double angleRads = armSubsystem.getGoalDegrees().in(Radians);
-        Pose3d arm = new Pose3d(new Translation3d(0, 0, 0.25), new Rotation3d(0, angleRads, 0));
+        double angleRads = armSubsystem.getGoal().in(Radians);
+        Pose3d arm = new Pose3d(new Translation3d(0, 0, armHeight.get()), new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/ArmAndEndEffector", arm);
     }
