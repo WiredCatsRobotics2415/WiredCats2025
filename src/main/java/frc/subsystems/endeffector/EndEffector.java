@@ -10,8 +10,9 @@ public class EndEffector extends SubsystemBase {
     private static EndEffector instance;
 
     private boolean hasCoral = false;
-    // stores if running the motor forwards will intake algae and outtake coral
-    private boolean ForwardAlgaeIntakeCoralOuttake = true;
+
+    // stores the direction which will intake algae and outtake coral (1 is forwards, -1 is reverse)
+    private int AlgaeIntakeDirection = -1; 
 
     private AnalogInput coralSensor;
 
