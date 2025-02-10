@@ -20,7 +20,7 @@ public class Arm extends SubsystemBase {
     private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
         new TrapezoidProfile.Constraints(ArmConstants.veloMax, ArmConstants.accelMax));
 
-    @Getter private Angle goalDegrees = Degrees.of(0.0);
+    @Getter private Angle goal = Degrees.of(0.0);
 
     private boolean isCoasting = false;
     private static Arm instance;
@@ -38,10 +38,10 @@ public class Arm extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(Angle goalDegrees) {
-        if (goalDegrees.gt(ArmConstants.MaxDegreesFront) || goalDegrees.lt(ArmConstants.MaxDegreesBack)) return;
-        this.goalDegrees = goalDegrees;
-        pid.setGoal(new TrapezoidProfile.State(goalDegrees.in(Degrees), 0.0d));
+    public void setGoal(Angle goal) {
+        if (goal.gt(ArmConstants.MaxDegreesFront) || goal.lt(ArmConstants.MaxDegreesBack)) return;
+        this.goal = goal;
+        pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
     }
 
     /**
@@ -49,12 +49,12 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (goalDegrees.gt(ArmConstants.MaxDegreesFront)) {
-                goalDegrees = ArmConstants.MaxDegreesFront;
+            if (goal.gt(ArmConstants.MaxDegreesFront)) {
+                goal = ArmConstants.MaxDegreesFront;
                 return;
             }
-            goalDegrees = goalDegrees.plus(Degrees.of(0.5));
-            this.setGoal(goalDegrees);
+            goal = goal.plus(Degrees.of(0.5));
+            this.setGoal(goal);
         }));
     }
 
@@ -63,12 +63,12 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return new RepeatCommand(new InstantCommand(() -> {
-            if (goalDegrees.lt(ArmConstants.MaxDegreesBack)) {
-                goalDegrees = ArmConstants.MaxDegreesBack;
+            if (goal.lt(ArmConstants.MaxDegreesBack)) {
+                goal = ArmConstants.MaxDegreesBack;
                 return;
             }
-            goalDegrees = goalDegrees.minus(Degrees.of(0.5));
-            this.setGoal(goalDegrees);
+            goal = goal.minus(Degrees.of(0.5));
+            this.setGoal(goal);
         }));
     }
 

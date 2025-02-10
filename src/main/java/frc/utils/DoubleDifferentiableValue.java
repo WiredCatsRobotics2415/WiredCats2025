@@ -3,7 +3,7 @@ package frc.utils;
 import edu.wpi.first.wpilibj.Timer;
 import lombok.Getter;
 
-class DoubleDifferentiableValue {
+public class DoubleDifferentiableValue {
     @Getter private double value;
     @Getter private double velocity;
     @Getter private double acceleration;

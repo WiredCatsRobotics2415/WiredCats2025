@@ -34,9 +34,6 @@ public class Dealgae extends Command {
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
 
-    private double goalHeightInches;
-    private double goalArmDegrees;
-
     private Command driveCommand;
     private Command superStructureCommand;
 
