@@ -17,6 +17,7 @@ public class Measurements {
         public static final Distance BumperLength = Inches.of(3);
 
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
+        public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
 
         public static final Angle ElevatorTilt = Degrees.of(3.7);
     }
@@ -58,6 +59,11 @@ public class Measurements {
         static {
             reefRedApriltags = List.of(redReefABApriltag, redReefCDApriltag, redReefEFApriltag, redReefGHApriltag,
                 redReefIJApriltag, redReefKLApriltag);
+        }
+
+        public static final List<Boolean> ReefAlgaeOnTopAlphabeticOrder;
+        static {
+            ReefAlgaeOnTopAlphabeticOrder = List.of(true, false, true, false, true, false);
         }
     }
 

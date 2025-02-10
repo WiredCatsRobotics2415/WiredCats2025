@@ -44,5 +44,10 @@ public class Controls {
         public static final Distance Level3Height = Inches.of(36);
         public static final Angle Level4Angle = Degrees.of(135);
         public static final Distance Level4Height = Inches.of(72);
+
+        public static final Angle BottomAlgaeDescoreAngle = Degrees.of(75);
+        public static final Distance BottomAlgaeDescoreHeight = Inches.of(16);
+        public static final Angle TopAlgaeDescoreAngle = Degrees.of(75);
+        public static final Distance TopAlgaeDescoreHeight = Inches.of(32);
     }
 }

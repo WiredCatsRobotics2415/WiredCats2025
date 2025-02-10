@@ -1,6 +1,5 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -20,28 +19,16 @@ import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
 import lombok.Setter;
 
-/**
- * Command that pathfinds to the nearest side of the reef + a position offset depending on whether you chose right or left, and moves the elevator and the arm to thier presets
- */
-public class ScoreCoral extends Command {
-    public static enum Side {
-        Left, Right
-    }
-
-    public static enum Level {
-        L1, L2, L3, L4,
-    }
-
-    public static enum CoralAutomationMode {
+public class Dealgae extends Command {
+    public static enum DealgaeAutomationMode {
         PresetOnly, PresetAndAlign
     }
 
-    @Setter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
+    @Setter private static DealgaeAutomationMode currentAutomationMode = DealgaeAutomationMode.PresetAndAlign;
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
-    private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
-    private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
+    private static final Transform2d Offset = new Transform2d(CenterToBumper, Inches.of(0), new Rotation2d());
     private static final double DriveToleranceMeters = Units.inchesToMeters(2);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
@@ -49,7 +36,6 @@ public class ScoreCoral extends Command {
 
     private double goalHeightInches;
     private double goalArmDegrees;
-    private Transform2d offset;
 
     private Command driveCommand;
     private Command superStructureCommand;
@@ -63,54 +49,42 @@ public class ScoreCoral extends Command {
         }
     }
 
-    public ScoreCoral(Side reefSide, Level reefLevel) {
+    private boolean algaeOnTopForPose(Pose2d apriltagPose) {
+        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
+            return ReefMeasurements.ReefAlgaeOnTopAlphabeticOrder
+                .get(ReefMeasurements.reefBlueApriltags.indexOf(apriltagPose));
+        } else {
+            return ReefMeasurements.ReefAlgaeOnTopAlphabeticOrder
+                .get(ReefMeasurements.reefRedApriltags.indexOf(apriltagPose));
+        }
+    }
+
+    public Dealgae() {
         // TODO: Note that if the robot is not driveable while the preset is going even though
         // You are in the PresetOnly mode, consider moving this addRequirements line to
         // initialize so it doesn't require drive too early
         addRequirements(drive, Elevator.getInstance(), Arm.getInstance());
-
-        switch (reefLevel) {
-            case L1:
-                goalHeightInches = Presets.Level1Height.in(Inches);
-                goalArmDegrees = Presets.Level1Angle.in(Degrees);
-                break;
-            case L2:
-                goalHeightInches = Presets.Level2Height.in(Inches);
-                goalArmDegrees = Presets.Level2Angle.in(Degrees);
-                break;
-            case L3:
-                goalHeightInches = Presets.Level3Height.in(Inches);
-                goalArmDegrees = Presets.Level3Angle.in(Degrees);
-                break;
-            case L4:
-                goalHeightInches = Presets.Level4Height.in(Inches);
-                goalArmDegrees = Presets.Level4Angle.in(Degrees);
-                break;
-            default:
-                goalHeightInches = Presets.Level1Height.in(Inches);
-                goalArmDegrees = Presets.Level1Angle.in(Degrees);
-                break;
-        }
-
-        offset = reefSide.equals(Side.Left) ? LeftOffset : RightOffset;
     }
 
     @Override
     public void initialize() {
-        superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
-            Degrees.of(goalArmDegrees));
+        Pose2d apriltagPose = findNearestReefSideApriltag();
+        boolean algaeOnTop = algaeOnTopForPose(apriltagPose);
+
+        superStructureCommand = superStructure.runToPositionCommand(
+            algaeOnTop ? Presets.TopAlgaeDescoreHeight : Presets.BottomAlgaeDescoreHeight,
+            algaeOnTop ? Presets.TopAlgaeDescoreAngle : Presets.BottomAlgaeDescoreAngle);
         superStructureCommand.schedule();
 
-        if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
-            Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
-            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
+        if (currentAutomationMode == DealgaeAutomationMode.PresetAndAlign) {
+            driveCommand = drive.driveTo(apriltagPose.plus(Offset), DriveToleranceMeters);
             driveCommand.schedule();
         }
     }
 
     @Override
     public boolean isFinished() {
-        if (currentAutomationMode == CoralAutomationMode.PresetOnly) {
+        if (currentAutomationMode == DealgaeAutomationMode.PresetOnly) {
             return superStructureCommand.isFinished();
         }
         return driveCommand.isFinished() && superStructureCommand.isFinished();

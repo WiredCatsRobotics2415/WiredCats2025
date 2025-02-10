@@ -1,14 +1,12 @@
 package frc.utils;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
-import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;

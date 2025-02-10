@@ -5,10 +5,8 @@ import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.utils.Util;
 
 public class ElevatorIOReal implements ElevatorIO {
     private TalonFX leftMotor;

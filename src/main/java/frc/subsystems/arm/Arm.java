@@ -2,7 +2,6 @@ package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -12,9 +11,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ArmConstants;
-import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
-import frc.utils.Visualizer;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -90,9 +87,8 @@ public class Arm extends SubsystemBase {
     }
 
     public double getMeasurement() {
-        return Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin,
-            ArmConstants.ThroughboreMax, ArmConstants.MaxDegreesBack.in(Degrees),
-            ArmConstants.MaxDegreesFront.in(Degrees));
+        return Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
+            ArmConstants.MaxDegreesBack.in(Degrees), ArmConstants.MaxDegreesFront.in(Degrees));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
