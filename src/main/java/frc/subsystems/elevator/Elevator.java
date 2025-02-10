@@ -7,6 +7,8 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.RuntimeConstants;
+import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.DoubleDifferentiableValue;
 import frc.utils.Util;
@@ -26,7 +28,11 @@ public class Elevator extends SubsystemBase {
     private static Elevator instance;
 
     private Elevator() {
+        pid.setTolerance(ArmConstants.GoalTolerance);
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+        if (RuntimeConstants.TuningMode) {
+            ElevatorCharacterization.enable(this);
+        }
     }
 
     public static Elevator getInstance() {

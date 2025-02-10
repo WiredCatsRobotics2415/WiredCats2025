@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.Util;
 import lombok.Getter;
@@ -30,6 +31,9 @@ public class Arm extends SubsystemBase {
     private Arm() {
         pid.setTolerance(ArmConstants.GoalTolerance);
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, ArmIO.class);
+        if (RuntimeConstants.TuningMode) {
+            ArmCharacterization.enable(this);
+        }
     }
 
     public static Arm getInstance() {
