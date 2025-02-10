@@ -24,7 +24,7 @@ public class Arm extends SubsystemBase {
 
     private boolean isCoasting = false;
     private static Arm instance;
-    private ArmIO io;
+    @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
     private Arm() {
