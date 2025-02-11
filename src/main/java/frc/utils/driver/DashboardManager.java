@@ -15,6 +15,7 @@ public class DashboardManager {
 
         public static final LayoutInfo MatchTime = new LayoutInfo(0, 0, 3, 2);
         public static final LayoutInfo IntakeStatus = new LayoutInfo(0, 2, 3, 2);
+        public static final LayoutInfo CoralIntook = new LayoutInfo(3, 2, 4, 2);
 
         public static final LayoutInfo Alerts = new LayoutInfo(7, 0, 3, 6);
 

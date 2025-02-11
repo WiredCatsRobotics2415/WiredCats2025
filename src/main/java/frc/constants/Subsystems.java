@@ -2,6 +2,7 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
@@ -111,5 +112,19 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
+    }
+
+    public class CoralIntakeConstants {
+        // Temporary values for constants
+        public static final int CoralIntakeMotorID = 0;
+        public static final int LimitSwitchID = 0;
+
+        public static final double IntakeSpeed = 0.6;
+        public static final double OuttakeSpeed = -0.35;
+
+        public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
+
+        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
+            .withInverted(InvertedValue.CounterClockwise_Positive);
     }
 }
