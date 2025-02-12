@@ -53,7 +53,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Distance getMeasurement() {
-        return Inches.of(Util.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt.in(Volts),
+        return Inches.of(Util.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.in(Volts),
             ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeightInches.in(Inches),
             ElevatorConstants.MaxHeightInches.in(Inches)));
     }

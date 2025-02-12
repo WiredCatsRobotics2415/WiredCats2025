@@ -29,14 +29,14 @@ public class ElevatorCharacterization extends Characterizer {
             state -> SignalLogger.writeString("SysIDElevatorState", state.toString())),
             new SysIdRoutine.Mechanism(output -> elevator.getIo().setVoltage(output.in(Volts)), null, elevator));
 
-        commands.add(sysIDRoutineElevator.dynamic(Direction.kForward).withName("Elevator: Dynamic Forward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineElevator.dynamic(Direction.kReverse).withName("Elevator: Dynamic Backward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineElevator.quasistatic(Direction.kForward).withName("Elevator: Quasi Forward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineElevator.quasistatic(Direction.kReverse).withName("Elevator: Quasi Backward")
-            .onlyWhile(this::withinSafeThreshold));
+        commands.add(sysIDRoutineElevator.dynamic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+            .withName("Elevator: Dynamic Forward"));
+        commands.add(sysIDRoutineElevator.dynamic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+            .withName("Elevator: Dynamic Backward"));
+        commands.add(sysIDRoutineElevator.quasistatic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+            .withName("Elevator: Quasi Forward"));
+        commands.add(sysIDRoutineElevator.quasistatic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+            .withName("Elevator: Quasi Backward"));
 
         TuningModeTab.getInstance().addCharacterizer("Elevator", this);
     }

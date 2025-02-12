@@ -28,14 +28,14 @@ public class ArmCharacterization extends Characterizer {
                 state -> SignalLogger.writeString("SysIDArmState", state.toString())),
             new SysIdRoutine.Mechanism(output -> arm.getIo().setVoltage(output.in(Volts)), null, arm));
 
-        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).withName("Arm: Dynamic Forward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).withName("Arm: Dynamic Backward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).withName("Arm: Quasi Forward")
-            .onlyWhile(this::withinSafeThreshold));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).withName("Arm: Quasi Backward")
-            .onlyWhile(this::withinSafeThreshold));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+            .withName("Arm: Dynamic Forward"));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+            .withName("Arm: Dynamic Backward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+            .withName("Arm: Quasi Forward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+            .withName("Arm: Quasi Backward"));
 
         TuningModeTab.getInstance().addCharacterizer("Arm", this);
     }

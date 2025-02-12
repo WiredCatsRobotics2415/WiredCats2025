@@ -2,6 +2,7 @@ package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -28,7 +29,7 @@ public class ArmIOSim implements ArmIO {
         simArm.update(0.02);
 
         inputs.motorConnected = true;
-        inputs.appliedVoltage = appliedVoltage;
+        inputs.appliedVoltage = Volts.of(appliedVoltage);
         inputs.throughborePosition = Units.radiansToRotations(simArm.getAngleRads());
     }
 
