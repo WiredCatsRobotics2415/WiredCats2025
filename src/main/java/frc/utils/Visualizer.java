@@ -21,8 +21,6 @@ public class Visualizer {
     private static Elevator elevatorSubsystem = Elevator.getInstance();
     private static Arm armSubsystem = Arm.getInstance();
 
-    private static TuneableNumber armHeight = new TuneableNumber(0.25, "ArmHeight");
-
     public static void update() {
         // Elevator
         double height = elevatorSubsystem.getGoal().in(Inches);
@@ -41,7 +39,7 @@ public class Visualizer {
 
         // Arm
         double angleRads = armSubsystem.getGoal().in(Radians);
-        Pose3d arm = new Pose3d(new Translation3d(0, 0, armHeight.get()), new Rotation3d(0, angleRads, 0));
+        Pose3d arm = new Pose3d(new Translation3d(0, 0, 0.25+height), new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/ArmAndEndEffector", arm);
     }

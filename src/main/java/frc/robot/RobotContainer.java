@@ -59,7 +59,7 @@ public class RobotContainer {
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
             double[] input = oi.getXY();
-            return drive.drive.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
+            return drive.driveOpenLoopRequest.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
                 .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
                 .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
         }));

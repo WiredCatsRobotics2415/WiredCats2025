@@ -67,7 +67,8 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
-        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20, 5).withName("Slip Current Characterization"));
+        commands.add(
+            new CurrentLimitCharacterization(driveSubsystem, 20, 2.5, 0.5).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
@@ -155,16 +156,19 @@ public class DriveCharacterization extends Characterizer {
         private CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
-        private int secondsCounter;
-        private int currentCounter = 20;
-        private int currentStep = 5;
+        private double secondsCounter;
+        private double currentCounter = 20;
+        private double currentStep = 5;
+        private double timeStep;
 
-        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent, int currentStep) {
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, double startingCurrent, double currentStep,
+            double timeStep) {
             this.drive = drive;
             addRequirements(drive);
             timer = new Timer();
             secondsCounter = 1;
             this.currentStep = currentStep;
+            this.timeStep = timeStep;
             currentCounter = startingCurrent;
         }
 
@@ -189,12 +193,12 @@ public class DriveCharacterization extends Characterizer {
                 currentCounter += currentStep;
                 System.out.println("Current Limit: " + currentCounter);
                 applyCurrentToAll(Amps.of(currentCounter));
-                secondsCounter += 1;
+                secondsCounter += timeStep;
             }
         }
 
         @Override
-        public boolean isFinished() { return (secondsCounter == 80); }
+        public boolean isFinished() { return (currentCounter >= 80); }
 
         @Override
         public void end(boolean interrupted) {
@@ -202,6 +206,29 @@ public class DriveCharacterization extends Characterizer {
             System.out.println("Please restart robot code to apply correct current limit to swerve");
             timer.stop();
             timer.reset();
+        }
+    }
+
+    public class SpeedAt12VCharacterization extends Command {
+        private CommandSwerveDrivetrain drive;
+        private SwerveRequest.RobotCentric driveForwardAtFullEffort = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo)
+            .withVelocityX(TunerConstants.kSpeedAt12Volts);
+
+        public SpeedAt12VCharacterization(CommandSwerveDrivetrain drive) {
+            this.drive = drive;
+            addRequirements(drive);
+        }
+
+        @Override
+        public void initialize() {
+            drive.setControl(driveForwardAtFullEffort);
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            System.out.println("Ending m/s: " + drive.getState().Speeds.vxMetersPerSecond);
+            System.out.println("Please double check the log to ensure this value is correct");
         }
     }
 

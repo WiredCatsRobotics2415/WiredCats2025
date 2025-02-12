@@ -24,6 +24,7 @@ public class OI {
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
     private SlewRateLimiter xLimiter = new SlewRateLimiter(Controls.SlewRate);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(Controls.SlewRate);
+    private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Controls.SlewRate);
 
     private static OI instance;
 
@@ -88,10 +89,11 @@ public class OI {
         double deadbanded = deadbandCompensation(
             MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX), Controls.Deadband));
         if (Controls.UseCurve) {
-            return Math.pow(minimumPowerCompensation(deadbanded), Controls.CurveExponent);
+            deadbanded = Math.pow(minimumPowerCompensation(deadbanded), Controls.CurveExponent);
         } else {
-            return minimumPowerCompensation(deadbanded);
+            deadbanded = minimumPowerCompensation(deadbanded);
         }
+        return rotationLimiter.calculate(deadbanded);
     }
 
     public XboxController getHIDOfController() { return controller.getHID(); }

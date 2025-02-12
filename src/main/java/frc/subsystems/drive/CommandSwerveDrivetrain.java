@@ -2,13 +2,8 @@ package frc.subsystems.drive;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.hardware.CANcoder;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.swerve.SwerveDrivetrainConstants;
-import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
@@ -37,7 +32,6 @@ import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.Statistics;
-import frc.utils.TorqueSafety;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -56,11 +50,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private boolean hasAppliedOperatorPerspective = false;
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds()
-        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position);
-    public final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
-        .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05) // Add a 5% deadband
-        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.Position)
+        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
+    public final SwerveRequest.FieldCentric driveOpenLoopRequest = new SwerveRequest.FieldCentric()
+        .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo)
         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+    private final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
+        .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
+    PIDController driveToPositionXController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+        DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+    PIDController driveToPositionYController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
+        DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+    PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
+        DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
 
     private Vision vision = Vision.getInstance();
     private static CommandSwerveDrivetrain instance;
@@ -72,37 +75,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             startSimThread();
         }
         configureAutoBuilder();
+
+        driveToPositionHeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
+        driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
+
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
                 resetPoseFromLimelight().ignoringDisable(true));
             TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
                 resetRotationFromLimelightMT1().ignoringDisable(true));
-            // Add torque safety to motors
-            SwerveRequest coastAllSwerve = new SwerveRequest() {
-                boolean sentMotorConfigs = false;
-
-                @Override
-                public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
-                    for (SwerveModule<?, ?, ?> m : modulesToApply) {
-                        if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast);
-                        ((TalonFX) m.getDriveMotor()).set(0);
-                        if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast);
-                        ((TalonFX) m.getSteerMotor()).set(0);
-                    }
-                    sentMotorConfigs = true;
-                    return StatusCode.OK;
-                }
-            };
-            String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" };
-            int i = 0;
-            for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) {
-                TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(),
-                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive"));
-                TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(),
-                    applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer"));
-                i++;
-            }
+            // Add torque safety to all motors
+            // Only uncomment this if you are risking grinding a gear, otherwise make sure
+            // all swerve requests are Slew Rate Limited to prevent gear wear
+            /*
+             * SwerveRequest coastAllSwerve = new SwerveRequest() { boolean sentMotorConfigs = false;
+             *
+             * @Override public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) { for (SwerveModule<?, ?, ?> m : modulesToApply) { if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getDriveMotor()).set(0); if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getSteerMotor()).set(0); } sentMotorConfigs = true; return StatusCode.OK; } }; String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" }; int i = 0; for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) { TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive")); TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer")); i++; }
+             */
         }
     }
 
@@ -192,40 +182,26 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * @param translationToleranceMeters The tolerance allowed for the translation controllers
      */
     public Command driveTo(Pose2d goalPose, double translationToleranceMeters) {
-        PIDController xController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
-            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
-        PIDController yController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
-            DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
-
-        xController.setTolerance(translationToleranceMeters);
-        yController.setTolerance(translationToleranceMeters);
-
-        SwerveRequest.FieldCentricFacingAngle angleFacingRequest = new SwerveRequest.FieldCentricFacingAngle()
-            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.Position)
-            .withTargetDirection(goalPose.getRotation());
-        angleFacingRequest.HeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
-            DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
-        angleFacingRequest.HeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
+        driveToPositionXController.setTolerance(translationToleranceMeters);
+        driveToPositionYController.setTolerance(translationToleranceMeters);
 
         double maxSpeedMS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
         return applyRequest(() -> {
             Pose2d currentPose = getState().Pose;
-            double velocityX = MathUtil.clamp(xController.calculate(currentPose.getX(), goalPose.getX()), -maxSpeedMS,
-                maxSpeedMS);
-            double velocityY = MathUtil.clamp(yController.calculate(currentPose.getY(), goalPose.getY()), -maxSpeedMS,
-                maxSpeedMS);
+            double velocityX = MathUtil.clamp(driveToPositionXController.calculate(currentPose.getX(), goalPose.getX()),
+                -maxSpeedMS, maxSpeedMS);
+            double velocityY = MathUtil.clamp(driveToPositionYController.calculate(currentPose.getY(), goalPose.getY()),
+                -maxSpeedMS, maxSpeedMS);
 
-            return angleFacingRequest.withVelocityX(velocityX).withVelocityY(velocityY);
+            return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
+                .withVelocityX(velocityX).withVelocityY(velocityY);
         }).until(() -> {
-            System.out.println("xcontroller: " + xController.atSetpoint() + " | ycontroller: "
-                + yController.atSetpoint() + " | headcon: " + angleFacingRequest.HeadingController.atSetpoint());
-            return xController.atSetpoint() && yController.atSetpoint()
-                && angleFacingRequest.HeadingController.atSetpoint();
+            return driveToPositionXController.atSetpoint() && driveToPositionYController.atSetpoint()
+                && driveToPositionHeadingController.atSetpoint();
         }).finallyDo(() -> {
-            System.out.println("driveTo has been interrupted");
-            xController.reset();
-            yController.reset();
-            angleFacingRequest.HeadingController.reset();
+            driveToPositionXController.reset();
+            driveToPositionYController.reset();
+            driveToPositionHeadingController.reset();
         });
     }
 

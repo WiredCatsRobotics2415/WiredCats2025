@@ -83,7 +83,13 @@ public class Measurements {
             BreakerCurrentAndTripTimes.put(2.5, 1.25 - TimeSafetyTolerace);
         }
 
-        // TODO: look back at this
+        /**
+         * Uses the BreakerCurrentAndTripTimes to find the most optimal possible supply lower limit and time
+         *
+         * @param targetSupply The desired supply current. Can and should be above 40. This will be the maxiumum possible supply current allowance.
+         * @param targetStator The desired stator current.
+         * @return A CurrentLimitsConfigs object with lower limit and time set optimally.
+         */
         public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
             CurrentLimitsConfigs config = new CurrentLimitsConfigs();
             config.SupplyCurrentLimitEnable = true;
