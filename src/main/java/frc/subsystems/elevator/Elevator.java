@@ -1,6 +1,7 @@
 package frc.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -16,7 +17,7 @@ import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
     @Getter private Distance goal = Inches.of(0.0);
-    @Getter private DoubleDifferentiableValue measurementInches = new DoubleDifferentiableValue();
+    @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA);
@@ -42,8 +43,7 @@ public class Elevator extends SubsystemBase {
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
     public void setGoal(Distance setGoal) {
-        if (setGoal.in(Inches) > ElevatorConstants.MaxHeightInches
-            || setGoal.in(Inches) < ElevatorConstants.MinHeightInches) return;
+        if (setGoal.gt(ElevatorConstants.MaxHeightInches) || setGoal.lt(ElevatorConstants.MinHeightInches)) return;
         this.goal = setGoal;
         pid.setGoal(setGoal.in(Inches));
     }
@@ -52,10 +52,10 @@ public class Elevator extends SubsystemBase {
         return pid.atSetpoint();
     }
 
-    public double getMeasurement() {
-        return Util.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt,
-            ElevatorConstants.PotentiometerMaxVolt, ElevatorConstants.MinHeightInches,
-            ElevatorConstants.MaxHeightInches);
+    public Distance getMeasurement() {
+        return Inches.of(Util.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt.in(Volts),
+            ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeightInches.in(Inches),
+            ElevatorConstants.MaxHeightInches.in(Inches)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
@@ -68,8 +68,8 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
 
-        double measurement = getMeasurement();
-        measurementInches.update(measurement);
-        useOutput(pid.calculate(measurement), pid.getSetpoint());
+        double measurementInches = getMeasurement().in(Inches);
+        differentiableMeasurementInches.update(measurementInches);
+        useOutput(pid.calculate(measurementInches), pid.getSetpoint());
     }
 }

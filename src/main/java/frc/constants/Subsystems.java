@@ -13,8 +13,7 @@ import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class Subsystems {
@@ -59,10 +58,10 @@ public class Subsystems {
         public static final int LeftMotorPort = 2;
         public static final int RightMotorPort = 3;
 
-        public static final double PotentiometerMinVolt = 0;
-        public static final double PotentiometerMaxVolt = 0;
-        public static final double MinHeightInches = 0;
-        public static final double MaxHeightInches = 75.0;
+        public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
+        public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
+        public static final Distance MinHeightInches = Inches.of(0.0d);
+        public static final Distance MaxHeightInches = Inches.of(75.0d);
 
         public static final double kS = 0;
         public static final double kG = 0;
@@ -74,9 +73,9 @@ public class Subsystems {
         public static final double VelocityMax = 0;
         public static final double AccelerationMax = 0;
 
-        public static final double BaseHeight = 30;
-        public static final double Stage2Height = 24;
-        public static final double Stage3Height = 23;
+        public static final Distance BaseHeight = Inches.of(30);
+        public static final Distance Stage2Height = Inches.of(24);
+        public static final Distance Stage3Height = Inches.of(23);
     }
 
     public class ArmConstants {
@@ -85,6 +84,7 @@ public class Subsystems {
         public static final int ThroughborePort = 19;
 
         // With 0 degrees being up
+        public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 0;
         public static final Angle MaxDegreesBack = Degrees.of(-135);

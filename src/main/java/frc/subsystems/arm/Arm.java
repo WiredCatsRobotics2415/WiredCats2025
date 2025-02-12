@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.Util;
+import frc.utils.tuning.TuneableNumber;
+import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -28,11 +30,19 @@ public class Arm extends SubsystemBase {
     @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
 
+    private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0, "ArmVelocityMultiplier");
+
     private Arm() {
         pid.setTolerance(ArmConstants.GoalTolerance);
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, ArmIO.class);
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
+            TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", new InstantCommand(() -> {
+                if (isCoasting)
+                    brake();
+                else
+                    coast();
+            }, this));
         }
     }
 
@@ -90,14 +100,15 @@ public class Arm extends SubsystemBase {
         return pid.atSetpoint();
     }
 
-    public double getMeasurement() {
-        return Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
-            ArmConstants.MaxDegreesBack.in(Degrees), ArmConstants.MaxDegreesFront.in(Degrees));
+    public Angle getMeasurement() {
+        return Degrees
+            .of(Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
+                ArmConstants.MaxDegreesBack.in(Degrees), ArmConstants.MaxDegreesFront.in(Degrees)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
-        double voltOut = output + feedforward;
+        double voltOut = output + feedforward + elevatorVelocityMultiplier.get();
         if (!isCoasting) {
             io.setVoltage(voltOut);
         }
@@ -108,7 +119,9 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        double measurement = getMeasurement();
-        useOutput(pid.calculate(measurement), pid.getSetpoint());
+        double measurementDegrees = getMeasurement().in(Degrees);
+        useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
+
+        if (RuntimeConstants.TuningMode) Logger.recordOutput("Arm/Error", pid.getPositionError());
     }
 }

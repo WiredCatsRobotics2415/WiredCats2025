@@ -1,16 +1,14 @@
 package frc.utils;
 
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Radians;
+import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
-import frc.utils.tuning.TuneableNumber;
 import org.littletonrobotics.junction.Logger;
 
 /**
@@ -23,14 +21,16 @@ public class Visualizer {
 
     public static void update() {
         // Elevator
-        double height = elevatorSubsystem.getGoal().in(Inches);
+        Distance height = elevatorSubsystem.getGoal();
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
         Pose3d elevatorStage2 = new Pose3d(0, 0,
-            Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) * (ElevatorConstants.Stage2Height)),
+            height.div(ElevatorConstants.MaxHeightInches).times(ElevatorConstants.Stage2Height).in(Meters),
             Rotation3d.kZero);
-        Pose3d elevatorStage3 = new Pose3d(0, 0, Units.inchesToMeters((height / ElevatorConstants.MaxHeightInches) *
-            (ElevatorConstants.Stage2Height + ElevatorConstants.Stage3Height)), Rotation3d.kZero);
-        Pose3d carriage = new Pose3d(0, 0, Units.inchesToMeters(height), Rotation3d.kZero);
+        Pose3d elevatorStage3 = new Pose3d(0, 0,
+            height.div(ElevatorConstants.MaxHeightInches)
+                .times(ElevatorConstants.Stage2Height.plus(ElevatorConstants.Stage3Height)).in(Meters),
+            Rotation3d.kZero);
+        Pose3d carriage = new Pose3d(0, 0, height.in(Meters), Rotation3d.kZero);
 
         Logger.recordOutput("Visualization/ElevatorBase", elevatorBase);
         Logger.recordOutput("Visualization/ElevatorStage2", elevatorStage2);
@@ -39,7 +39,7 @@ public class Visualizer {
 
         // Arm
         double angleRads = armSubsystem.getGoal().in(Radians);
-        Pose3d arm = new Pose3d(new Translation3d(0, 0, 0.25+height), new Rotation3d(0, angleRads, 0));
+        Pose3d arm = new Pose3d(new Translation3d(0, 0, 0.25 + height.in(Meters)), new Rotation3d(0, angleRads, 0));
 
         Logger.recordOutput("Visualization/ArmAndEndEffector", arm);
     }
