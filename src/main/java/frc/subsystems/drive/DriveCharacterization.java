@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Controls;
 import frc.constants.TunerConstants;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.utils.tuning.Characterizer;
 import frc.utils.tuning.TuningModeTab;
 import java.util.stream.DoubleStream;
@@ -79,7 +80,7 @@ public class DriveCharacterization extends Characterizer {
     }
 
     public class WheelRadiusCharacterization extends Command {
-        double driveBaseRadius = TunerConstants.DriveBaseRadiusInches;
+        double driveBaseRadius = RobotMeasurements.DriveTrainRadius.in(Inches);
         double wheelRadiusMeters = TunerConstants.kWheelRadius.in(Meters);
         CommandSwerveDrivetrain drive;
 

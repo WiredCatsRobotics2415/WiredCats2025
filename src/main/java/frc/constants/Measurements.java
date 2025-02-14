@@ -18,6 +18,7 @@ public class Measurements {
 
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
         public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
+        public static final Distance DriveTrainRadius = Inches.of(18.432785);
 
         public static final Angle ElevatorTilt = Degrees.of(3.7);
     }
