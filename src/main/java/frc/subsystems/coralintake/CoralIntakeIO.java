@@ -8,7 +8,7 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CoralIntakeIO {
     @AutoLog
     abstract class CoralIntakeIOInputs {
-        public boolean limitSwitch = false;
+        public int sensorValue = 0;
 
         public boolean motorConnected = true;
         public Temperature motorTemp = Temperature.ofBaseUnits(0.0, Units.Celsius);

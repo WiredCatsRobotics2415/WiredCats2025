@@ -10,19 +10,19 @@ import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 // import frc.utils.Visualizer;
+import frc.constants.Subsystems.CoralIntakeConstants;
 
 public class CoralIntakeIOSim implements CoralIntakeIO {
     private DCMotorSim motor = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getFalcon500(1), 1, 1),
-        DCMotor.getFalcon500(1), 1.0);
-    // create simulated limit switch
-    private DIOSim limitSwitchInput = new DIOSim(new DigitalInput(0));
+        DCMotor.getFalcon500(1));
+    private DIOSim sensorInput = new DIOSim(new DigitalInput(0));
 
     public CoralIntakeIOSim() {}
 
     @Override
     public void updateInputs(CoralIntakeIOInputsAutoLogged inputs) {
         // needs to get value from visualizer once it is implemented
-        inputs.limitSwitch = limitSwitchInput.getValue();
+        inputs.sensorValue = sensorInput.getValue() ? CoralIntakeConstants.IRThreshold : 0;
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = Current.ofBaseUnits(motor.getCurrentDrawAmps(), Units.Amps);

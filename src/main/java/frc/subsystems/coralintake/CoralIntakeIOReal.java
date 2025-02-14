@@ -6,12 +6,14 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DigitalInput;
+import frc.constants.Subsystems;
 import frc.constants.Subsystems.CoralIntakeConstants;
 
 public class CoralIntakeIOReal implements CoralIntakeIO {
-    private TalonFX motor = new TalonFX(CoralIntakeConstants.CoralIntakeMotorID);
-    private DigitalInput limitSwitchInput;
+    private TalonFX motor = new TalonFX(CoralIntakeConstants.MotorID);
+    private AnalogInput irSensor;
 
     private StatusSignal<Current> motorStatorCurrent = motor.getStatorCurrent();
     private StatusSignal<Current> motorSupplyCurrent = motor.getSupplyCurrent();
@@ -20,7 +22,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     public CoralIntakeIOReal() {
         configureMotor();
 
-        limitSwitchInput = new DigitalInput(CoralIntakeConstants.LimitSwitchID);
+        irSensor = new AnalogInput(CoralIntakeConstants.IRSensor);
     }
 
     private void configureMotor() {
@@ -35,7 +37,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     @Override
     public void updateInputs(CoralIntakeIOInputsAutoLogged inputs) {
         BaseStatusSignal.refreshAll(motorStatorCurrent, motorSupplyCurrent, motorTemp);
-        inputs.limitSwitch = limitSwitchInput.get();
+        inputs.sensorValue = irSensor.getValue();
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = motorStatorCurrent.getValue();

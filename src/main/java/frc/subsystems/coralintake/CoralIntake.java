@@ -35,7 +35,7 @@ public class CoralIntake extends SubsystemBase {
         return instance;
     }
 
-    public Command off() {
+    public Command turnOff() {
         return runOnce(() -> {
             isBeingIntook = false;
             state = false;
@@ -43,14 +43,14 @@ public class CoralIntake extends SubsystemBase {
         });
     }
 
-    public Command out() {
+    public Command outtake() {
         return runOnce(() -> {
             isBeingIntook = false;
             io.setPower(CoralIntakeConstants.OuttakeSpeed);
         });
     }
 
-    public Command in() {
+    public Command intake() {
         return runOnce(() -> {
             isBeingIntook = true;
             io.setPower(CoralIntakeConstants.IntakeSpeed);
@@ -63,35 +63,35 @@ public class CoralIntake extends SubsystemBase {
     public Command toggleCoralIntake() {
         return runOnce(() -> {
             if (state == true) {
-                off().schedule();
+                turnOff().schedule();
                 state = false;
             } else {
-                IntakeAndWaitForCoral().schedule();
+                intakeAndWaitForCoral().schedule();
                 state = true;
             }
         });
     }
 
-    public Command IntakeAndWaitForCoral() {
-        return new SequentialCommandGroup(in(), new InstantCommand(() -> {
+    public Command intakeAndWaitForCoral() {
+        return new SequentialCommandGroup(intake(), new InstantCommand(() -> {
             state = true;
         }), new WaitUntilCommand(() -> hasCoral()), new InstantCommand(() -> {
             state = false;
-        }), off());
+        }), turnOff());
     }
 
     /**
      * uses limit switch to check if Coral is being intook
      */
     public boolean hasCoral() {
-        return inputs.limitSwitch && isBeingIntook;
+        return sensorTrigger() && isBeingIntook;
     }
 
     /**
      * return true if the limitswitch is triggered
      */
     public boolean sensorTrigger() {
-        return inputs.limitSwitch;
+        return inputs.sensorValue > CoralIntakeConstants.IRThreshold;
     }
 
     @Override

@@ -17,6 +17,14 @@ import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
 
 public class Subsystems {
+    public class NavxMXPPorts {
+        //https://pdocs.kauailabs.com/navx-mxp/installation/io-expansion/
+        public static final int Analog0 = 4;
+        public static final int Analog1 = 5;
+        public static final int Analog2 = 6;
+        public static final int Analog3 = 7;
+    }
+
     public class VisionConstants {
         public static final String FrontLeftName = "limelight-left";
         public static final String FrontRightName = "limelight-right";
@@ -54,9 +62,9 @@ public class Subsystems {
     }
 
     public class ElevatorConstants {
-        public static final int AnalogPotentiometerPort = 1;
-        public static final int LeftMotorPort = 2;
-        public static final int RightMotorPort = 3;
+        public static final int AnalogPotentiometerPort = NavxMXPPorts.Analog0;
+        public static final int LeftMotorPort = 9; //(2/14): this is Elevator1
+        public static final int RightMotorPort = 10; //(2/14): this is Elevator2
 
         public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
         public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
@@ -73,9 +81,9 @@ public class Subsystems {
         public static final double VelocityMax = 0;
         public static final double AccelerationMax = 0;
 
-        public static final Distance BaseHeight = Inches.of(30);
-        public static final Distance Stage2Height = Inches.of(24);
-        public static final Distance Stage3Height = Inches.of(23);
+        public static final Distance BaseHeight = Inches.of(38);
+        public static final Distance Stage2Height = Inches.of(35);
+        public static final Distance Stage3Height = Inches.of(34);
     }
 
     public class ArmConstants {
@@ -83,12 +91,12 @@ public class Subsystems {
         public static final int MotorID = 32;
         public static final int ThroughborePort = 19;
 
-        // With 0 degrees being up
+        // 0 degrees: the arm beam is parallel to the elevator
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 0;
-        public static final Angle MaxDegreesBack = Degrees.of(-135);
-        public static final Angle MaxDegreesFront = Degrees.of(135);
+        public static final Angle MaxDegreesBack = Degrees.of(-107);
+        public static final Angle MaxDegreesFront = Degrees.of(107);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -116,14 +124,15 @@ public class Subsystems {
 
     public class CoralIntakeConstants {
         // Temporary values for constants
-        public static final int CoralIntakeMotorID = 0;
-        public static final int LimitSwitchID = 0;
+        public static final int MotorID = 13;
+        public static final int IRSensor = NavxMXPPorts.Analog1;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
 
-        public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
+        public static final int IRThreshold = 100; //(2/14) copied from akit2024
 
+        public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
     }
