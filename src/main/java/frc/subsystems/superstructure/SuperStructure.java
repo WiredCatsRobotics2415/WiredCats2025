@@ -1,11 +1,14 @@
 package frc.subsystems.superstructure;
 
-import edu.wpi.first.math.util.Units;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radian;
+
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
@@ -34,42 +37,42 @@ public class SuperStructure {
     }
 
     /** Change arm goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
-    public Command changeArmGoalBy(double changeByDegrees) {
+    public Command changeArmGoalBy(Angle changeBy) {
         return new RepeatCommand(new InstantCommand(() -> {
-            this.setArmGoalSafely(arm.getGoalDegrees() + changeByDegrees);
+            this.setArmGoalSafely((arm.getGoal().plus(changeBy)));
         }));
     }
 
     /** Change goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
-    public Command changeElevatorGoalBy(double changeByInches) {
+    public Command changeElevatorGoalBy(Distance changeBy) {
         return new RepeatCommand(new InstantCommand(() -> {
-            this.setElevatorGoalSafely(elevator.getGoalInches() + changeByInches);
+            this.setElevatorGoalSafely((elevator.getGoal().plus(changeBy)));
         }));
     }
 
     /** Sets goals and waits for both mechanisms to achieve them */
-    public Command runToPositionCommand(double elevatorGoalInches, double armGoalDegrees) {
+    public Command runToPositionCommand(Distance elevatorGoal, Angle armGoal) {
         return new RepeatCommand(new InstantCommand(() -> {
-            goToPosition(elevatorGoalInches, armGoalDegrees);
+            goToPosition(elevatorGoal, armGoal);
         })).until(this::bothAtGoal);
     }
 
-    public void setArmGoalSafely(double armGoalDegrees) {
-        if (!willCollide(elevator.getGoalInches(), armGoalDegrees)) {
-            arm.setGoal(armGoalDegrees);
+    public void setArmGoalSafely(Angle armGoal) {
+        if (!willCollide(elevator.getGoal(), armGoal)) {
+            arm.setGoal(armGoal);
         }
     }
 
-    public void setElevatorGoalSafely(double elevatorGoalInches) {
-        if (!willCollide(elevatorGoalInches, arm.getGoalDegrees())) {
-            elevator.setGoal(elevatorGoalInches);
+    public void setElevatorGoalSafely(Distance elevatorGoal) {
+        if (!willCollide(elevatorGoal, arm.getGoal())) {
+            elevator.setGoal(elevatorGoal);
         }
     }
 
-    public void goToPosition(double elevatorGoalInches, double armGoalDegrees) {
-        if (!willCollide(elevatorGoalInches, armGoalDegrees)) {
-            elevator.setGoal(elevatorGoalInches);
-            arm.setGoal(armGoalDegrees);
+    public void goToPosition(Distance elevatorGoal, Angle armGoal) {
+        if (!willCollide(elevatorGoal, armGoal)) {
+            elevator.setGoal(elevatorGoal);
+            arm.setGoal(armGoal);
         }
     }
 
@@ -77,9 +80,9 @@ public class SuperStructure {
         return elevator.atGoal() && arm.atGoal();
     }
 
-    private boolean willCollide(double elevatorGoalInches, double armGoalDegrees) {
-        boolean willCollide = elevatorGoalInches + Math.cos(Units.degreesToRadians(armGoalDegrees)) *
-            (ArmConstants.EffectiveLengthInches + EndEffectorConstants.EffectiveLengthInches) < 0;
+    private boolean willCollide(Distance elevatorGoal, Angle armGoal) {
+        boolean willCollide = (elevatorGoal.in(Inches) +
+            Math.cos(armGoal.in(Radian)) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
         this.collisionPrevented = willCollide;
         return willCollide;
     }

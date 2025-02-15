@@ -18,6 +18,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import lombok.Setter;
 
 /**
  * Command that pathfinds to the nearest side of the reef + a position offset depending on whether you chose right or left, and moves the elevator and the arm to thier presets
@@ -31,11 +32,17 @@ public class ScoreCoral extends Command {
         L1, L2, L3, L4,
     }
 
-    private static final Distance CenterToBumper = RobotMeasurements.CenterToPerpendicularFrame
+    public static enum CoralAutomationMode {
+        PresetOnly, PresetAndAlign
+    }
+
+    @Setter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
+
+    private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
     private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
     private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
-    private static final double ToleranceMetersInches = Units.inchesToMeters(2);
+    private static final double DriveToleranceMeters = Units.inchesToMeters(2);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
@@ -57,6 +64,9 @@ public class ScoreCoral extends Command {
     }
 
     public ScoreCoral(Side reefSide, Level reefLevel) {
+        // TODO: Note that if the robot is not driveable while the preset is going even though
+        // You are in the PresetOnly mode, consider moving this addRequirements line to
+        // initialize so it doesn't require drive too early
         addRequirements(drive, Elevator.getInstance(), Arm.getInstance());
 
         switch (reefLevel) {
@@ -87,14 +97,22 @@ public class ScoreCoral extends Command {
 
     @Override
     public void initialize() {
-        Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
-        driveCommand = drive.driveTo(driveTo, ToleranceMetersInches);
-        driveCommand.schedule();
-
-        superStructureCommand = superStructure.runToPositionCommand(goalHeightInches, goalArmDegrees);
+        superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
+            Degrees.of(goalArmDegrees));
         superStructureCommand.schedule();
+
+        if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
+            Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
+            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
+            driveCommand.schedule();
+        }
     }
 
     @Override
-    public boolean isFinished() { return driveCommand.isFinished() && superStructureCommand.isFinished(); }
+    public boolean isFinished() {
+        if (currentAutomationMode == CoralAutomationMode.PresetOnly) {
+            return superStructureCommand.isFinished();
+        }
+        return driveCommand.isFinished() && superStructureCommand.isFinished();
+    }
 }

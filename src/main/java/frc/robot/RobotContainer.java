@@ -1,5 +1,8 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -48,7 +51,7 @@ public class RobotContainer {
 
     public void neutralizeSubsystems() {
         drive.setDefaultCommand(Commands.idle(drive));
-        elevator.setGoal(0);
+        elevator.setGoal(Inches.of(0));
     }
 
     private void configureControls() {
@@ -56,16 +59,16 @@ public class RobotContainer {
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
             double[] input = oi.getXY();
-            return drive.drive.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
+            return drive.driveOpenLoopRequest.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
                 .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
                 .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
         }));
 
-        oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(1));
-        oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(superstructure.changeElevatorGoalBy(-1));
+        oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(1.0)));
+        oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(-1.0)));
 
-        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(1));
-        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(-1));
+        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(Degrees.of(1)));
+        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(Degrees.of(-1)));
 
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
         oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));

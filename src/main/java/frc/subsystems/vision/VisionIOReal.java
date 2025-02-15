@@ -12,11 +12,12 @@ public class VisionIOReal implements VisionIO {
     }
 
     @Override
-    public void updateInputs(VisionIOInputsAutoLogged inputs) {
+    public void updateInputs(VisionIOInputs inputs) {
         inputs.poseEstimates = new Pose2d[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
+        inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
 
         for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = LimelightHelpers
@@ -26,13 +27,14 @@ public class VisionIOReal implements VisionIO {
             inputs.poseLatencies[i] = estimate.latency;
             inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
             inputs.poseTagCounts[i] = estimate.tagCount;
+            inputs.poseTagDistances[i] = estimate.avgTagDist;
         }
     }
 
     @Override
-    public void setRobotOrientation(double yaw) {
+    public void setRobotOrientation(double yaw, double yawRate) {
         for (String llName : VisionConstants.PoseEstimationLLNames) {
-            LimelightHelpers.SetRobotOrientation(llName, yaw, 0, 0, 0, 0, 0);
+            LimelightHelpers.SetRobotOrientation(llName, yaw, yawRate, 0, 0, 0, 0);
         }
     }
 

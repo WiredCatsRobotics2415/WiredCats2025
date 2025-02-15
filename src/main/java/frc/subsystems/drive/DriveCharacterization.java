@@ -17,8 +17,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Controls;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.TunerConstants;
 import frc.utils.tuning.Characterizer;
+import frc.utils.tuning.TuningModeTab;
 import java.util.stream.DoubleStream;
 
 public class DriveCharacterization extends Characterizer {
@@ -31,37 +33,27 @@ public class DriveCharacterization extends Characterizer {
     private static final SwerveRequest.SysIdSwerveRotation rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
 
     private DriveCharacterization(CommandSwerveDrivetrain driveSubsystem) {
-        super("Swerve");
         this.driveSubsystem = driveSubsystem;
 
-        SysIdRoutine sysIdRoutineTranslation = new SysIdRoutine(new SysIdRoutine.Config(null, // (1 V/s)
-            Volts.of(4), // Prevent brownout
-            null, // (10 s)
-            state -> SignalLogger.writeString("SysIdTranslationState", state.toString())),
+        SysIdRoutine sysIdRoutineTranslation = new SysIdRoutine(
+            new SysIdRoutine.Config(null, Volts.of(4), null,
+                state -> SignalLogger.writeString("SysIdTranslationState", state.toString())),
             new SysIdRoutine.Mechanism(
                 output -> driveSubsystem.setControl(translationCharacterization.withVolts(output)), null,
                 driveSubsystem));
 
-        SysIdRoutine sysIdRoutineSteer = new SysIdRoutine(new SysIdRoutine.Config(null, // Use default ramp rate (1 V/s)
-            Volts.of(7), // Use dynamic voltage of 7 V
-            null, // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdSteerState", state.toString())),
+        SysIdRoutine sysIdRoutineSteer = new SysIdRoutine(
+            new SysIdRoutine.Config(null, Volts.of(7), null,
+                state -> SignalLogger.writeString("SysIdSteerState", state.toString())),
             new SysIdRoutine.Mechanism(volts -> driveSubsystem.setControl(steerCharacterization.withVolts(volts)), null,
                 driveSubsystem));
 
-        SysIdRoutine sysIdRoutineRotation = new SysIdRoutine(new SysIdRoutine.Config(
-            /* This is in radians per second², but SysId only supports "volts per second" */
-            Volts.of(Math.PI / 6).per(Second),
-            /* This is in radians per second, but SysId only supports "volts" */
-            Volts.of(Math.PI), null, // Use default timeout (10 s)
-            // Log state with SignalLogger class
-            state -> SignalLogger.writeString("SysIdRotationState", state.toString())),
+        SysIdRoutine sysIdRoutineRotation = new SysIdRoutine(
+            new SysIdRoutine.Config(Volts.of(Math.PI / 6).per(Second), Volts.of(Math.PI), null,
+                state -> SignalLogger.writeString("SysIdRotationState", state.toString())),
             new SysIdRoutine.Mechanism(output ->
             {
-                /* output is actually radians per second, but SysId only supports "volts" */
                 driveSubsystem.setControl(rotationCharacterization.withRotationalRate(output.in(Volts)));
-                /* also log the requested output for SysId */
                 SignalLogger.writeDouble("Rotational_Rate", output.in(Volts));
             }, null, driveSubsystem));
 
@@ -76,16 +68,19 @@ public class DriveCharacterization extends Characterizer {
         commands.add(sysIdRoutineSteer.quasistatic(Direction.kReverse).withName("Steer: Quasi Backward"));
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
-        commands.add(new CurrentLimitCharacterization(driveSubsystem, 20, 5).withName("Slip Current Characterization"));
+        commands.add(
+            new CurrentLimitCharacterization(driveSubsystem, 20, 2.5, 0.5).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));
         commands.add(sysIdRoutineRotation.quasistatic(Direction.kForward).withName("Rotation: Quasi Forward"));
         commands.add(sysIdRoutineRotation.quasistatic(Direction.kReverse).withName("Rotation: Quasi Backward"));
+
+        TuningModeTab.getInstance().addCharacterizer("Swerve", this);
     }
 
     public class WheelRadiusCharacterization extends Command {
-        double driveBaseRadius = TunerConstants.DriveBaseRadiusInches;
+        double driveBaseRadius = RobotMeasurements.DriveTrainRadius.in(Inches);
         double wheelRadiusMeters = TunerConstants.kWheelRadius.in(Meters);
         CommandSwerveDrivetrain drive;
 
@@ -112,7 +107,6 @@ public class DriveCharacterization extends Characterizer {
                 i++;
             }
             lastGyroDegrees = drive.getPigeon2().getYaw().getValueAsDouble();
-            System.out.println("Initialization");
         }
 
         @Override
@@ -130,9 +124,6 @@ public class DriveCharacterization extends Characterizer {
             for (int j = 0; j < 4; j++) {
                 deltaSum += Math.abs(currentModuleDriveEncoderPositions[j] - lastModuleDriveEncoderPositions[j]);
             }
-            System.out.println("--------");
-            System.out.println("    delta gyro: " + (currentGyroDegrees - lastGyroDegrees));
-            System.out.println("    delta wheels: " + (deltaSum / 4));
             // inches = (degrees * inches)/degrees
             radii[execution] = ((currentGyroDegrees - lastGyroDegrees) * (driveBaseRadius)) / (deltaSum / 4);
 
@@ -140,7 +131,7 @@ public class DriveCharacterization extends Characterizer {
             lastModuleDriveEncoderPositions = currentModuleDriveEncoderPositions;
 
             drive.setControl(new SwerveRequest.RobotCentric()
-                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / radii.length))
+                .withRotationalRate(Controls.MaxAngularRadS * ((double) execution / (radii.length / 1.5)))
                 .withSteerRequestType(SteerRequestType.MotionMagicExpo)
                 .withDriveRequestType(DriveRequestType.Velocity));
 
@@ -166,16 +157,19 @@ public class DriveCharacterization extends Characterizer {
         private CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
             .withStatorCurrentLimitEnable(true);
         private Timer timer;
-        private int secondsCounter;
-        private int currentCounter = 20;
-        private int currentStep = 5;
+        private double secondsCounter;
+        private double currentCounter = 20;
+        private double currentStep = 5;
+        private double timeStep;
 
-        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, int startingCurrent, int currentStep) {
+        public CurrentLimitCharacterization(CommandSwerveDrivetrain drive, double startingCurrent, double currentStep,
+            double timeStep) {
             this.drive = drive;
             addRequirements(drive);
             timer = new Timer();
             secondsCounter = 1;
             this.currentStep = currentStep;
+            this.timeStep = timeStep;
             currentCounter = startingCurrent;
         }
 
@@ -200,12 +194,12 @@ public class DriveCharacterization extends Characterizer {
                 currentCounter += currentStep;
                 System.out.println("Current Limit: " + currentCounter);
                 applyCurrentToAll(Amps.of(currentCounter));
-                secondsCounter += 1;
+                secondsCounter += timeStep;
             }
         }
 
         @Override
-        public boolean isFinished() { return (secondsCounter == 80); }
+        public boolean isFinished() { return (currentCounter >= 80); }
 
         @Override
         public void end(boolean interrupted) {
@@ -213,6 +207,29 @@ public class DriveCharacterization extends Characterizer {
             System.out.println("Please restart robot code to apply correct current limit to swerve");
             timer.stop();
             timer.reset();
+        }
+    }
+
+    public class SpeedAt12VCharacterization extends Command {
+        private CommandSwerveDrivetrain drive;
+        private SwerveRequest.RobotCentric driveForwardAtFullEffort = new SwerveRequest.RobotCentric()
+            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo)
+            .withVelocityX(TunerConstants.kSpeedAt12Volts);
+
+        public SpeedAt12VCharacterization(CommandSwerveDrivetrain drive) {
+            this.drive = drive;
+            addRequirements(drive);
+        }
+
+        @Override
+        public void initialize() {
+            drive.setControl(driveForwardAtFullEffort);
+        }
+
+        @Override
+        public void end(boolean interrupted) {
+            System.out.println("Ending m/s: " + drive.getState().Speeds.vxMetersPerSecond);
+            System.out.println("Please double check the log to ensure this value is correct");
         }
     }
 

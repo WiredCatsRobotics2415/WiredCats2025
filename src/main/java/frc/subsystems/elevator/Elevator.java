@@ -1,27 +1,39 @@
 package frc.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Volts;
+
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.RuntimeConstants;
+import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.utils.Utils;
+import frc.utils.DoubleDifferentiableValue;
+import frc.utils.Util;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
-    @Getter private double goalInches = 0.0;
+    @Getter private Distance goal = Inches.of(0.0);
+    @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA);
     private ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.kP, 0, ElevatorConstants.kD,
         new TrapezoidProfile.Constraints(ElevatorConstants.VelocityMax, ElevatorConstants.AccelerationMax));
 
-    private ElevatorIO io;
+    @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private static Elevator instance;
 
     private Elevator() {
-        io = (ElevatorIO) Utils.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+        pid.setTolerance(ArmConstants.GoalTolerance);
+        io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+        if (RuntimeConstants.TuningMode) {
+            ElevatorCharacterization.enable(this);
+        }
     }
 
     public static Elevator getInstance() {
@@ -30,24 +42,24 @@ public class Elevator extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(double goalInches) {
-        if (goalInches > ElevatorConstants.MaxHeightInches || goalInches < ElevatorConstants.MinHeightInches) return;
-        this.goalInches = goalInches;
-        pid.setGoal(new TrapezoidProfile.State(goalInches, 0));
+    public void setGoal(Distance setGoal) {
+        if (setGoal.gt(ElevatorConstants.MaxHeightInches) || setGoal.lt(ElevatorConstants.MinHeightInches)) return;
+        this.goal = setGoal;
+        pid.setGoal(setGoal.in(Inches));
     }
 
     public boolean atGoal() {
         return pid.atSetpoint();
     }
 
-    public double getMeasurement() {
-        return Utils.linearMap(inputs.wirePotentiometerValue, ElevatorConstants.PotentiometerMinVolt,
-            ElevatorConstants.PotentiometerMaxVolt, ElevatorConstants.MinHeightInches,
-            ElevatorConstants.MaxHeightInches);
+    public Distance getMeasurement() {
+        return Inches.of(Util.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.in(Volts),
+            ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeightInches.in(Inches),
+            ElevatorConstants.MaxHeightInches.in(Inches)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+        double feedforward = ff.calculate(setpoint.position);
         double voltOut = output + feedforward;
         io.setVoltage(voltOut);
     }
@@ -56,7 +68,8 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         io.updateInputs(inputs);
 
-        double measurement = getMeasurement();
-        useOutput(pid.calculate(measurement), pid.getSetpoint());
+        double measurementInches = getMeasurement().in(Inches);
+        differentiableMeasurementInches.update(measurementInches);
+        useOutput(pid.calculate(measurementInches), pid.getSetpoint());
     }
 }

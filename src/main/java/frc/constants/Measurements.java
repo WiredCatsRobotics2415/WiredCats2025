@@ -7,15 +7,21 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import java.util.List;
 
 public class Measurements {
     public class RobotMeasurements {
-        public static final Distance BumperLength = Inches.of(0);
+        // Front of the robot: coral scoring side
+        public static final Distance BumperLength = Inches.of(3);
 
-        public static final Distance CenterToPerpendicularFrame = Inches.of(15.375); // Krayon: 14, 24': 15.375
+        public static final Distance CenterToFrameRadius = Inches.of(21.313);
+        public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
+        public static final Distance DriveTrainRadius = Inches.of(18.432785);
+
+        public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
     }
 
     public class ReefMeasurements {
@@ -56,24 +62,36 @@ public class Measurements {
             reefRedApriltags = List.of(redReefABApriltag, redReefCDApriltag, redReefEFApriltag, redReefGHApriltag,
                 redReefIJApriltag, redReefKLApriltag);
         }
+
+        public static final List<Boolean> ReefAlgaeOnTopAlphabeticOrder;
+        static {
+            ReefAlgaeOnTopAlphabeticOrder = List.of(true, false, true, false, true, false);
+        }
     }
 
     public class BalanceConstants {
-        public static final double yawThreshold = 0;
         public static final double rollThreshold = 0;
+        public static final double pitchThreshold = 0;
     }
 
     public class MotorConstants {
         // The number of seconds to subtract from all times in BreakerCurrentAndTripTimes just to be careful
-        public static final double timeSafetyTolerace = 0.1;
+        public static final double TimeSafetyTolerace = 0.1;
         public static final InterpolatingDoubleTreeMap BreakerCurrentAndTripTimes = new InterpolatingDoubleTreeMap();
         static {
             BreakerCurrentAndTripTimes.put(1.0, 70.0);
-            BreakerCurrentAndTripTimes.put(1.5, 10.5 - timeSafetyTolerace);
-            BreakerCurrentAndTripTimes.put(2.0, 4.5 - timeSafetyTolerace);
-            BreakerCurrentAndTripTimes.put(2.5, 1.25 - timeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(1.5, 10.5 - TimeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.0, 4.5 - TimeSafetyTolerace);
+            BreakerCurrentAndTripTimes.put(2.5, 1.25 - TimeSafetyTolerace);
         }
 
+        /**
+         * Uses the BreakerCurrentAndTripTimes to find the most optimal possible supply lower limit and time
+         *
+         * @param targetSupply The desired supply current. Can and should be above 40. This will be the maxiumum possible supply current allowance.
+         * @param targetStator The desired stator current.
+         * @return A CurrentLimitsConfigs object with lower limit and time set optimally.
+         */
         public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
             CurrentLimitsConfigs config = new CurrentLimitsConfigs();
             config.SupplyCurrentLimitEnable = true;
