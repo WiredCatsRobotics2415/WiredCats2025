@@ -101,9 +101,9 @@ public class Arm extends SubsystemBase {
     }
 
     public Angle getMeasurement() {
-        return Degrees
-            .of(Util.linearMap(inputs.throughborePosition+ArmConstants.ThroughboreZero, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
-                ArmConstants.MaxDegreesBack.in(Degrees), ArmConstants.MaxDegreesFront.in(Degrees)));
+        return Degrees.of(Util.linearMap(inputs.throughborePosition + ArmConstants.ThroughboreZero,
+            ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax, ArmConstants.MaxDegreesBack.in(Degrees),
+            ArmConstants.MaxDegreesFront.in(Degrees)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {

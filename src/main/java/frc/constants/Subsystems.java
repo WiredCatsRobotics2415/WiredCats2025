@@ -2,9 +2,7 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -30,6 +28,7 @@ public class Subsystems {
         public static final String FrontLeftName = "limelight-left";
         public static final String FrontRightName = "limelight-right";
         public static final String BackCenterName = "limelight-back";
+        public static final String EndEffectorName = "limelight-endeffector";
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
             BackCenterName };
@@ -94,11 +93,12 @@ public class Subsystems {
         public static final int ThroughborePort = 19;
 
         // 0 degrees: the arm beam is parallel to the elevator
+        // positive: front of the robot: coral scoring side
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 0;
-        public static final Angle MaxDegreesBack = Degrees.of(-107);
-        public static final Angle MaxDegreesFront = Degrees.of(107);
+        public static final Angle MaxDegreesBack = Degrees.of(-135); // 107 is safe
+        public static final Angle MaxDegreesFront = Degrees.of(135);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -121,17 +121,22 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final int MotorID = 12;
+        public static final int IRSensorPort = NavxMXPPorts.Analog1;
+
+        public static final double IntakeCoralSpeed = 0.6;
+        public static final double IntakeAlgaeSpeed = 0.8;
+        public static final double OuttakeSpeed = -0.35;
+
+        public static final int IRThreshold = 100; // (2/14) copied from akit2024
+        public static final int AlgaeIntookCameraThreshold = 127;
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
     }
 
     public class CoralIntakeConstants {
         public static final int MotorID = 13;
-        public static final int IRSensor = NavxMXPPorts.Analog1;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
-
-        public static final int IRThreshold = 100; // (2/14) copied from akit2024
     }
 }

@@ -29,6 +29,9 @@ public class VisionIOReal implements VisionIO {
             inputs.poseTagCounts[i] = estimate.tagCount;
             inputs.poseTagDistances[i] = estimate.avgTagDist;
         }
+
+        inputs.endEffectorCameraAveragePixelValue = (int) LimelightHelpers
+            .getPythonScriptData(VisionConstants.EndEffectorName)[0];
     }
 
     @Override
@@ -47,6 +50,8 @@ public class VisionIOReal implements VisionIO {
 
     @Override
     public void setEndEffectorStreamOrientation(boolean upsideDown) {
-        LimelightHelpers.setPythonScriptData(VisionConstants.FrontLeftName, new double[] { upsideDown ? 1.0d : -1.0d });
+        LimelightHelpers.setPythonScriptData(VisionConstants.EndEffectorName,
+            new double[] { upsideDown ? 1.0d : -1.0d });
     }
+
 }

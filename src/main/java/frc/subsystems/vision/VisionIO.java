@@ -12,6 +12,8 @@ public interface VisionIO {
         public double[] poseLatencies;
         public double[] poseTagDistances;
         public int[] poseTagCounts;
+
+        public int endEffectorCameraAveragePixelValue;
     }
 
     public default void updateInputs(VisionIOInputs inputs) {}

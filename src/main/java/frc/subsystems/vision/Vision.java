@@ -90,6 +90,8 @@ public class Vision extends SubsystemBase {
         io.setEndEffectorStreamOrientation(upsideDown);
     }
 
+    public int getEndEffectorCameraAveragePixelValue() { return inputs.endEffectorCameraAveragePixelValue; }
+
     /**
      * Updates a swervedrive with the current global pose estimation. This is in Vision because it does not directly interact with any of the hardware. This should be run periodically.
      *

@@ -49,5 +49,11 @@ public class Controls {
         public static final Distance BottomAlgaeDescoreHeight = Inches.of(16);
         public static final Angle TopAlgaeDescoreAngle = Degrees.of(75);
         public static final Distance TopAlgaeDescoreHeight = Inches.of(32);
+
+        public static final Angle IntakeFromHPSAngle = Degrees.of(-45);
+        public static final Distance IntakeFromHPSHeight = Inches.of(0);
+
+        public static final Angle GroundIntakeAngle = Degrees.of(-100);
+        public static final Distance GroundIntakeHeight = Inches.of(0);
     }
 }

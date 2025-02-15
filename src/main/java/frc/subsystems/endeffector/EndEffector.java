@@ -1,26 +1,29 @@
 package frc.subsystems.endeffector;
 
-import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
-import frc.utils.Utils;
+import frc.subsystems.vision.Vision;
+import frc.utils.Util;
+import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class EndEffector extends SubsystemBase {
     private EndEffectorIO io;
+    private EndEffectorIOInputsAutoLogged inputs = new EndEffectorIOInputsAutoLogged();
     private static EndEffector instance;
 
-    private boolean hasCoral = false;
-
-    // stores the direction which will intake algae and outtake coral (1 is forwards, -1 is reverse)
-    private int AlgaeIntakeDirection = -1; 
-
-    private AnalogInput coralSensor;
+    @Getter private boolean intakingCoral = false;
+    @Getter private boolean intakingAlgae = false;
+    @Getter private boolean outtaking = false;
 
     private EndEffector() {
-        io = (EndEffectorIO) Utils.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
+        io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             EndEffectorIO.class);
 
-        coralSensor = new AnalogInput(EndEffectorConstants.EndEffectorIR);
+        new Trigger(this::hasCoral).onTrue(turnOff());
+        new Trigger(this::hasAlgae).onTrue(turnOff());
     }
 
     public static EndEffector getInstance() {
@@ -28,7 +31,72 @@ public class EndEffector extends SubsystemBase {
         return instance;
     }
 
-    // DON'T HAVE TO INVERT MOTOR--JUST SET TO NEGATIVE
+    public Command toggleIntakeCoral() {
+        return runOnce(() -> {
+            if (!intakingCoral) {
+                io.setPower(EndEffectorConstants.IntakeCoralSpeed);
+                intakingCoral = true;
+            } else {
+                io.setPower(0);
+                intakingCoral = false;
+            }
+            intakingAlgae = false;
+            outtaking = false;
+        });
+    }
 
-    // use infrared sensor to check if coral has been intook??? (idk grammar)
+    public Command toggleIntakeAlgae() {
+        return runOnce(() -> {
+            if (!intakingAlgae) {
+                io.setPower(EndEffectorConstants.IntakeAlgaeSpeed);
+                intakingAlgae = true;
+            } else {
+                io.setPower(0);
+                intakingAlgae = false;
+            }
+            intakingCoral = false;
+            outtaking = false;
+        });
+    }
+
+    public Command outtake() {
+        return runOnce(() -> {
+            io.setPower(EndEffectorConstants.OuttakeSpeed);
+            outtaking = true;
+            intakingCoral = false;
+            intakingAlgae = false;
+        });
+    }
+
+    public Command turnOff() {
+        return runOnce(() -> {
+            io.setPower(0);
+            outtaking = false;
+            intakingCoral = false;
+            intakingAlgae = false;
+        });
+    }
+
+    private boolean sensorTrigger() {
+        return inputs.sensorValue > EndEffectorConstants.IRThreshold;
+    }
+
+    private boolean cameraTrigger() {
+        return Vision.getInstance()
+            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold;
+    }
+
+    public boolean hasCoral() {
+        return sensorTrigger() && intakingCoral;
+    }
+
+    public boolean hasAlgae() {
+        return cameraTrigger() && intakingAlgae;
+    }
+
+    @Override
+    public void periodic() {
+        io.updateInputs(inputs);
+        Logger.processInputs("EndEffector", inputs);
+    }
 }

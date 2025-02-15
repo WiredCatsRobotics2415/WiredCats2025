@@ -8,8 +8,6 @@ import org.littletonrobotics.junction.AutoLog;
 public interface CoralIntakeIO {
     @AutoLog
     abstract class CoralIntakeIOInputs {
-        public int sensorValue = 0;
-
         public boolean motorConnected = true;
         public Temperature motorTemp = Temperature.ofBaseUnits(0.0, Units.Celsius);
         public Current motorStatorCurrent = Current.ofBaseUnits(0.0, Units.Amps);
@@ -18,5 +16,5 @@ public interface CoralIntakeIO {
 
     public default void updateInputs(CoralIntakeIOInputsAutoLogged inputs) {}
 
-    public default void setPower(double speed) {}
+    public default void setPower(double power) {}
 }
