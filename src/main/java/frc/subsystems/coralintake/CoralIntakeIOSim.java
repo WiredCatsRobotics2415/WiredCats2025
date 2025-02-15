@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import edu.wpi.first.wpilibj.simulation.DIOSim;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
-// import frc.utils.Visualizer;
 import frc.constants.Subsystems.CoralIntakeConstants;
 
 public class CoralIntakeIOSim implements CoralIntakeIO {
@@ -33,10 +32,5 @@ public class CoralIntakeIOSim implements CoralIntakeIO {
     @Override
     public void setPower(double speed) {
         motor.setInputVoltage(speed * RoboRioSim.getVInVoltage());
-    }
-
-    @Override
-    public void off() {
-        motor.setInputVoltage(0);
     }
 }

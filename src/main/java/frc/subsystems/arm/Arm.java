@@ -21,7 +21,7 @@ import org.littletonrobotics.junction.Logger;
 public class Arm extends SubsystemBase {
     private ArmFeedforward ff = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
     private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
-        new TrapezoidProfile.Constraints(ArmConstants.veloMax, ArmConstants.accelMax));
+        new TrapezoidProfile.Constraints(ArmConstants.VelocityMax, ArmConstants.AccelerationMax));
 
     @Getter private Angle goal = Degrees.of(0.0);
 
@@ -102,7 +102,7 @@ public class Arm extends SubsystemBase {
 
     public Angle getMeasurement() {
         return Degrees
-            .of(Util.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
+            .of(Util.linearMap(inputs.throughborePosition+ArmConstants.ThroughboreZero, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
                 ArmConstants.MaxDegreesBack.in(Degrees), ArmConstants.MaxDegreesFront.in(Degrees)));
     }
 

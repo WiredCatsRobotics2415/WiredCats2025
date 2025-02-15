@@ -19,6 +19,4 @@ public interface CoralIntakeIO {
     public default void updateInputs(CoralIntakeIOInputsAutoLogged inputs) {}
 
     public default void setPower(double speed) {}
-
-    public default void off() {}
 }

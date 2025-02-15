@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
@@ -18,7 +19,7 @@ import edu.wpi.first.wpilibj.util.Color;
 
 public class Subsystems {
     public class NavxMXPPorts {
-        //https://pdocs.kauailabs.com/navx-mxp/installation/io-expansion/
+        // https://pdocs.kauailabs.com/navx-mxp/installation/io-expansion/
         public static final int Analog0 = 4;
         public static final int Analog1 = 5;
         public static final int Analog2 = 6;
@@ -63,13 +64,13 @@ public class Subsystems {
 
     public class ElevatorConstants {
         public static final int AnalogPotentiometerPort = NavxMXPPorts.Analog0;
-        public static final int LeftMotorPort = 9; //(2/14): this is Elevator1
-        public static final int RightMotorPort = 10; //(2/14): this is Elevator2
+        public static final int LeftMotorPort = 9; // (2/14): this is Elevator1
+        public static final int RightMotorPort = 10; // (2/14): this is Elevator2
 
         public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
         public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
         public static final Distance MinHeightInches = Inches.of(0.0d);
-        public static final Distance MaxHeightInches = Inches.of(75.0d);
+        public static final Distance MaxHeightInches = Inches.of(69.0d);
 
         public static final double kS = 0;
         public static final double kG = 0;
@@ -80,15 +81,16 @@ public class Subsystems {
 
         public static final double VelocityMax = 0;
         public static final double AccelerationMax = 0;
+        public static final double GoalTolerance = 0.5;
 
+        public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
         public static final Distance BaseHeight = Inches.of(38);
         public static final Distance Stage2Height = Inches.of(35);
         public static final Distance Stage3Height = Inches.of(34);
     }
 
     public class ArmConstants {
-        // Setting temporary values
-        public static final int MotorID = 32;
+        public static final int MotorID = 11;
         public static final int ThroughborePort = 19;
 
         // 0 degrees: the arm beam is parallel to the elevator
@@ -101,9 +103,6 @@ public class Subsystems {
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
-        public static final double veloMax = 0;
-        public static final double accelMax = 0;
-
         public static final double kS = 0;
         public static final double kV = 0;
         public static final double kA = 0;
@@ -111,29 +110,28 @@ public class Subsystems {
         public static final double kP = 0;
         public static final double kD = 0;
 
-        public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
-        public static final float RotorToArmGearRatio = 50 / 1; // Planetaries amount unknown as of 2/7
-        public static final Distance EffectiveLengthInches = Inches.of(28);
+        public static final double VelocityMax = 0;
+        public static final double AccelerationMax = 0;
         public static final double GoalTolerance = 0.5;
 
+        public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
+        public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
+        public static final Distance EffectiveLength = Inches.of(28);
     }
 
     public class EndEffectorConstants {
+        public static final int MotorID = 12;
+
         public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
     }
 
     public class CoralIntakeConstants {
-        // Temporary values for constants
         public static final int MotorID = 13;
         public static final int IRSensor = NavxMXPPorts.Analog1;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
 
-        public static final int IRThreshold = 100; //(2/14) copied from akit2024
-
-        public static final CurrentLimitsConfigs CurrentLimit = new CurrentLimitsConfigs().withSupplyCurrentLimit(40);
-        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
-            .withInverted(InvertedValue.CounterClockwise_Positive);
+        public static final int IRThreshold = 100; // (2/14) copied from akit2024
     }
 }

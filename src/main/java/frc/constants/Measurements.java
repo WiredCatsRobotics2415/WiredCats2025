@@ -14,14 +14,14 @@ import java.util.List;
 
 public class Measurements {
     public class RobotMeasurements {
-        //Front of the robot: coral scoring side
+        // Front of the robot: coral scoring side
         public static final Distance BumperLength = Inches.of(3);
 
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
         public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
         public static final Distance DriveTrainRadius = Inches.of(18.432785);
 
-        public static final Angle ElevatorTilt = Degrees.of(3.7); //Towards the front
+        public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
     }
 
     public class ReefMeasurements {

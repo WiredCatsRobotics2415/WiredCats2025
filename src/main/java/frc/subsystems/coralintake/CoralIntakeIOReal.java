@@ -7,8 +7,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
-import frc.constants.Subsystems;
 import frc.constants.Subsystems.CoralIntakeConstants;
 
 public class CoralIntakeIOReal implements CoralIntakeIO {
@@ -27,9 +25,6 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
 
     private void configureMotor() {
         motor.setNeutralMode(NeutralModeValue.Brake);
-        // set to counter clockwise positive
-        motor.getConfigurator().apply(CoralIntakeConstants.MotorOutput);
-        motor.getConfigurator().apply(CoralIntakeConstants.CurrentLimit);
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, motorStatorCurrent, motorSupplyCurrent, motorTemp);
     }
@@ -48,10 +43,5 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     @Override
     public void setPower(double speed) {
         motor.set(speed);
-    }
-
-    @Override
-    public void off() {
-        motor.set(0);
     }
 }

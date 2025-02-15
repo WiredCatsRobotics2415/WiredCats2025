@@ -24,10 +24,6 @@ public class CoralIntake extends SubsystemBase {
     private CoralIntake() {
         io = (CoralIntakeIO) Util.getIOImplementation(CoralIntakeIOReal.class, CoralIntakeIOSim.class,
             CoralIntakeIO.class);
-
-        DashboardManager.getInstance().addBoolSupplier(true, "Intaking", () -> state, LayoutConstants.IntakeStatus);
-        DashboardManager.getInstance().addBoolSupplier(true, "Intook", () -> sensorTrigger(),
-            LayoutConstants.CoralIntook);
     }
 
     public static CoralIntake getInstance() {
@@ -39,7 +35,7 @@ public class CoralIntake extends SubsystemBase {
         return runOnce(() -> {
             isBeingIntook = false;
             state = false;
-            io.off();
+            io.setPower(0);
         });
     }
 
@@ -87,9 +83,6 @@ public class CoralIntake extends SubsystemBase {
         return sensorTrigger() && isBeingIntook;
     }
 
-    /**
-     * return true if the limitswitch is triggered
-     */
     public boolean sensorTrigger() {
         return inputs.sensorValue > CoralIntakeConstants.IRThreshold;
     }
