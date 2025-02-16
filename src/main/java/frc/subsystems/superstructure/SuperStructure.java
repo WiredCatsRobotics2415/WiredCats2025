@@ -12,6 +12,7 @@ import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
+import frc.utils.math.AlgebraHelpers;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 
@@ -82,7 +83,7 @@ public class SuperStructure {
 
     private boolean willCollide(Distance elevatorGoal, Angle armGoal) {
         boolean willCollide = (elevatorGoal.in(Inches) +
-            Math.cos(armGoal.in(Radian)) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
+            AlgebraHelpers.cosizzle(armGoal) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
         this.collisionPrevented = willCollide;
         return willCollide;
     }

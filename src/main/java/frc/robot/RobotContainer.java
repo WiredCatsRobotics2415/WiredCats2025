@@ -9,7 +9,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.Dealgae;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.Level;
@@ -101,8 +100,10 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
+        oi.binds.get(OI.Bind.IntakeFromGround)
+            .onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
+        oi.binds.get(OI.Bind.IntakeFromHPS)
+            .onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
     }
 
     private void configureTriggers() {

@@ -11,8 +11,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.utils.DoubleDifferentiableValue;
 import frc.utils.Util;
+import frc.utils.math.AlgebraHelpers;
+import frc.utils.math.DoubleDifferentiableValue;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
@@ -53,9 +54,9 @@ public class Elevator extends SubsystemBase {
     }
 
     public Distance getMeasurement() {
-        return Inches.of(Util.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.in(Volts),
-            ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeightInches.in(Inches),
-            ElevatorConstants.MaxHeightInches.in(Inches)));
+        return Inches.of(AlgebraHelpers.linearMap(inputs.wirePotentiometer,
+            ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts),
+            ElevatorConstants.MinHeightInches.in(Inches), ElevatorConstants.MaxHeightInches.in(Inches)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {

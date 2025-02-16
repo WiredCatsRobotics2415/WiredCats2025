@@ -3,13 +3,19 @@ package frc.constants;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.pathplanner.lib.config.ModuleConfig;
+import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.units.measure.MomentOfInertia;
+import frc.constants.Subsystems.DriveAutoConstants;
 import java.util.List;
 
 public class Measurements {
@@ -20,8 +26,37 @@ public class Measurements {
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
         public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
         public static final Distance DriveTrainRadius = Inches.of(18.432785);
+        public static final Distance DriveTrainTrackWidth = Inches.of(24.625);
 
         public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
+
+        public static final Mass RobotWeight = Pounds.of(115); // TODO: update with real value
+        public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
+            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveAutoConstants.HeadingKA / TunerConstants.driveGains.kA));
+        public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
+            TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with spring test: cof = fs/(m*g)
+            DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);
+
+        public static final RobotConfig PPRobotConfig = new RobotConfig(RobotWeight, RobotMOI, SwerveModuleConfig,
+            new Translation2d[] { new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
+                new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
+                new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
+                new Translation2d(TunerConstants.kBackRightYPos, TunerConstants.kBackRightYPos) });
+        static {
+            System.out.println("PP Robot Config: ");
+            System.out.println("    Mass (KG): " + RobotWeight.in(Kilograms));
+            System.out.println("    Moi: " + RobotMOI.in(KilogramSquareMeters));
+            System.out.println("    Wheel Radius (M): " + TunerConstants.kWheelRadius.in(Meters));
+            System.out.println("    Drive Gearing: " + TunerConstants.kDriveGearRatio);
+            System.out.println("    True Max Drive Speed: " + TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+            System.out.println("    Wheel COF: " + SwerveModuleConfig.wheelCOF);
+            System.out.println("    Drive Motor: " + SwerveModuleConfig.driveMotor);
+            System.out.println("    Drive Current Limit: " + TunerConstants.kSlipCurrent.in(Amps));
+            System.out.println("    Module Offsets (FL, FR, BL, BR): ");
+            for (Translation2d location : PPRobotConfig.moduleLocations) {
+                System.out.println("        " + location.toString());
+            }
+        }
     }
 
     public class ReefMeasurements {

@@ -35,6 +35,24 @@ public class Controls {
         public static final int RightTrigger = XboxController.Axis.kRightTrigger.value;
     }
 
+    public class NumpadButtons {
+        public static final int NumberZero = 1;
+        public static final int Dot = 2;
+        public static final int NumberOne = 3;
+        public static final int NumberTwo = 4;
+        public static final int NumberThree = 5;
+        public static final int NumberFour = 6;
+        public static final int NumberFive = 7;
+        public static final int NumberSix = 8;
+        public static final int NumberSeven = 9;
+        public static final int NumberEight = 10;
+        public static final int NumberNine = 11;
+        public static final int ForwardSlash = 12;
+        public static final int Asterisk = 13;
+        public static final int Minus = 14;
+        public static final int Plus = 15;
+    }
+
     public class Presets {
         public static final Angle Level1Angle = Degrees.of(120);
         public static final Distance Level1Height = Inches.of(12);

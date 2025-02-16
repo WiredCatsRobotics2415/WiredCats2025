@@ -55,6 +55,8 @@ public class Subsystems {
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
             RadiansPerSecond.of(Math.PI), RadiansPerSecondPerSecond.of(Math.PI / 2));
 
+        public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
+
         public static final double HeadingkP = 3;
         public static final double HeadingkI = 0;
         public static final double HeadingkD = 0.3;

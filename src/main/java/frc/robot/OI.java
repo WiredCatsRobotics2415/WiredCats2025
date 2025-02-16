@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Controls;
 import frc.constants.Controls.GulikitButtons;
+import frc.constants.Controls.NumpadButtons;
+import frc.utils.math.AlgebraHelpers;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,17 +53,17 @@ public class OI {
         binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
         binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
 
-        binds.put(Bind.IntakeFromHPS, numpad.button(1));
-        binds.put(Bind.IntakeFromHPS, numpad.button(4));
-        binds.put(Bind.DealgaePreset, numpad.button(7));
-        binds.put(Bind.AutoScoreLeftL1, numpad.button(2));
-        binds.put(Bind.AutoScoreLeftL2, numpad.button(5));
-        binds.put(Bind.AutoScoreLeftL3, numpad.button(8));
-        binds.put(Bind.AutoScoreLeftL4, numpad.button(10)); // Slash
-        binds.put(Bind.AutoScoreRightL1, numpad.button(3));
-        binds.put(Bind.AutoScoreRightL2, numpad.button(6));
-        binds.put(Bind.AutoScoreRightL3, numpad.button(9));
-        binds.put(Bind.AutoScoreRightL4, numpad.button(11)); // Asterisk
+        binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
+        binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
+        binds.put(Bind.DealgaePreset, numpad.button(NumpadButtons.NumberSeven));
+        binds.put(Bind.AutoScoreLeftL1, numpad.button(NumpadButtons.NumberTwo));
+        binds.put(Bind.AutoScoreLeftL2, numpad.button(NumpadButtons.NumberFive));
+        binds.put(Bind.AutoScoreLeftL3, numpad.button(NumpadButtons.NumberEight));
+        binds.put(Bind.AutoScoreLeftL4, numpad.button(NumpadButtons.ForwardSlash));
+        binds.put(Bind.AutoScoreRightL1, numpad.button(NumpadButtons.NumberThree));
+        binds.put(Bind.AutoScoreRightL2, numpad.button(NumpadButtons.NumberSix));
+        binds.put(Bind.AutoScoreRightL3, numpad.button(NumpadButtons.NumberNine));
+        binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
     }
 
     private double deadbandCompensation(double r) {
@@ -82,8 +84,8 @@ public class OI {
             if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
             double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
             double powerCompensated = minimumPowerCompensation(magCurved);
-            newX = Math.cos(angle) * powerCompensated;
-            newY = Math.sin(angle) * powerCompensated;
+            newX = AlgebraHelpers.cosizzle(angle) * powerCompensated;
+            newY = AlgebraHelpers.sizzle(angle) * powerCompensated;
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;
