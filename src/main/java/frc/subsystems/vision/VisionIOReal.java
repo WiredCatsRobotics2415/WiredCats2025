@@ -3,10 +3,14 @@ package frc.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import frc.constants.Subsystems.VisionConstants;
+import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.LimelightHelpers.RawDetection;
 
 public class VisionIOReal implements VisionIO {
+    private EndEffectorPipeline currentPipeline;
+
     public VisionIOReal() {
 
     }
@@ -30,8 +34,34 @@ public class VisionIOReal implements VisionIO {
             inputs.poseTagDistances[i] = estimate.avgTagDist;
         }
 
-        inputs.endEffectorCameraAveragePixelValue = (int) LimelightHelpers
-            .getPythonScriptData(VisionConstants.EndEffectorName)[0];
+        if (currentPipeline == EndEffectorPipeline.DriverView) {
+            inputs.endEffectorCameraAveragePixelValue = (int) LimelightHelpers
+                .getPythonScriptData(VisionConstants.EndEffectorName)[0];
+        } else {
+            RawDetection[] objectsDetected = LimelightHelpers.getRawDetections(VisionConstants.EndEffectorName);
+            if (objectsDetected.length == 0) {
+                inputs.objectDetected = false;
+                return;
+            }
+            inputs.objectDetected = true;
+
+            RawDetection object = objectsDetected[0];
+            if (objectsDetected.length > 1) {
+                double closestValue = Double.MAX_VALUE;
+                int closestIndex = 0;
+                for (int i = 0; i < objectsDetected.length; i++) {
+                    double closeness = Math.sqrt(objectsDetected[i].txnc*objectsDetected[i].txnc + objectsDetected[i].tync*objectsDetected[i].tync);
+                    if (closeness < closestValue) {
+                        closestValue = closeness;
+                        closestIndex = i;
+                    }
+                }
+                object = objectsDetected[closestIndex];
+            }
+
+            inputs.detectedObjectTx = object.txnc;
+            inputs.detectedObjectLabel = object.classId;
+        }
     }
 
     @Override
@@ -54,4 +84,9 @@ public class VisionIOReal implements VisionIO {
             new double[] { upsideDown ? 1.0d : -1.0d });
     }
 
+    @Override
+    public void setEndEffectorPipeline(EndEffectorPipeline pipeline) {
+        currentPipeline = pipeline;
+        LimelightHelpers.setPipelineIndex(VisionConstants.EndEffectorName, pipeline == EndEffectorPipeline.DriverView ? 0 : 1);
+    }
 }

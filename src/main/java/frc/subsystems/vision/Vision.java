@@ -24,6 +24,14 @@ public class Vision extends SubsystemBase {
     private VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
     private static Vision instance;
 
+    public enum EndEffectorPipeline {
+        DriverView, NeuralNetwork
+    }
+
+    public enum ObjectRecognized {
+        Coral, Algae
+    }
+
     private final TuneableNumber BaseDistrust = new TuneableNumber(0.7, "BaseDistrust");
     private final TuneableNumber DistanceFromCurrentScalar = new TuneableNumber(2, "DistanceFromCurrentScalar");
     private final TuneableNumber DistanceDistrustScalar = new TuneableNumber(15, "DistanceDistrustScalar");
@@ -91,6 +99,22 @@ public class Vision extends SubsystemBase {
     }
 
     public int getEndEffectorCameraAveragePixelValue() { return inputs.endEffectorCameraAveragePixelValue; }
+
+    public void setEndEffectorPipeline(EndEffectorPipeline pipeline) {
+        io.setEndEffectorPipeline(pipeline);
+    }
+
+    public boolean objectDetected() {
+        return inputs.objectDetected;
+    }
+
+    public double getObjectDetectedTx() {
+        return inputs.detectedObjectTx;
+    }
+
+    public ObjectRecognized getObjectDetectedType() {
+        return inputs.detectedObjectLabel == 0 ? ObjectRecognized.Algae : ObjectRecognized.Coral;
+    }
 
     /**
      * Updates a swervedrive with the current global pose estimation. This is in Vision because it does not directly interact with any of the hardware. This should be run periodically.

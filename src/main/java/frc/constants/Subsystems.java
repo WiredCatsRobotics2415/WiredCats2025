@@ -74,7 +74,7 @@ public class Subsystems {
         public static final double kS = 0;
         public static final double kG = 0;
         public static final double kV = 0;
-        public static final double kA = 0;
+        public static final double kA = 1e-4;
         public static final double kP = 0;
         public static final double kD = 0;
 
@@ -124,8 +124,9 @@ public class Subsystems {
         public static final int IRSensorPort = NavxMXPPorts.Analog1;
 
         public static final double IntakeCoralSpeed = 0.6;
-        public static final double IntakeAlgaeSpeed = 0.8;
-        public static final double OuttakeSpeed = -0.35;
+        public static final double IntakeAlgaeSpeed = -0.8;
+        public static final double OuttakeCoralSpeed = -0.35;
+        public static final double OuttakeAlageSpeed = 0.35;
 
         public static final int IRThreshold = 100; // (2/14) copied from akit2024
         public static final int AlgaeIntookCameraThreshold = 127;

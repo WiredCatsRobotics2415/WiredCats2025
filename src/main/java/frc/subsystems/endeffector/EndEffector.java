@@ -59,12 +59,27 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
-    public Command outtake() {
+    /**
+     * Outtakes, spinning at different speeds/directions depending on which sensor is triggered. Will not run if neither sensor is triggered.
+     */
+    public Command toggleOuttake() {
         return runOnce(() -> {
-            io.setPower(EndEffectorConstants.OuttakeSpeed);
-            outtaking = true;
-            intakingCoral = false;
-            intakingAlgae = false;
+            if (outtaking) {
+                io.setPower(0);
+                outtaking = false;
+                return;
+            }
+            if (sensorTrigger()) {
+                io.setPower(EndEffectorConstants.OuttakeCoralSpeed);
+                intakingCoral = false;
+                intakingAlgae = false;
+                outtaking = true;
+            } else if (cameraTrigger()) {
+                io.setPower(EndEffectorConstants.OuttakeAlageSpeed);
+                intakingCoral = false;
+                intakingAlgae = false;
+                outtaking = true;
+            }
         });
     }
 
@@ -83,7 +98,7 @@ public class EndEffector extends SubsystemBase {
 
     private boolean cameraTrigger() {
         return Vision.getInstance()
-            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold;
+            .getEndEffectorCameraAveragePixelValue() < EndEffectorConstants.AlgaeIntookCameraThreshold;
     }
 
     public boolean hasCoral() {

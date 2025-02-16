@@ -213,8 +213,8 @@ public class DriveCharacterization extends Characterizer {
     public class SpeedAt12VCharacterization extends Command {
         private CommandSwerveDrivetrain drive;
         private SwerveRequest.RobotCentric driveForwardAtFullEffort = new SwerveRequest.RobotCentric()
-            .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo)
-            .withVelocityX(TunerConstants.kSpeedAt12Volts);
+            .withDriveRequestType(DriveRequestType.OpenLoopVoltage)
+            .withSteerRequestType(SteerRequestType.MotionMagicExpo).withVelocityX(TunerConstants.kSpeedAt12Volts);
 
         public SpeedAt12VCharacterization(CommandSwerveDrivetrain drive) {
             this.drive = drive;

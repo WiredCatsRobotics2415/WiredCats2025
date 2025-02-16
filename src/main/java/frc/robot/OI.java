@@ -16,9 +16,10 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
-        AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
-        AutoScoreRightL3, AutoScoreRightL4, DeAlgae, SeedFieldCentric
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
+        ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
+        AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
+        SeedFieldCentric
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -46,9 +47,13 @@ public class OI {
         binds.put(Bind.ManualArmForward, controller.povUp());
         binds.put(Bind.ManualArmBack, controller.povDown());
 
+        binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
+        binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
+        binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
+
         binds.put(Bind.IntakeFromHPS, numpad.button(1));
         binds.put(Bind.IntakeFromHPS, numpad.button(4));
-        binds.put(Bind.DeAlgae, numpad.button(7));
+        binds.put(Bind.DealgaePreset, numpad.button(7));
         binds.put(Bind.AutoScoreLeftL1, numpad.button(2));
         binds.put(Bind.AutoScoreLeftL2, numpad.button(5));
         binds.put(Bind.AutoScoreLeftL3, numpad.button(8));

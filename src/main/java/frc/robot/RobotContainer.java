@@ -4,20 +4,27 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.commands.Dealgae;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
+import frc.constants.Controls.Presets;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.driver.DashboardManager;
 import frc.utils.driver.DashboardManager.LayoutConstants;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotContainer {
     private static RobotContainer instance;
@@ -25,6 +32,7 @@ public class RobotContainer {
     private Arm arm = Arm.getInstance();
     private Elevator elevator = Elevator.getInstance();
     private SuperStructure superstructure = SuperStructure.getInstance();
+    private EndEffector endEffector = EndEffector.getInstance();
     private @Getter OI oi = OI.getInstance();
 
     private SendableChooser<Command> autoChooser;
@@ -47,6 +55,16 @@ public class RobotContainer {
         // Put Auto named commands here
         autoChooser = AutoBuilder.buildAutoChooser("");
         DashboardManager.getInstance().addChooser(false, "Auto", autoChooser, LayoutConstants.AutoSelector);
+
+        PathPlannerLogging.setLogActivePathCallback((activePath) -> {
+            Logger.recordOutput("Pathplanner/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
+        });
+        PathPlannerLogging.setLogTargetPoseCallback((targetPose) -> {
+            Logger.recordOutput("Pathplanner/TargetPose", targetPose);
+        });
+        PathPlannerLogging.setLogCurrentPoseCallback((currentPose) -> {
+            Logger.recordOutput("Pathplanner/CurrentPose", currentPose);
+        });
     }
 
     public void neutralizeSubsystems() {
@@ -70,6 +88,10 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(Degrees.of(1)));
         oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(Degrees.of(-1)));
 
+        oi.binds.get(OI.Bind.ToggleDealgae).onTrue(endEffector.toggleIntakeAlgae());
+        oi.binds.get(OI.Bind.ToggleIntake).onTrue(endEffector.toggleIntakeCoral());
+        oi.binds.get(OI.Bind.ToggleOuttake).onTrue(endEffector.toggleOuttake());
+
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
         oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));
         oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3));
@@ -78,6 +100,9 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2));
         oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
+        oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
     }
 
     private void configureTriggers() {
