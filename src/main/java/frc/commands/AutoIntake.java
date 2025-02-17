@@ -2,9 +2,10 @@
 package frc.commands;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
-
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls;
 import frc.constants.Subsystems.DriveAutoConstants;
@@ -28,6 +29,18 @@ public class AutoIntake extends Command {
     @Override
     public void initialize() {
         endEffector.intakeAndWaitForCoral().schedule();
+        if (RobotState.isAutonomous()) {
+            PPHolonomicDriveController.overrideRotationFeedback(() -> {
+                Rotation2d pose = drive.getState().Pose.getRotation();
+                double tx = vision.getObjectDetectedTx();
+
+                if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
+                    return pose.minus(Rotation2d.fromDegrees(tx)).getDegrees();
+                } else {
+                    return pose.getDegrees();
+                }
+            });
+        }
     }
 
     @Override
@@ -35,12 +48,9 @@ public class AutoIntake extends Command {
         if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
             // turns robot to current pose + x-degree
             Rotation2d pose = drive.getState().Pose.getRotation();
-
             double tx = vision.getObjectDetectedTx();
-            if (!MathUtil.isNear(0, tx, DriveAutoConstants.HeadingTolerance)) {
 
-                // System.out.println(pose);
-                // System.out.println(pose.minus(Rotation2d.fromDegrees(vision.getNoteAngleOnX())));
+            if (!MathUtil.isNear(0, tx, DriveAutoConstants.HeadingTolerance)) {
 
                 drive.setControl(drive.driveToPositionFacingAngleRequest
                     .withTargetDirection(pose.minus(Rotation2d.fromDegrees(tx))));
@@ -52,7 +62,7 @@ public class AutoIntake extends Command {
 
     @Override
     public boolean isFinished() {
-        // return false;
+        PPHolonomicDriveController.clearRotationFeedbackOverride();
         return endEffector.hasCoral();
     }
 }
