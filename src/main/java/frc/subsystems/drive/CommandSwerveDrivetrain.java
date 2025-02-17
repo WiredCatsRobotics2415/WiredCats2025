@@ -55,7 +55,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05)
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo)
         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
-    private final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
+    public final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     PIDController driveToPositionXController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,

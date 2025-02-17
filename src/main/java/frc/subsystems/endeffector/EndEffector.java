@@ -1,7 +1,10 @@
 package frc.subsystems.endeffector;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.vision.Vision;
@@ -107,6 +110,14 @@ public class EndEffector extends SubsystemBase {
 
     public boolean hasAlgae() {
         return cameraTrigger() && intakingAlgae;
+    }
+
+    public Command intakeAndWaitForCoral() {
+        return new SequentialCommandGroup(new InstantCommand(() -> {
+            intakingCoral = true;
+        }), toggleIntakeCoral(), new WaitUntilCommand(() -> hasCoral()), new InstantCommand(() -> {
+            intakingCoral = false;
+        }), turnOff());
     }
 
     @Override
