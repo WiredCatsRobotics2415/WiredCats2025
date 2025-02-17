@@ -66,6 +66,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
 
     private Vision vision = Vision.getInstance();
+    private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private static CommandSwerveDrivetrain instance;
 
     private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
@@ -147,7 +148,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         SwerveDriveState currentState = getState();
-        vision.globalPoseEstimation(currentState, this);
+        poseFuser.update(currentState);
 
         Logger.recordOutput("Drive/Pose", currentState.Pose);
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);

@@ -35,7 +35,7 @@ public class Arm extends SubsystemBase {
 
     private Arm() {
         pid.setTolerance(ArmConstants.GoalTolerance);
-        io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, ArmIO.class);
+        io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, new ArmIO() {});
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", new InstantCommand(() -> {

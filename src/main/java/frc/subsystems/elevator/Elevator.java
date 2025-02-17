@@ -31,7 +31,7 @@ public class Elevator extends SubsystemBase {
 
     private Elevator() {
         pid.setTolerance(ArmConstants.GoalTolerance);
-        io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, ElevatorIO.class);
+        io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
         }

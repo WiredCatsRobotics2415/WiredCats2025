@@ -5,8 +5,8 @@ import lombok.Getter;
 
 public class DoubleDifferentiableValue {
     @Getter private double value;
-    @Getter private double velocity;
-    @Getter private double acceleration;
+    @Getter private double firstDerivative;
+    @Getter private double secondDerivative;
 
     private boolean firstUpdate = false;
     private double lastTimestamp;
@@ -17,14 +17,14 @@ public class DoubleDifferentiableValue {
     public void update(double update) {
         if (firstUpdate) {
             value = update;
-            velocity = 0.0d;
-            acceleration = 0.0d;
+            firstDerivative = 0.0d;
+            secondDerivative = 0.0d;
         } else {
-            velocity = (update - value) / lastTimestamp;
-            acceleration = (velocity - lastVelocity) / lastTimestamp;
+            firstDerivative = (update - value) / lastTimestamp;
+            secondDerivative = (firstDerivative - lastVelocity) / lastTimestamp;
         }
         lastTimestamp = Timer.getFPGATimestamp();
-        lastVelocity = velocity;
+        lastVelocity = firstDerivative;
         firstUpdate = false;
     }
 }

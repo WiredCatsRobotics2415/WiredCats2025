@@ -1,22 +1,11 @@
 package frc.subsystems.vision;
 
-import static edu.wpi.first.units.Units.Meters;
-
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
-import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.Subsystems.VisionConstants;
-import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Util;
-import frc.utils.tuning.TuneableBoolean;
-import frc.utils.tuning.TuneableNumber;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -32,15 +21,8 @@ public class Vision extends SubsystemBase {
         Coral, Algae
     }
 
-    private final TuneableNumber BaseDistrust = new TuneableNumber(0.7, "BaseDistrust");
-    private final TuneableNumber DistanceFromCurrentScalar = new TuneableNumber(2, "DistanceFromCurrentScalar");
-    private final TuneableNumber DistanceDistrustScalar = new TuneableNumber(15, "DistanceDistrustScalar");
-    private final TuneableNumber RotationSpeedDiscardThreshold = new TuneableNumber(720,
-        "RotationSpeedDiscardThreshold");
-    private final TuneableBoolean AddYawRate = new TuneableBoolean(true, "AddYawRate");
-
     private Vision() {
-        io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, VisionIO.class);
+        io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, new VisionIO() {});
     }
 
     public static Vision getInstance() {
@@ -112,46 +94,6 @@ public class Vision extends SubsystemBase {
 
     public ObjectRecognized getObjectDetectedType() {
         return inputs.detectedObjectLabel == 0 ? ObjectRecognized.Algae : ObjectRecognized.Coral;
-    }
-
-    /**
-     * Updates a swervedrive with the current global pose estimation. This is in Vision because it does not directly interact with any of the hardware. This should be run periodically.
-     *
-     * @param driveState    The current state of the drivebase
-     * @param driveInstance The instance of the drive
-     */
-    public void globalPoseEstimation(SwerveDriveState driveState, CommandSwerveDrivetrain driveInstance) {
-        Pose2d currentRobotPose = driveState.Pose;
-        ChassisSpeeds currentChassisSpeeds = driveState.Speeds;
-
-        if (AddYawRate.get()) {
-            this.sendOrientation(currentRobotPose.getRotation().getDegrees(),
-                driveInstance.getPigeon2().getAngularVelocityZWorld(true).getValueAsDouble());
-        } else {
-            this.sendOrientation(currentRobotPose.getRotation().getDegrees(), 0);
-        }
-        PoseEstimate[] estimates = this.getPoseEstimates();
-
-        for (int i = 0; i < estimates.length; i++) {
-            PoseEstimate estimate = estimates[i];
-            double twoDDistance = currentRobotPose.getTranslation().getDistance(estimate.pose.getTranslation());
-            boolean rejectUpdate = false;
-            if (Math.abs(
-                (Units.radiansToDegrees(currentChassisSpeeds.omegaRadiansPerSecond))) < RotationSpeedDiscardThreshold
-                    .get())
-                rejectUpdate = true;
-            if (estimate.tagCount > 0) rejectUpdate = true;
-            if (twoDDistance > 2 * RobotMeasurements.CenterToFrameRadius.in(Meters)) rejectUpdate = true; // test 1-10: inequality was unintentionally flipped, test 20: added 2x
-            if (!rejectUpdate) {
-                double xSTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist) +
-                    (DistanceFromCurrentScalar.get() * twoDDistance);
-                double ySTDEV = BaseDistrust.get() + (DistanceDistrustScalar.get() * estimate.avgTagDist) +
-                    (DistanceFromCurrentScalar.get() * twoDDistance);
-
-                driveInstance.addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds),
-                    VecBuilder.fill(xSTDEV, ySTDEV, 9999999));
-            }
-        }
     }
 
     @Override

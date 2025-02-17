@@ -20,7 +20,7 @@ public class EndEffector extends SubsystemBase {
 
     private EndEffector() {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
-            EndEffectorIO.class);
+            new EndEffectorIO() {});
 
         new Trigger(this::hasCoral).onTrue(turnOff());
         new Trigger(this::hasAlgae).onTrue(turnOff());

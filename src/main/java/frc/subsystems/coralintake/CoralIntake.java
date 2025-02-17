@@ -18,7 +18,7 @@ public class CoralIntake extends SubsystemBase {
 
     private CoralIntake() {
         io = (CoralIntakeIO) Util.getIOImplementation(CoralIntakeIOReal.class, CoralIntakeIOSim.class,
-            CoralIntakeIO.class);
+            new CoralIntakeIO() {});
 
         new Trigger(EndEffector.getInstance()::hasCoral).onTrue(turnOff());
     }

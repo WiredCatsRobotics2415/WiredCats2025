@@ -3,6 +3,7 @@ package frc.utils.math;
 import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.units.measure.Angle;
+import lombok.val;
 
 public class AlgebraHelpers {
     /**
@@ -43,5 +44,19 @@ public class AlgebraHelpers {
      */
     public static double cosizzle(double angleRadians) {
         return Math.cos(angleRadians);
+    }
+
+    /**
+     * multiples the arrays element wise
+     */
+    public static double addWeighted(double[] weights, double[] values) {
+        if (weights.length != values.length) {
+            throw new IllegalArgumentException("Weights and values must be the same length, but weights has " + weights.length + " elements and values has " + values.length);
+        }
+        double sum = 0.0d;
+        for (int i = 0; i < weights.length; i++) {
+            sum += weights[i]*values[i];
+        }
+        return sum;
     }
 }

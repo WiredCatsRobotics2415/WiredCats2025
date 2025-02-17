@@ -1,7 +1,6 @@
 package frc.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Radian;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;

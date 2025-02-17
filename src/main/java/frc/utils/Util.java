@@ -16,12 +16,12 @@ public class Util {
      * @param replay The replay IO
      * @return The instantiated IO (MUST be cast to correct IO class)
      */
-    public static Object getIOImplementation(Class<?> real, Class<?> sim, Class<?> replay) {
+    public static Object getIOImplementation(Class<?> real, Class<?> sim, Object replay) {
         Class<?> attemptedInstantationType = real;
         try {
             if (Robot.isSimulation()) {
-                if (RuntimeConstants.simMode == Mode.REPLAY) {
-                    attemptedInstantationType = replay;
+                if (RuntimeConstants.SimMode == Mode.REPLAY) {
+                    return replay;
                 } else {
                     attemptedInstantationType = sim;
                 }
