@@ -48,6 +48,15 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
+    public Command intakeAndWaitForCoral() {
+        return run(() -> {
+            io.setPower(EndEffectorConstants.IntakeCoralSpeed);
+            intakingCoral = true;
+            intakingAlgae = false;
+            outtaking = false;
+        }).until(this::hasCoral).andThen(turnOff());
+    }
+
     public Command toggleIntakeAlgae() {
         return runOnce(() -> {
             if (!intakingAlgae) {
@@ -110,14 +119,6 @@ public class EndEffector extends SubsystemBase {
 
     public boolean hasAlgae() {
         return cameraTrigger() && intakingAlgae;
-    }
-
-    public Command intakeAndWaitForCoral() {
-        return new SequentialCommandGroup(new InstantCommand(() -> {
-            intakingCoral = true;
-        }), toggleIntakeCoral(), new WaitUntilCommand(() -> hasCoral()), new InstantCommand(() -> {
-            intakingCoral = false;
-        }), turnOff());
     }
 
     @Override
