@@ -10,7 +10,6 @@ import com.ctre.phoenix6.Utils;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveDriveState;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
@@ -97,8 +96,10 @@ public class VisionPoseFuser {
                 VecBuilder.fill(xSTDEV, ySTDEV, 9999999));
         }
 
-        Logger.recordOutput("VisionPoseFuser/LinearVelocityOfRobot", Algebra.euclideanDistance(state.Speeds.vxMetersPerSecond, state.Speeds.vyMetersPerSecond));
-        Logger.recordOutput("VisionPoseFuser/LinearAccelerationOfRobot", Algebra.euclideanDistance(pigeonLinearAccelX.getValueAsDouble(), pigeonLinearAccelY.getValueAsDouble()));
+        Logger.recordOutput("VisionPoseFuser/LinearVelocityOfRobot",
+            Algebra.euclideanDistance(state.Speeds.vxMetersPerSecond, state.Speeds.vyMetersPerSecond));
+        Logger.recordOutput("VisionPoseFuser/LinearAccelerationOfRobot",
+            Algebra.euclideanDistance(pigeonLinearAccelX.getValueAsDouble(), pigeonLinearAccelY.getValueAsDouble()));
         Logger.recordOutput("VisionPoseFuser/AngularVelocity", robotAngularVelocityDS);
         Logger.recordOutput("VisionPoseFuser/AngularAccelerationOfRobot", robotAngularAccelerationDSS);
 

@@ -9,7 +9,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
@@ -30,7 +29,7 @@ public class Elevator extends SubsystemBase {
     private static Elevator instance;
 
     private Elevator() {
-        pid.setTolerance(ArmConstants.GoalTolerance);
+        pid.setTolerance(ElevatorConstants.GoalTolerance);
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
@@ -54,9 +53,9 @@ public class Elevator extends SubsystemBase {
     }
 
     public Distance getMeasurement() {
-        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer,
-            ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts),
-            ElevatorConstants.MinHeightInches.in(Inches), ElevatorConstants.MaxHeightInches.in(Inches)));
+        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.in(Volts),
+            ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeightInches.in(Inches),
+            ElevatorConstants.MaxHeightInches.in(Inches)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {

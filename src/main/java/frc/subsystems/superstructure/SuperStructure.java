@@ -1,5 +1,6 @@
 package frc.subsystems.superstructure;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.units.measure.Angle;
@@ -43,34 +44,44 @@ public class SuperStructure {
         }));
     }
 
-    /** Change goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
+    /** Change elevator goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
     public Command changeElevatorGoalBy(Distance changeBy) {
         return new RepeatCommand(new InstantCommand(() -> {
             this.setElevatorGoalSafely((elevator.getGoal().plus(changeBy)));
         }));
     }
 
-    /** Sets goals and waits for both mechanisms to achieve them */
+    /**
+     * Sets goals and waits for both mechanisms to achieve them. This method ensures that, while moving, there will be no collisions
+     */
     public Command runToPositionCommand(Distance elevatorGoal, Angle armGoal) {
         return new RepeatCommand(new InstantCommand(() -> {
-            goToPosition(elevatorGoal, armGoal);
+            arm.setGoal(armGoal);
+            double elevatorHeightNextTimestep = elevator.getDifferentiableMeasurementInches()
+                .secondDerivativeLinearApprox(0.02);
+            double armAngleNextTimestep = arm.getDifferentiableMeasurementDegrees().secondDerivativeLinearApprox(0.02);
+            if (positionsWillCollide(Inches.of(elevatorHeightNextTimestep), Degrees.of(armAngleNextTimestep))) {
+                elevator.setGoal(elevator.getMeasurement());
+            } else {
+                elevator.setGoal(elevatorGoal);
+            }
         })).until(this::bothAtGoal);
     }
 
     public void setArmGoalSafely(Angle armGoal) {
-        if (!willCollide(elevator.getGoal(), armGoal)) {
+        if (!positionsWillCollide(elevator.getGoal(), armGoal)) {
             arm.setGoal(armGoal);
         }
     }
 
     public void setElevatorGoalSafely(Distance elevatorGoal) {
-        if (!willCollide(elevatorGoal, arm.getGoal())) {
+        if (!positionsWillCollide(elevatorGoal, arm.getGoal())) {
             elevator.setGoal(elevatorGoal);
         }
     }
 
     public void goToPosition(Distance elevatorGoal, Angle armGoal) {
-        if (!willCollide(elevatorGoal, armGoal)) {
+        if (!positionsWillCollide(elevatorGoal, armGoal)) {
             elevator.setGoal(elevatorGoal);
             arm.setGoal(armGoal);
         }
@@ -80,9 +91,9 @@ public class SuperStructure {
         return elevator.atGoal() && arm.atGoal();
     }
 
-    private boolean willCollide(Distance elevatorGoal, Angle armGoal) {
-        boolean willCollide = (elevatorGoal.in(Inches) +
-            Algebra.cosizzle(armGoal) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
+    private boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle) {
+        boolean willCollide = (elevatorHeight.in(Inches) +
+            Algebra.cosizzle(armAngle) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
         this.collisionPrevented = willCollide;
         return willCollide;
     }

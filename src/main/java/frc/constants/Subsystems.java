@@ -80,8 +80,8 @@ public class Subsystems {
         public static final double kP = 0;
         public static final double kD = 0;
 
-        public static final double VelocityMax = 0;
-        public static final double AccelerationMax = 0;
+        public static final double VelocityMax = 50.0d; // (2/18) copied from akit2024
+        public static final double AccelerationMax = 50.0d; // (2/18) copied from akit2024
         public static final double GoalTolerance = 0.5;
 
         public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
@@ -112,8 +112,8 @@ public class Subsystems {
         public static final double kP = 0;
         public static final double kD = 0;
 
-        public static final double VelocityMax = 0;
-        public static final double AccelerationMax = 0;
+        public static final double VelocityMax = 50.0d; // (2/18) copied from akit2024
+        public static final double AccelerationMax = 50.0d; // (2/18) copied from akit2024
         public static final double GoalTolerance = 0.5;
 
         public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7

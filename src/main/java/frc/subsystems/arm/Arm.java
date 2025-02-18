@@ -12,25 +12,29 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
+import frc.subsystems.elevator.Elevator;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
+import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
+    @Getter private Angle goal = Degrees.of(0.0);
+    @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
+    private boolean isCoasting = false;
+
     private ArmFeedforward ff = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
     private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
         new TrapezoidProfile.Constraints(ArmConstants.VelocityMax, ArmConstants.AccelerationMax));
 
-    @Getter private Angle goal = Degrees.of(0.0);
-
-    private boolean isCoasting = false;
-    private static Arm instance;
     @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
+    private static Arm instance;
 
+    private DoubleDifferentiableValue elevatorDDV = Elevator.getInstance().getDifferentiableMeasurementInches();
     private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0, "ArmVelocityMultiplier");
 
     private Arm() {
@@ -109,7 +113,7 @@ public class Arm extends SubsystemBase {
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
-        double voltOut = output + feedforward + elevatorVelocityMultiplier.get();
+        double voltOut = output + feedforward + elevatorVelocityMultiplier.get() * elevatorDDV.getFirstDerivative();
         if (!isCoasting) {
             io.setVoltage(voltOut);
         }
@@ -121,6 +125,7 @@ public class Arm extends SubsystemBase {
         Logger.processInputs("Arm", inputs);
 
         double measurementDegrees = getMeasurement().in(Degrees);
+        differentiableMeasurementDegrees.update(measurementDegrees);
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
 
         if (RuntimeConstants.TuningMode) Logger.recordOutput("Arm/Error", pid.getPositionError());

@@ -61,6 +61,6 @@ public class Algebra {
     }
 
     public static double euclideanDistance(double x, double y) {
-        return Math.sqrt(x*x + y*y);
+        return Math.sqrt(x * x + y * y);
     }
 }

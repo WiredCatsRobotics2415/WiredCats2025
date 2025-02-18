@@ -30,19 +30,21 @@ public class DoubleDifferentiableValue {
 
     /**
      * Does first order linear approximation
+     *
      * @param time the delta t that you want an approximation at
      * @return the approximation
      */
     public double firstDerivativeLinearApprox(double time) {
-        return value + firstDerivative*time;
+        return value + firstDerivative * time;
     }
 
     /**
      * Does linear approximation taking the 2nd derivative into account
+     *
      * @param time the delta t that you want an approximation at
      * @return the approximation
      */
     public double secondDerivativeLinearApprox(double time) {
-        return firstDerivativeLinearApprox(time) + 0.5*secondDerivative*(time*time);
+        return firstDerivativeLinearApprox(time) + 0.5 * secondDerivative * (time * time);
     }
 }
