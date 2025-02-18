@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
+import frc.robot.Robot;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
 import frc.utils.math.Algebra;
@@ -87,7 +88,11 @@ public class SuperStructure {
         }
     }
 
+    //TODO: add in PID values for elevator and arm at goal (not working in simulator)
     public boolean bothAtGoal() {
+        if (Robot.isSimulation()) {
+            return true;
+        }
         return elevator.atGoal() && arm.atGoal();
     }
 

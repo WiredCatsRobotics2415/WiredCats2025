@@ -42,7 +42,7 @@ public class ScoreCoral extends Command {
         .plus(RobotMeasurements.BumperLength).times(-1);
     private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
     private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
-    private static final double DriveToleranceMeters = Units.inchesToMeters(2);
+    private static final double DriveToleranceMeters = Units.inchesToMeters(5);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
@@ -67,7 +67,7 @@ public class ScoreCoral extends Command {
         // TODO: Note that if the robot is not driveable while the preset is going even though
         // You are in the PresetOnly mode, consider moving this addRequirements line to
         // initialize so it doesn't require drive too early
-        addRequirements(drive, Elevator.getInstance(), Arm.getInstance());
+        addRequirements(Elevator.getInstance(), Arm.getInstance());
 
         switch (reefLevel) {
             case L1:
@@ -97,15 +97,29 @@ public class ScoreCoral extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("test initialize 2");
         superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
             Degrees.of(goalArmDegrees));
+        System.out.println("scheduled super structure command");
         superStructureCommand.schedule();
 
         if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
             driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
+            System.out.println("BEFORE scheduled drive command");
             driveCommand.schedule();
+            System.out.println("AFTER scheduled drive command");
         }
+    }
+
+    @Override
+    public void execute() {
+        System.out.println(driveCommand.isFinished());
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        System.out.println("ended" + interrupted);
     }
 
     @Override

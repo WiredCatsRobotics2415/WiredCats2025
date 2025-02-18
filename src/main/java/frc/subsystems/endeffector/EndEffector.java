@@ -107,7 +107,7 @@ public class EndEffector extends SubsystemBase {
 
     private boolean cameraTrigger() {
         return Vision.getInstance()
-            .getEndEffectorCameraAveragePixelValue() < EndEffectorConstants.AlgaeIntookCameraThreshold;
+            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold;
     }
 
     public boolean hasCoral() {

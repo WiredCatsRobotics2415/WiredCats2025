@@ -131,7 +131,7 @@ public class Subsystems {
         public static final double OuttakeAlageSpeed = 0.35;
 
         public static final int IRThreshold = 100; // (2/14) copied from akit2024
-        public static final int AlgaeIntookCameraThreshold = 127;
+        public static final int AlgaeIntookCameraThreshold = 200;
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
     }
