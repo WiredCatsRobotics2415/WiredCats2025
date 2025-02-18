@@ -10,7 +10,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
     private VisionIO io;
-    private VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
+    public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
     private static Vision instance;
 
     public enum EndEffectorPipeline {
@@ -58,6 +58,16 @@ public class Vision extends SubsystemBase {
         }
         if (usedPoses == 0) return null;
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
+    }
+
+    public Pose2d getSinglePoseEstimate() {
+
+        double x = (inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX()) / 2;
+        double y = (inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY()) / 2;
+
+        Pose2d singleTagPose = new Pose2d(x, y, new Rotation2d());
+        return singleTagPose;
+
     }
 
     /**

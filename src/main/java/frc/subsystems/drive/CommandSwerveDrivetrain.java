@@ -68,6 +68,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private Vision vision = Vision.getInstance();
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private static CommandSwerveDrivetrain instance;
+    private static Boolean switchToSingle = false;
 
     private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules) {
@@ -148,7 +149,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             });
         }
         SwerveDriveState currentState = getState();
-        poseFuser.update(currentState);
+
+        // either adds singlePose or poseFuser depending on value of switchToSingle
+        if (switchToSingle) {
+            this.addVisionMeasurement(vision.getSinglePoseEstimate(), vision.inputs.poseTimestampsSeconds[1]);
+        } else {
+            poseFuser.update(currentState);
+        }
 
         Logger.recordOutput("Drive/Pose", currentState.Pose);
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
@@ -221,6 +228,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             resetPose(new Pose2d(sumX / poses.size(), sumY / poses.size(), getState().Pose.getRotation()));
             poses.clear();
         }));
+    }
+
+    public Command switchPoseEstimator() {
+
+        return run(() -> {
+            if (switchToSingle == true) {
+                switchToSingle = false;
+            } else if (switchToSingle == false) {
+                switchToSingle = true;
+            }
+        });
     }
 
     public Command resetRotationFromLimelightMT1() {
