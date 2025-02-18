@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import com.pathplanner.lib.auto.AutoBuilder;
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -16,14 +17,17 @@ import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
 import frc.subsystems.arm.Arm;
+import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
+import frc.subsystems.vision.Vision;
 import frc.utils.driver.DashboardManager;
 import frc.utils.driver.DashboardManager.LayoutConstants;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
+import frc.commands.ScoreCoral;
 
 public class RobotContainer {
     private static RobotContainer instance;
@@ -32,7 +36,9 @@ public class RobotContainer {
     private Elevator elevator = Elevator.getInstance();
     private SuperStructure superstructure = SuperStructure.getInstance();
     private EndEffector endEffector = EndEffector.getInstance();
+    private CoralIntake coralIntake = CoralIntake.getInstance();
     private @Getter OI oi = OI.getInstance();
+    private Vision vision = Vision.getInstance();
 
     private SendableChooser<Command> autoChooser;
 
@@ -52,6 +58,15 @@ public class RobotContainer {
 
     private void setupAuto() {
         // Put Auto named commands here
+        NamedCommands.registerCommand("L4", new ScoreCoral(Side.Left, Level.L4));
+        NamedCommands.registerCommand("L3", new ScoreCoral(Side.Left, Level.L3));
+        NamedCommands.registerCommand("L2", new ScoreCoral(Side.Left, Level.L2));
+        NamedCommands.registerCommand("L1", new ScoreCoral(Side.Left, Level.L1));
+        //these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
+        NamedCommands.registerCommand("GroundIntake", coralIntake.toggleIntake());
+        NamedCommands.registerCommand("SourceIntake", coralIntake.toggleIntake());
+        //NamedCommands.registerCommand("align", vision.singleTagTrack());
+
         autoChooser = AutoBuilder.buildAutoChooser("");
         DashboardManager.getInstance().addChooser(false, "Auto", autoChooser, LayoutConstants.AutoSelector);
 

@@ -4,8 +4,6 @@ import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
-import org.littletonrobotics.junction.Logger;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.Utils;
@@ -20,6 +18,7 @@ import frc.constants.Subsystems.VisionConstants;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.DoubleDifferentiableValue;
+import org.littletonrobotics.junction.Logger;
 
 public class VisionPoseFuser {
     private final double BaseDistrustConstant = 0.7;
@@ -30,7 +29,7 @@ public class VisionPoseFuser {
     private final double AngularVelocityOfRobot = 0;
     private final double AngularAccelerationOfRobot = 0;
     private final double PoseLatencyScalar = 0;
-    //To disable vision pose fusing: set this to 0
+    // To disable vision pose fusing: set this to 0
     private final Distance DistanceFromCurrentPoseCutoffThreshold = Inches.of(0);
 
     private StatusSignal<LinearAcceleration> pigeonLinearAccelX;
@@ -98,8 +97,10 @@ public class VisionPoseFuser {
         }
 
         for (int i = 0; i < estimates.length; i++) {
-            Logger.recordOutput("VisionPoseFuser/" + VisionConstants.PoseEstimationLLNames[i] + "xSTDEV", finalXSTDEVs[i]);
-            Logger.recordOutput("VisionPoseFuser/" + VisionConstants.PoseEstimationLLNames[i] + "ySTDEV", finalYSTDEVs[i]);
+            Logger.recordOutput("VisionPoseFuser/" + VisionConstants.PoseEstimationLLNames[i] + "xSTDEV",
+                finalXSTDEVs[i]);
+            Logger.recordOutput("VisionPoseFuser/" + VisionConstants.PoseEstimationLLNames[i] + "ySTDEV",
+                finalYSTDEVs[i]);
         }
     }
 }
