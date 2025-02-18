@@ -12,7 +12,7 @@ import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
-import frc.utils.math.AlgebraHelpers;
+import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import lombok.Getter;
 
@@ -54,7 +54,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Distance getMeasurement() {
-        return Inches.of(AlgebraHelpers.linearMap(inputs.wirePotentiometer,
+        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer,
             ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts),
             ElevatorConstants.MinHeightInches.in(Inches), ElevatorConstants.MaxHeightInches.in(Inches)));
     }

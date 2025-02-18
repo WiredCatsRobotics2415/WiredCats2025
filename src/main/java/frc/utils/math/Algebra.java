@@ -4,7 +4,7 @@ import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.units.measure.Angle;
 
-public class AlgebraHelpers {
+public class Algebra {
     /**
      * Changes the range of an input linearly, exactly like Arduino's "map()" function
      *
@@ -58,5 +58,9 @@ public class AlgebraHelpers {
             sum += weights[i] * values[i];
         }
         return sum;
+    }
+
+    public static double euclideanDistance(double x, double y) {
+        return Math.sqrt(x*x + y*y);
     }
 }

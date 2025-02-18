@@ -9,7 +9,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Controls;
 import frc.constants.Controls.GulikitButtons;
 import frc.constants.Controls.NumpadButtons;
-import frc.utils.math.AlgebraHelpers;
+import frc.utils.math.Algebra;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,12 +80,12 @@ public class OI {
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
-            double magInitial = Math.sqrt(x * x + y * y);
+            double magInitial = Algebra.euclideanDistance(x, y);
             if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
             double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
             double powerCompensated = minimumPowerCompensation(magCurved);
-            newX = AlgebraHelpers.cosizzle(angle) * powerCompensated;
-            newY = AlgebraHelpers.sizzle(angle) * powerCompensated;
+            newX = Algebra.cosizzle(angle) * powerCompensated;
+            newY = Algebra.sizzle(angle) * powerCompensated;
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;

@@ -17,6 +17,7 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import frc.constants.Subsystems.VisionConstants;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import org.littletonrobotics.junction.Logger;
 
@@ -61,7 +62,7 @@ public class VisionPoseFuser {
         pigeonAngularVeloDDV.update(robotAngularVelocityDS);
         double robotAngularAccelerationDSS = pigeonAngularVeloDDV.getFirstDerivative();
 
-        vision.sendOrientation(Units.radiansToDegrees(state.Speeds.omegaRadiansPerSecond), robotAngularVelocityDS);
+        vision.sendOrientation(state.Pose.getRotation().getDegrees(), robotAngularVelocityDS);
 
         if (firstRun) {
             firstRun = false;
@@ -95,6 +96,11 @@ public class VisionPoseFuser {
             drivetrain.addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds),
                 VecBuilder.fill(xSTDEV, ySTDEV, 9999999));
         }
+
+        Logger.recordOutput("VisionPoseFuser/LinearVelocityOfRobot", Algebra.euclideanDistance(state.Speeds.vxMetersPerSecond, state.Speeds.vyMetersPerSecond));
+        Logger.recordOutput("VisionPoseFuser/LinearAccelerationOfRobot", Algebra.euclideanDistance(pigeonLinearAccelX.getValueAsDouble(), pigeonLinearAccelY.getValueAsDouble()));
+        Logger.recordOutput("VisionPoseFuser/AngularVelocity", robotAngularVelocityDS);
+        Logger.recordOutput("VisionPoseFuser/AngularAccelerationOfRobot", robotAngularAccelerationDSS);
 
         for (int i = 0; i < estimates.length; i++) {
             Logger.recordOutput("VisionPoseFuser/" + VisionConstants.PoseEstimationLLNames[i] + "xSTDEV",

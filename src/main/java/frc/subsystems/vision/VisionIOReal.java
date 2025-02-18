@@ -7,6 +7,7 @@ import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.LimelightHelpers.RawDetection;
+import frc.utils.math.Algebra;
 
 public class VisionIOReal implements VisionIO {
     private EndEffectorPipeline currentPipeline;
@@ -50,8 +51,7 @@ public class VisionIOReal implements VisionIO {
                 double closestValue = Double.MAX_VALUE;
                 int closestIndex = 0;
                 for (int i = 0; i < objectsDetected.length; i++) {
-                    double closeness = Math.sqrt(objectsDetected[i].txnc * objectsDetected[i].txnc +
-                        objectsDetected[i].tync * objectsDetected[i].tync);
+                    double closeness = Algebra.euclideanDistance(objectsDetected[i].txnc, objectsDetected[i].tync);
                     if (closeness < closestValue) {
                         closestValue = closeness;
                         closestIndex = i;

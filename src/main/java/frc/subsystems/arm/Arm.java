@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.Util;
-import frc.utils.math.AlgebraHelpers;
+import frc.utils.math.Algebra;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
@@ -102,7 +102,7 @@ public class Arm extends SubsystemBase {
     }
 
     public Angle getMeasurement() {
-        return Degrees.of(AlgebraHelpers.linearMap(inputs.throughborePosition + ArmConstants.ThroughboreZero,
+        return Degrees.of(Algebra.linearMap(inputs.throughborePosition + ArmConstants.ThroughboreZero,
             ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax, ArmConstants.MaxDegreesBack.in(Degrees),
             ArmConstants.MaxDegreesFront.in(Degrees)));
     }

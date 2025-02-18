@@ -8,7 +8,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.utils.math.AlgebraHelpers;
+import frc.utils.math.Algebra;
 
 public class ElevatorIOSim implements ElevatorIO {
     private double appliedVoltage;
@@ -34,7 +34,7 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.isConnectedRight = true;
         inputs.statorCurrentRight = draw;
 
-        inputs.wirePotentiometer = AlgebraHelpers.linearMap(simElevator.getPositionMeters(),
+        inputs.wirePotentiometer = Algebra.linearMap(simElevator.getPositionMeters(),
             ElevatorConstants.MinHeightInches.in(Meters), ElevatorConstants.MaxHeightInches.in(Meters),
             ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts));
     }

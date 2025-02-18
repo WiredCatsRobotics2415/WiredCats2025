@@ -7,6 +7,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.math.Algebra;
+
 import org.photonvision.PhotonCamera;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
@@ -26,7 +28,7 @@ public class VisionIOSim implements VisionIO {
         visionSystemSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
 
         SimCameraProperties limelightCameraProps = new SimCameraProperties();
-        limelightCameraProps.setCalibration(640, 480, Rotation2d.fromDegrees(Math.sqrt(80 * 80 + 56 * 56)));
+        limelightCameraProps.setCalibration(640, 480, Rotation2d.fromDegrees(Algebra.euclideanDistance(80, 56)));
         limelightCameraProps.setCalibError(0.25, 0.08);
         limelightCameraProps.setFPS(20);
         limelightCameraProps.setAvgLatencyMs(60);
