@@ -88,7 +88,7 @@ public class SuperStructure {
         }
     }
 
-    //TODO: add in PID values for elevator and arm at goal (not working in simulator)
+    // TODO: add in PID values for elevator and arm at goal (not working in simulator)
     public boolean bothAtGoal() {
         if (Robot.isSimulation()) {
             return true;

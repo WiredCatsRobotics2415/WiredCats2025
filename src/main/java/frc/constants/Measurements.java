@@ -7,6 +7,8 @@ import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -21,7 +23,8 @@ import java.util.List;
 public class Measurements {
     public class RobotMeasurements {
         // Front of the robot: coral scoring side
-        public static final Distance BumperLength = Inches.of(3);
+        public static final Distance BumperLength = Inches.of(3.204);
+        public static final Distance BumperToBumper = Inches.of(36);
 
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
         public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
@@ -57,6 +60,13 @@ public class Measurements {
                 System.out.println("        " + location.toString());
             }
         }
+
+        public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(2.644), Inches.of(11.784437),
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(20)));
+        public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(-20)));
+        public static final Transform3d BackCamera = new Transform3d(Inches.of(2.644), Inches.of(-7.530),
+            Inches.of(27.443), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(180)));
     }
 
     public class ReefMeasurements {

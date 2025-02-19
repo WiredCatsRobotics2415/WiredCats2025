@@ -1,19 +1,32 @@
 package frc.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Feet;
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation2d;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.Subsystems.VisionConstants;
+import frc.subsystems.drive.CommandSwerveDrivetrain;
+import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Algebra;
+import frc.utils.math.Triangle2d;
+import java.util.List;
+import org.ironmaple.simulation.SimulatedArena;
 import org.photonvision.PhotonCamera;
 import org.photonvision.simulation.PhotonCameraSim;
 import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 
 public class VisionIOSim implements VisionIO {
+    private EndEffectorPipeline currentPipeline;
+
     private VisionSystemSim visionSystemSim;
     private PhotonCameraSim frontLeftSimCam;
     private PhotonCamera frontLeftCam;
@@ -21,6 +34,8 @@ public class VisionIOSim implements VisionIO {
     private PhotonCamera frontRightCam;
     private PhotonCameraSim backSimCam;
     private PhotonCamera backCam;
+
+    private CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
 
     public VisionIOSim() {
         visionSystemSim = new VisionSystemSim("main");
@@ -40,9 +55,9 @@ public class VisionIOSim implements VisionIO {
         backSimCam = new PhotonCameraSim(new PhotonCamera("Back LL"), limelightCameraProps);
         backCam = frontLeftSimCam.getCamera();
 
-        visionSystemSim.addCamera(frontLeftSimCam, new Transform3d());
-        visionSystemSim.addCamera(frontRightSimCam, new Transform3d());
-        visionSystemSim.addCamera(backSimCam, new Transform3d());
+        visionSystemSim.addCamera(frontLeftSimCam, RobotMeasurements.FrontLeftCamera);
+        visionSystemSim.addCamera(frontRightSimCam, RobotMeasurements.FrontRightCamera);
+        visionSystemSim.addCamera(backSimCam, RobotMeasurements.BackCamera);
     }
 
     // TODO: Maybe don't need to make this realisitic
@@ -68,5 +83,38 @@ public class VisionIOSim implements VisionIO {
             inputs.poseTagCounts[i] = estimate.tagCount;
             inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
         }
+
+        if (currentPipeline == EndEffectorPipeline.DriverView) {
+            inputs.endEffectorCameraAveragePixelValue = 255;
+        } else {
+            Translation2d currentEndEffectorPosition = drivetrain.getState().Pose.getTranslation()
+                .plus(new Translation2d(Inches.of(11.972173), Inches.of(0)));
+            Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(currentEndEffectorPosition, Feet.of(8),
+                Degrees.of(59.6));
+            List<Pose3d> allCoralsOnField = SimulatedArena.getInstance().getGamePiecesByType("Coral");
+
+            boolean seesACoral = false;
+            Pose2d closestCoral = null;
+            double closestCoralDistance = Double.MAX_VALUE;
+            for (Pose3d coral : allCoralsOnField) {
+                Pose2d coral2d = coral.toPose2d();
+                if (fovTriangle.isInside(coral2d.getTranslation())) {
+                    seesACoral = true;
+                    double thisCoralDistance = coral2d.getTranslation().getDistance(currentEndEffectorPosition);
+                    if (thisCoralDistance < closestCoralDistance) {
+                        closestCoral = coral2d;
+                    }
+                }
+            }
+            inputs.objectDetected = seesACoral;
+            if (seesACoral) {
+                inputs.detectedObjectTx = Math.atan2(closestCoral.getY() - currentEndEffectorPosition.getY(),
+                    closestCoral.getX() - currentEndEffectorPosition.getX());
+                inputs.detectedObjectLabel = 1;
+            }
+        }
     }
+
+    @Override
+    public void setEndEffectorPipeline(EndEffectorPipeline pipeline) { currentPipeline = pipeline; }
 }

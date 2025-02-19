@@ -1,7 +1,11 @@
 package frc.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.Subsystems.VisionConstants;
 import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.utils.LimelightHelpers;
@@ -13,7 +17,20 @@ public class VisionIOReal implements VisionIO {
     private EndEffectorPipeline currentPipeline;
 
     public VisionIOReal() {
+        Transform3d fl = RobotMeasurements.FrontLeftCamera;
+        LimelightHelpers.setCameraPose_RobotSpace(VisionConstants.FrontLeftName, fl.getX(), fl.getY(), fl.getZ(),
+            fl.getRotation().getMeasureX().in(Degrees), fl.getRotation().getMeasureY().in(Degrees),
+            fl.getRotation().getMeasureZ().in(Degrees));
 
+        Transform3d fr = RobotMeasurements.FrontRightCamera;
+        LimelightHelpers.setCameraPose_RobotSpace(VisionConstants.FrontRightName, fr.getX(), fr.getY(), fr.getZ(),
+            fr.getRotation().getMeasureX().in(Degrees), fr.getRotation().getMeasureY().in(Degrees),
+            fr.getRotation().getMeasureZ().in(Degrees));
+
+        Transform3d b = RobotMeasurements.BackCamera;
+        LimelightHelpers.setCameraPose_RobotSpace(VisionConstants.BackCenterName, b.getX(), b.getY(), b.getZ(),
+            b.getRotation().getMeasureX().in(Degrees), b.getRotation().getMeasureY().in(Degrees),
+            b.getRotation().getMeasureZ().in(Degrees));
     }
 
     @Override
@@ -51,7 +68,8 @@ public class VisionIOReal implements VisionIO {
                 double closestValue = Double.MAX_VALUE;
                 int closestIndex = 0;
                 for (int i = 0; i < objectsDetected.length; i++) {
-                    double closeness = Algebra.euclideanDistance(objectsDetected[i].txnc, objectsDetected[i].tync);
+                    double closeness = Math.signum(objectsDetected[i].tync) *
+                        Algebra.euclideanDistance(objectsDetected[i].txnc, objectsDetected[i].tync);
                     if (closeness < closestValue) {
                         closestValue = closeness;
                         closestIndex = i;
