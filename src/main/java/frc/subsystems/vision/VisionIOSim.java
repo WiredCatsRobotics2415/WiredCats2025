@@ -35,8 +35,6 @@ public class VisionIOSim implements VisionIO {
     private PhotonCameraSim backSimCam;
     private PhotonCamera backCam;
 
-    private CommandSwerveDrivetrain drivetrain = CommandSwerveDrivetrain.getInstance();
-
     public VisionIOSim() {
         visionSystemSim = new VisionSystemSim("main");
         visionSystemSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
@@ -87,8 +85,8 @@ public class VisionIOSim implements VisionIO {
         if (currentPipeline == EndEffectorPipeline.DriverView) {
             inputs.endEffectorCameraAveragePixelValue = 255;
         } else {
-            Translation2d currentEndEffectorPosition = drivetrain.getState().Pose.getTranslation()
-                .plus(new Translation2d(Inches.of(11.972173), Inches.of(0)));
+            Translation2d currentEndEffectorPosition = CommandSwerveDrivetrain.getInstance().getState().Pose
+                .getTranslation().plus(new Translation2d(Inches.of(11.972173), Inches.of(0)));
             Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(currentEndEffectorPosition, Feet.of(8),
                 Degrees.of(59.6));
             List<Pose3d> allCoralsOnField = SimulatedArena.getInstance().getGamePiecesByType("Coral");

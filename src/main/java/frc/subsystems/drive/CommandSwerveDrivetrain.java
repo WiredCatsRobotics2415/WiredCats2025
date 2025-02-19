@@ -14,6 +14,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -32,8 +33,8 @@ import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.DriveAutoConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
-import frc.robot.Robot;
 import frc.subsystems.vision.Vision;
+import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuningModeTab;
@@ -69,16 +70,24 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
         DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
 
-    private Vision vision = Vision.getInstance();
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
+    private Vision vision = Vision.getInstance();
+
+    public enum PoseEstimationType {
+        SingleTag, Global
+    }
+
+    private static PoseEstimationType currentPoseEstimationType = PoseEstimationType.Global;
+
     private static CommandSwerveDrivetrain instance;
-    private static Boolean switchToSingle = false;
 
     private CommandSwerveDrivetrain(SwerveDrivetrainConstants drivetrainConstants,
         SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, MapleSimSwerveDrivetrain.regulateModuleConstantsForSimulation(modules));
         if (Utils.isSimulation()) {
             startSimThread();
+            // Start robot out farther in field so collisions don't apply (yet)
+            resetPose(new Pose2d(1.5, 1.5, Rotation2d.kZero));
         }
         configureAutoBuilder();
 
@@ -99,9 +108,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
              *
              * @Override public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) { for (SwerveModule<?, ?, ?> m : modulesToApply) { if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getDriveMotor()).set(0); if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getSteerMotor()).set(0); } sentMotorConfigs = true; return StatusCode.OK; } }; String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" }; int i = 0; for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) { TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive")); TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer")); i++; }
              */
-        }
-        if (Robot.isSimulation()) {
-            resetPose(new Pose2d(1, 1, Rotation2d.kZero));
         }
     }
 
@@ -157,9 +163,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         SwerveDriveState currentState = getState();
 
-        // either adds singlePose or poseFuser depending on value of switchToSingle
-        if (switchToSingle) {
-            this.addVisionMeasurement(vision.getSinglePoseEstimate(), vision.inputs.poseTimestampsSeconds[1]);
+        if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
+            PoseEstimate singleTag = vision.getSinglePoseEstimate();
+            addVisionMeasurement(singleTag.pose, singleTag.timestampSeconds, VecBuilder.fill(0.7, 0.7, 999999));
         } else {
             poseFuser.update(currentState);
         }
@@ -237,14 +243,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }));
     }
 
-    public Command switchPoseEstimator() {
-
-        return run(() -> {
-            if (switchToSingle == true) {
-                switchToSingle = false;
-            } else if (switchToSingle == false) {
-                switchToSingle = true;
-            }
+    public Command switchPoseEstimator(PoseEstimationType estimatorType) {
+        return runOnce(() -> {
+            currentPoseEstimationType = estimatorType;
         });
     }
 
@@ -277,7 +278,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public void resetPose(Pose2d pose) {
         if (this.mapleSimSwerveDrivetrain != null) {
             mapleSimSwerveDrivetrain.mapleSimDrive.setSimulationWorldPose(pose);
-            Timer.delay(0.1); // wait for simulation to update
+            Timer.delay(0.05); // wait for simulation to update
         }
         super.resetPose(pose);
     }

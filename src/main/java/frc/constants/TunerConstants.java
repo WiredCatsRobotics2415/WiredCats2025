@@ -45,7 +45,7 @@ public class TunerConstants {
     // This needs to be tuned to your individual robot
     // 1/31 - keep this at 40 until it is tuned, for safety reasons
     // 2/7 - tuned: this is 40 (on 24 robot)
-    public static final Current kSlipCurrent = Amps.of(40.0);
+    public static final Current kSlipCurrent = Amps.of(40);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -82,11 +82,11 @@ public class TunerConstants {
 
     // These are only used for simulation
     // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template/
-    private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.004);
-    private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.025);
+    private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.05);
+    private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.05);
     // Simulated voltage necessary to overcome friction
-    private static final Voltage kSteerFrictionVoltage = Volts.of(0.2);
-    private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
+    private static final Voltage kSteerFrictionVoltage = Volts.of(0.1);
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.1);
 
     public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
         .withCANBusName(kCANBus.getName()).withPigeon2Id(kPigeonId).withPigeon2Configs(pigeonConfigs);

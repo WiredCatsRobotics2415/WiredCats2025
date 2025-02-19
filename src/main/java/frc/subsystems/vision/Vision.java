@@ -60,14 +60,14 @@ public class Vision extends SubsystemBase {
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 
-    public Pose2d getSinglePoseEstimate() {
+    public PoseEstimate getSinglePoseEstimate() {
+        PoseEstimate pe = new PoseEstimate();
+        pe.pose = new Pose2d(inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX() / 2.0d,
+            inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY() / 2.0d, Rotation2d.kZero);
+        // Choosing latest pose increases trust
+        pe.timestampSeconds = Math.min(inputs.poseTimestampsSeconds[1], inputs.poseTimestampsSeconds[2]);
 
-        double x = (inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX()) / 2;
-        double y = (inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY()) / 2;
-
-        Pose2d singleTagPose = new Pose2d(x, y, new Rotation2d());
-        return singleTagPose;
-
+        return pe;
     }
 
     /**

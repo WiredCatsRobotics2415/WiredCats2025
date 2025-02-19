@@ -15,18 +15,18 @@ public class SimulationTab {
     private SimulationTab() {
         thisTab = Shuffleboard.getTab("Simulation");
 
-        thisTab.add("", new InstantCommand(() -> {
+        thisTab.add("Insert Coral at Left HPS", new InstantCommand(() -> {
             SimulatedArena.getInstance()
                 .addGamePiece(new ReefscapeCoralOnField(new Pose2d(1.276731, 7.0, Rotation2d.kZero)));
         }).withName("Left HPS"));
 
-        thisTab.add("", new InstantCommand(() -> {
+        thisTab.add("Insert Coral at Right HPS", new InstantCommand(() -> {
             SimulatedArena.getInstance()
                 .addGamePiece(new ReefscapeCoralOnField(new Pose2d(0.75, 0.75, Rotation2d.kZero)));
         }).withName("Right HPS"));
     }
 
-    public static void enableTuningMode() {
+    public static void enableSimulationControls() {
         if (instance == null) {
             instance = new SimulationTab();
         }

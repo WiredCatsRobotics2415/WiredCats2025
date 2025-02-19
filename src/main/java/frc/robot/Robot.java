@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
+import frc.utils.simulation.SimulationTab;
 import frc.utils.tuning.TuningModeTab;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -49,6 +50,7 @@ public class Robot extends LoggedRobot {
 
             case SIM:
                 // Running a physics simulator, log to NT
+                SimulationTab.enableSimulationControls();
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
 
