@@ -130,6 +130,7 @@ public class Vision extends SubsystemBase {
     }
 
     public double getObjectDetectedTx() { return inputs.detectedObjectTx; }
+    public double getObjectDetectedTy() { return inputs.detectedObjectTy; }
 
     public ObjectRecognized getObjectDetectedType() {
         return inputs.detectedObjectLabel == 0 ? ObjectRecognized.Algae : ObjectRecognized.Coral;

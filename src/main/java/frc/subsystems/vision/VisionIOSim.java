@@ -108,6 +108,8 @@ public class VisionIOSim implements VisionIO {
             if (seesACoral) {
                 inputs.detectedObjectTx = Math.atan2(closestCoral.getY() - currentEndEffectorPosition.getY(),
                     closestCoral.getX() - currentEndEffectorPosition.getX());
+                inputs.detectedObjectTy = Math.atan2(closestCoral.getX() - currentEndEffectorPosition.getX(),
+                    closestCoral.getY() - currentEndEffectorPosition.getY());
                 inputs.detectedObjectLabel = 1;
             }
         }

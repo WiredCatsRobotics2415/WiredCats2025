@@ -91,6 +91,7 @@ public class VisionIOReal implements VisionIO {
             }
 
             inputs.detectedObjectTx = object.txnc;
+            inputs.detectedObjectTy = object.tync;
             inputs.detectedObjectLabel = object.classId;
         }
     }

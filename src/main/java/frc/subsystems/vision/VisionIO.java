@@ -19,6 +19,7 @@ public interface VisionIO {
         public int endEffectorCameraAveragePixelValue;
         public boolean objectDetected;
         public double detectedObjectTx;
+        public double detectedObjectTy;
         public int detectedObjectLabel;
     }
 
