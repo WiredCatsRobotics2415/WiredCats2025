@@ -50,7 +50,7 @@ public class Vision extends SubsystemBase {
     public Pose2d getCurrentAveragePose() {
         double averageX = 0.0d, averageY = 0.0d;
         int usedPoses = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             if (inputs.poseTagCounts[i] > 0) {
                 averageX += inputs.poseEstimates[i].getX();
                 averageY += inputs.poseEstimates[i].getY();
@@ -105,7 +105,7 @@ public class Vision extends SubsystemBase {
     public Rotation2d getCurrentAverageRotation() {
         double averageTheta = 0.0d;
         int usedPoses = 0;
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             if (inputs.poseTagCounts[i] > 0) {
                 averageTheta += io.getMT1RotationOf(i).getDegrees();
                 usedPoses += 1;
@@ -130,6 +130,7 @@ public class Vision extends SubsystemBase {
     }
 
     public double getObjectDetectedTx() { return inputs.detectedObjectTx; }
+
     public double getObjectDetectedTy() { return inputs.detectedObjectTy; }
 
     public ObjectRecognized getObjectDetectedType() {

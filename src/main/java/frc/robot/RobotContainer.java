@@ -10,8 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.Dealgae;
+import frc.commands.Dealgae.DealgaeAutomationMode;
 import frc.commands.ScoreCoral;
+import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
@@ -122,6 +125,22 @@ public class RobotContainer {
             .onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
         oi.binds.get(OI.Bind.IntakeFromHPS)
             .onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
+        oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive)
+            .onTrue(new InstantCommand(() -> {
+                if (ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign)) {
+                    ScoreCoral.setCurrentAutomationMode(CoralAutomationMode.PresetOnly);
+                } else {
+                    ScoreCoral.setCurrentAutomationMode(CoralAutomationMode.PresetAndAlign);
+                }
+
+                if (Dealgae.getCurrentAutomationMode().equals(DealgaeAutomationMode.PresetAndAlign)) {
+                    Dealgae.setCurrentAutomationMode(DealgaeAutomationMode.PresetOnly);
+                } else {
+                    Dealgae.setCurrentAutomationMode(DealgaeAutomationMode.PresetAndAlign);
+                }
+            }));
+        
+        //oi.binds.get(OI.Bind.StowPreset).onTrue();
     }
 
     private void configureTriggers() {

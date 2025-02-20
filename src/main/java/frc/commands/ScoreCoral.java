@@ -18,6 +18,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import lombok.Getter;
 import lombok.Setter;
 
 /**
@@ -36,7 +37,7 @@ public class ScoreCoral extends Command {
         PresetOnly, PresetAndAlign
     }
 
-    @Setter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
+    @Setter @Getter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);

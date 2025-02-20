@@ -22,6 +22,54 @@ import java.util.List;
 
 public class Measurements {
     public class RobotMeasurements {
+        // Front of the robot: battery side
+        public static final Distance BumperLength = Inches.of(3.125);
+        public static final Distance BumperToBumper = Inches.of(30.75); // 2/20 will probably just be frame to frame
+
+        public static final Distance CenterToFrameRadius = Inches.of(20.695);
+        public static final Distance CenterToFramePerpendicular = Inches.of(15.375);
+        public static final Distance DriveTrainRadius = Inches.of(17.1395);
+        public static final Distance DriveTrainTrackWidth = Inches.of(25.225); // from l to r, bc this robot is a rectangle
+
+        public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
+
+        public static final Mass RobotWeight = Pounds.of(115); // TODO: update with real value
+        public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
+            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveAutoConstants.HeadingKA / TunerConstants.driveGains.kA));
+        public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
+            TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with spring test: cof = fs/(m*g)
+            DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);
+
+        public static final RobotConfig PPRobotConfig = new RobotConfig(RobotWeight, RobotMOI, SwerveModuleConfig,
+            new Translation2d[] { new Translation2d(TunerConstants.kFrontLeftXPos, TunerConstants.kFrontLeftYPos),
+                new Translation2d(TunerConstants.kFrontRightXPos, TunerConstants.kFrontRightYPos),
+                new Translation2d(TunerConstants.kBackLeftXPos, TunerConstants.kBackLeftYPos),
+                new Translation2d(TunerConstants.kBackRightYPos, TunerConstants.kBackRightYPos) });
+        static {
+            System.out.println("PP Robot Config: ");
+            System.out.println("    Mass (KG): " + RobotWeight.in(Kilograms));
+            System.out.println("    Moi: " + RobotMOI.in(KilogramSquareMeters));
+            System.out.println("    Wheel Radius (M): " + TunerConstants.kWheelRadius.in(Meters));
+            System.out.println("    Drive Gearing: " + TunerConstants.kDriveGearRatio);
+            System.out.println("    True Max Drive Speed: " + TunerConstants.kSpeedAt12Volts.in(MetersPerSecond));
+            System.out.println("    Wheel COF: " + SwerveModuleConfig.wheelCOF);
+            System.out.println("    Drive Motor: " + SwerveModuleConfig.driveMotor);
+            System.out.println("    Drive Current Limit: " + TunerConstants.kSlipCurrent.in(Amps));
+            System.out.println("    Module Offsets (FL, FR, BL, BR): ");
+            for (Translation2d location : PPRobotConfig.moduleLocations) {
+                System.out.println("        " + location.toString());
+            }
+        }
+
+        public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(0), Inches.of(0), Inches.of(0),
+            new Rotation3d(Degrees.of(0), Degrees.of(0), Degrees.of(0)));
+        public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(0), Inches.of(0), Inches.of(0),
+            new Rotation3d(Degrees.of(0), Degrees.of(0), Degrees.of(0)));
+        public static final Transform3d BackCamera = new Transform3d(Inches.of(-12.279), Inches.of(0), Inches.of(8.3),
+            new Rotation3d(Degrees.of(-90), Degrees.of(30), Degrees.of(180))); // DONE
+    }
+
+    public class RobotMeasurementsTitan {
         // Front of the robot: coral scoring side
         public static final Distance BumperLength = Inches.of(3.204);
         public static final Distance BumperToBumper = Inches.of(36);

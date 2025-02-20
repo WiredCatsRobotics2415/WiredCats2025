@@ -21,7 +21,7 @@ public class OI {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
         ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
         AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
-        SeedFieldCentric
+        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -46,8 +46,8 @@ public class OI {
 
         binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
-        binds.put(Bind.ManualArmForward, controller.povUp());
-        binds.put(Bind.ManualArmBack, controller.povDown());
+        binds.put(Bind.ManualArmForward, controller.povRight());
+        binds.put(Bind.ManualArmBack, controller.povLeft());
 
         binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
         binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
@@ -64,6 +64,9 @@ public class OI {
         binds.put(Bind.AutoScoreRightL2, numpad.button(NumpadButtons.NumberSix));
         binds.put(Bind.AutoScoreRightL3, numpad.button(NumpadButtons.NumberNine));
         binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
+        binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
+
+        binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
     }
 
     private double deadbandCompensation(double r) {

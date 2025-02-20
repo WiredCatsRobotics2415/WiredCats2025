@@ -61,7 +61,10 @@ public class TunerConstants {
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    public static final CANBus kCANBus = new CANBus("Swerve", "./logs/example.hoot");
+    // TITAN
+    // public static final CANBus kCANBus = new CANBus("Swerve", "./logs/example.hoot");
+    // BL
+    public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
@@ -110,8 +113,12 @@ public class TunerConstants {
     private static final boolean kFrontLeftSteerMotorInverted = true;
     private static final boolean kFrontLeftEncoderInverted = false;
 
-    public static final Distance kFrontLeftXPos = Inches.of(12.313);
-    public static final Distance kFrontLeftYPos = Inches.of(12.313);
+    // TITAN
+    // public static final Distance kFrontLeftXPos = Inches.of(12.313);
+    // public static final Distance kFrontLeftYPos = Inches.of(12.313);
+    // Bagel launcher
+    public static final Distance kFrontLeftXPos = Inches.of(11.6125);
+    public static final Distance kFrontLeftYPos = Inches.of(12.6125);
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;
@@ -121,8 +128,12 @@ public class TunerConstants {
     private static final boolean kFrontRightSteerMotorInverted = true;
     private static final boolean kFrontRightEncoderInverted = false;
 
-    public static final Distance kFrontRightXPos = Inches.of(12.313);
-    public static final Distance kFrontRightYPos = Inches.of(-12.313);
+    // TITAN
+    // public static final Distance kFrontRightXPos = Inches.of(12.313);
+    // public static final Distance kFrontRightYPos = Inches.of(-12.313);
+    // BL
+    public static final Distance kFrontRightXPos = Inches.of(11.6125);
+    public static final Distance kFrontRightYPos = Inches.of(-12.6125);
 
     // Back Left
     private static final int kBackLeftDriveMotorId = 1;
@@ -132,8 +143,12 @@ public class TunerConstants {
     private static final boolean kBackLeftSteerMotorInverted = true;
     private static final boolean kBackLeftEncoderInverted = false;
 
-    public static final Distance kBackLeftXPos = Inches.of(-12.313);
-    public static final Distance kBackLeftYPos = Inches.of(12.313);
+    // TITAN
+    // public static final Distance kBackLeftXPos = Inches.of(-12.313);
+    // public static final Distance kBackLeftYPos = Inches.of(12.313);
+    // BL
+    public static final Distance kBackLeftXPos = Inches.of(-11.6125);
+    public static final Distance kBackLeftYPos = Inches.of(12.6125);
 
     // Back Right
     private static final int kBackRightDriveMotorId = 3;
@@ -143,8 +158,12 @@ public class TunerConstants {
     private static final boolean kBackRightSteerMotorInverted = true;
     private static final boolean kBackRightEncoderInverted = false;
 
-    public static final Distance kBackRightXPos = Inches.of(-12.313);
-    public static final Distance kBackRightYPos = Inches.of(-12.313);
+    // TITAN
+    // public static final Distance kBackRightXPos = Inches.of(-12.313);
+    // public static final Distance kBackRightYPos = Inches.of(-12.313);
+    // BL
+    public static final Distance kBackRightXPos = Inches.of(-11.6125);
+    public static final Distance kBackRightYPos = Inches.of(-12.6125);
 
     public static final SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> FrontLeft = ConstantCreator
         .createModuleConstants(kFrontLeftSteerMotorId, kFrontLeftDriveMotorId, kFrontLeftEncoderId,
