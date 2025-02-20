@@ -14,6 +14,7 @@ public interface VisionIO {
         public double[] poseLatencies = new double[VisionConstants.PoseEstimationLLNames.length];
         public double[] poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
         public int[] poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
+        public int[] nearestTags = new int[VisionConstants.PoseEstimationLLNames.length];
 
         public int endEffectorCameraAveragePixelValue;
         public boolean objectDetected;

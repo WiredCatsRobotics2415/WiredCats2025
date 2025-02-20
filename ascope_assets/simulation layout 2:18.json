@@ -1,8 +1,8 @@
 {
   "hubs": [
     {
-      "x": 162,
-      "y": 70,
+      "x": 225,
+      "y": 146,
       "width": 1080,
       "height": 619,
       "state": {
@@ -11,7 +11,6 @@
           "expanded": [
             "/AdvantageKit",
             "/TuneableNumbers",
-            "/AdvantageKit/RealOutputs",
             "/AdvantageKit/RealOutputs/Visualization/Actual",
             "/AdvantageKit/RealOutputs/Visualization/Goal",
             "/AdvantageKit/RealOutputs/Drive",
@@ -22,7 +21,7 @@
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -134,6 +133,16 @@
                     "options": {
                       "variant": "Coral"
                     }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/Drive/SimulatedPose",
+                    "logType": "Pose2d",
+                    "visible": true,
+                    "options": {
+                      "model": "Crab Bot",
+                      "color": "#00ff00"
+                    }
                   }
                 ],
                 "game": "2025 Field (Welded)",
@@ -144,14 +153,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  8.090813692521307,
-                  1.1125077924462845,
-                  -2.3433512408779946
+                  11.666344962163006,
+                  5.8642475980618,
+                  1.375871603695913
                 ],
                 "cameraTarget": [
-                  4.43203828213148,
-                  -0.7847741005268142,
-                  -2.066665726739236
+                  4.997806414088598,
+                  -1.246154104096076,
+                  1.0573903611030722
                 ]
               },
               "controlsHeight": 210

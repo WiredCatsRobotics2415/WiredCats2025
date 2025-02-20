@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Util;
+import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -60,14 +61,42 @@ public class Vision extends SubsystemBase {
         return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
     }
 
-    public PoseEstimate getSinglePoseEstimate() {
+    public PoseEstimate getReefSingleTagPoseEstimate() {
         PoseEstimate pe = new PoseEstimate();
-        pe.pose = new Pose2d(inputs.poseEstimates[1].getX() + inputs.poseEstimates[2].getX() / 2.0d,
-            inputs.poseEstimates[1].getY() + inputs.poseEstimates[2].getY() / 2.0d, Rotation2d.kZero);
+
+        double xSum = 0;
+        double ySum = 0;
+        double smallestTimestamp = Double.MAX_VALUE;
+        int numCamerasUsed = 0;
+        for (int index : VisionConstants.ReefFacingLLs) {
+            if (inputs.poseTagCounts[index] > 0) {
+                xSum += inputs.poseEstimates[index].getX();
+                ySum += inputs.poseEstimates[index].getY();
+                numCamerasUsed += 1;
+                smallestTimestamp = Math.min(smallestTimestamp, inputs.poseTimestampsSeconds[index]);
+            }
+        }
+
+        if (numCamerasUsed == 0) return null;
+        pe.pose = new Pose2d(xSum / numCamerasUsed, ySum / numCamerasUsed, Rotation2d.kZero);
         // Choosing latest pose increases trust
-        pe.timestampSeconds = Math.min(inputs.poseTimestampsSeconds[1], inputs.poseTimestampsSeconds[2]);
+        pe.timestampSeconds = smallestTimestamp;
 
         return pe;
+    }
+
+    public boolean isReefSingleTagPoseEstimateAvailable() {
+        int[] tagIdsSeen = new int[VisionConstants.ReefFacingLLs.length];
+        int llCounter = 0;
+        for (int i = 0; i < inputs.nearestTags.length; i++) {
+            for (int llIdx : VisionConstants.ReefFacingLLs) {
+                if (llIdx == i) {
+                    tagIdsSeen[llCounter] = inputs.nearestTags[i];
+                    llCounter++;
+                }
+            }
+        }
+        return Arrays.stream(tagIdsSeen).distinct().count() == 1;
     }
 
     /**

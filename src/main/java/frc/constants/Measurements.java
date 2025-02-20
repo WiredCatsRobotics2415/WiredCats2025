@@ -96,6 +96,8 @@ public class Measurements {
         public static final Pose2d redReefKLApriltag = new Pose2d(new Translation2d(13.474446, 3.306318),
             Rotation2d.fromDegrees(300)); // ID 6
 
+        public static final int[] allReefApriltagIds = new int[] { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
+
         public static final List<Pose2d> reefBlueApriltags;
         static {
             reefBlueApriltags = List.of(blueReefABApriltag, blueReefCDApriltag, blueReefEFApriltag, blueReefGHApriltag,

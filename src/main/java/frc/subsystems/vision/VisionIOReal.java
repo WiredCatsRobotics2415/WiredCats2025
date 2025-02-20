@@ -11,6 +11,7 @@ import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.utils.LimelightHelpers;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.LimelightHelpers.RawDetection;
+import frc.utils.LimelightHelpers.RawFiducial;
 import frc.utils.math.Algebra;
 
 public class VisionIOReal implements VisionIO {
@@ -40,6 +41,7 @@ public class VisionIOReal implements VisionIO {
         inputs.poseTimestampsSeconds = new double[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTagCounts = new int[VisionConstants.PoseEstimationLLNames.length];
         inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
+        inputs.nearestTags = new int[VisionConstants.PoseEstimationLLNames.length];
 
         for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = LimelightHelpers
@@ -50,6 +52,16 @@ public class VisionIOReal implements VisionIO {
             inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
             inputs.poseTagCounts[i] = estimate.tagCount;
             inputs.poseTagDistances[i] = estimate.avgTagDist;
+
+            double nearestTagLength = Double.MAX_VALUE;
+            int nearestTagId = -1;
+            for (RawFiducial tag : estimate.rawFiducials) {
+                if (tag.distToCamera < nearestTagLength) {
+                    nearestTagLength = tag.distToCamera;
+                    nearestTagId = tag.id;
+                }
+            }
+            inputs.nearestTags[i] = nearestTagId;
         }
 
         if (currentPipeline == EndEffectorPipeline.DriverView) {

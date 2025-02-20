@@ -32,6 +32,7 @@ public class Subsystems {
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
             BackCenterName };
+        public static final int[] ReefFacingLLs = new int[] { 0, 1 };
 
         public static final Matrix<N3, N1> MegaTag2StdDev = VecBuilder.fill(.7, .7, 9999999);
     }
