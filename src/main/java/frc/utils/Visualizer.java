@@ -7,9 +7,12 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import frc.constants.Measurements;
 import frc.constants.Subsystems.ElevatorConstants;
+import frc.constants.Subsystems.VisionConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.vision.Vision;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 
@@ -19,6 +22,7 @@ import org.littletonrobotics.junction.Logger;
 public class Visualizer {
     private static Elevator elevatorSubsystem = Elevator.getInstance();
     private static Arm armSubsystem = Arm.getInstance();
+    private static Vision vision = Vision.getInstance();
 
     private static void visualizeElevator(Distance height, String key) {
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
@@ -44,6 +48,19 @@ public class Visualizer {
         Logger.recordOutput("Visualization/" + key + "/ArmAndEndEffector", arm);
     }
 
+    private static void visualizePECameraTargets() {
+        for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
+            int tagId = vision.getClosestApriltagTo(i);
+            if (tagId == -1) {
+                Logger.recordOutput("Visualization/" + VisionConstants.PoseEstimationLLNames[i] + "/NearestTag",
+                    Pose3d.kZero);
+            } else {
+                Logger.recordOutput("Visualization/" + VisionConstants.PoseEstimationLLNames[i] + "/NearestTag",
+                    Measurements.ApriltagFieldLayout.getTagPose(tagId).orElse(Pose3d.kZero));
+            }
+        }
+    }
+
     public static void update() {
         Distance elevatorGoal = elevatorSubsystem.getGoal();
         Distance elevatorActual = elevatorSubsystem.getMeasurement();
@@ -57,5 +74,7 @@ public class Visualizer {
 
         Pose3d[] coralPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
         Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
+
+        visualizePECameraTargets();
     }
 }

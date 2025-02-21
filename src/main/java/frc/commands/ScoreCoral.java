@@ -37,7 +37,8 @@ public class ScoreCoral extends Command {
         PresetOnly, PresetAndAlign
     }
 
-    @Setter @Getter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
+    @Setter
+    @Getter private static CoralAutomationMode currentAutomationMode = CoralAutomationMode.PresetAndAlign;
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);

@@ -11,7 +11,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
     private VisionIO io;
-    public VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
+    private VisionIOInputsAutoLogged inputs = new VisionIOInputsAutoLogged();
     private static Vision instance;
 
     public enum EndEffectorPipeline {
@@ -113,6 +113,10 @@ public class Vision extends SubsystemBase {
         }
         if (usedPoses == 0) return null;
         return Rotation2d.fromDegrees(averageTheta / usedPoses);
+    }
+
+    public int getClosestApriltagTo(int peCameraIdx) {
+        return inputs.nearestTags[peCameraIdx];
     }
 
     public void setEndEffectorStreamOrientation(boolean upsideDown) {

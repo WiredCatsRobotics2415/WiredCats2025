@@ -25,7 +25,8 @@ public class Dealgae extends Command {
         PresetOnly, PresetAndAlign
     }
 
-    @Setter @Getter private static DealgaeAutomationMode currentAutomationMode = DealgaeAutomationMode.PresetAndAlign;
+    @Setter
+    @Getter private static DealgaeAutomationMode currentAutomationMode = DealgaeAutomationMode.PresetAndAlign;
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
