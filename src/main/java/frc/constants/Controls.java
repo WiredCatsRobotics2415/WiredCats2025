@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Controls {
     public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    public static final double MaxAngularRadS = Math.PI;
+    public static final double MaxAngularRadS = 1.2*Math.PI;
     public static final double MinimumDrivePower = 0.05d;
     public static final double RumbleSoftValue = 0.2d;
     public static final double RumbleHardValue = 0.6d;
