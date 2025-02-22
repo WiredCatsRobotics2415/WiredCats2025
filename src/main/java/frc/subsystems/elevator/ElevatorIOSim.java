@@ -14,8 +14,8 @@ public class ElevatorIOSim implements ElevatorIO {
     private double appliedVoltage;
 
     private final ElevatorSim simElevator = new ElevatorSim(ElevatorConstants.kV, ElevatorConstants.kA,
-        DCMotor.getFalcon500(2), ElevatorConstants.MinHeightInches.in(Meters),
-        ElevatorConstants.MaxHeightInches.in(Meters), true, ElevatorConstants.MinHeightInches.in(Meters));
+        DCMotor.getFalcon500(2), ElevatorConstants.MinHeight.in(Meters), ElevatorConstants.MaxHeight.in(Meters), true,
+        ElevatorConstants.MinHeight.in(Meters));
 
     public ElevatorIOSim() {
         simElevator.setState(0, 0);
@@ -35,7 +35,7 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.statorCurrentRight = draw;
 
         inputs.wirePotentiometer = Algebra.linearMap(simElevator.getPositionMeters(),
-            ElevatorConstants.MinHeightInches.in(Meters), ElevatorConstants.MaxHeightInches.in(Meters),
+            ElevatorConstants.MinHeight.in(Meters), ElevatorConstants.MaxHeight.in(Meters),
             ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts));
     }
 

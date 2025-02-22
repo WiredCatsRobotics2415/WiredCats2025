@@ -4,8 +4,10 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
@@ -34,8 +36,10 @@ public class ElevatorIOReal implements ElevatorIO {
 
     private void configureMotors() {
         leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
+        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
         rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
+        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
         leftMotor.setNeutralMode(NeutralModeValue.Brake);

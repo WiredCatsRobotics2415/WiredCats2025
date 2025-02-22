@@ -14,6 +14,7 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.utils.tuning.TuneableNumber;
 
 public class Subsystems {
     public class NavxMXPPorts {
@@ -46,11 +47,18 @@ public class Subsystems {
     }
 
     public class DriveAutoConstants {
-        public static final PIDConstants PPTranslationPID = new PIDConstants(10, 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
-        public static final PIDConstants DTTranslationPID = new PIDConstants(5, 0, 0.5);
+        public static final TuneableNumber PPTranslationP = new TuneableNumber(10.0d, "DriveAuto/PPTranslationP");
+        public static final TuneableNumber PPTranslationD = new TuneableNumber(0d, "DriveAuto/PPTranslationD");
+        public static final TuneableNumber DTTranslationP = new TuneableNumber(5.0d, "DriveAuto/DTTranslationP");
+        public static final TuneableNumber DTTranslationD = new TuneableNumber(0.5d, "DriveAuto/DTTranslationD");
+
+        public static final PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0,
+            PPTranslationD.get()); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
+        public static final PIDConstants DTTranslationPID = new PIDConstants(DTTranslationP.get(), 0,
+            DTTranslationD.get());
         public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
-        public static final PathFollowingController PathFollowingController = new PPHolonomicDriveController(
-            PPTranslationPID, RotationPID);
+        public static PathFollowingController PathFollowingController = new PPHolonomicDriveController(PPTranslationPID,
+            RotationPID);
         public static final PathConstraints DefaultPathConstraints = new PathConstraints(
             MetersPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 2),
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
@@ -71,8 +79,8 @@ public class Subsystems {
 
         public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
         public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
-        public static final Distance MinHeightInches = Inches.of(0.0d);
-        public static final Distance MaxHeightInches = Inches.of(69.0d);
+        public static final Distance MinHeight = Inches.of(0.0d);
+        public static final Distance MaxHeight = Inches.of(69.0d);
 
         public static final double kS = 0;
         public static final double kG = 0;
@@ -81,11 +89,11 @@ public class Subsystems {
         public static final double kP = 0;
         public static final double kD = 0;
 
-        public static final double VelocityMax = 50.0d; // (2/18) copied from akit2024
-        public static final double AccelerationMax = 50.0d; // (2/18) copied from akit2024
-        public static final double GoalTolerance = 0.5;
+        public static final TuneableNumber VelocityMax = new TuneableNumber(50.0d, "Elevator/VelocityMax"); // (2/18) copied from akit2024
+        public static final TuneableNumber AccelerationMax = new TuneableNumber(50.0d, "Elevator/AccelMax"); // (2/18) copied from akit2024
+        public static final TuneableNumber GoalTolerance = new TuneableNumber(0.5, "Elevator/GoalTolerance");
 
-        public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
+        public static final float RotorToArmGearRatio = 5 / 1; // Planetaries amount unknown as of 2/7
         public static final Distance BaseHeight = Inches.of(38);
         public static final Distance Stage2Height = Inches.of(35);
         public static final Distance Stage3Height = Inches.of(34);

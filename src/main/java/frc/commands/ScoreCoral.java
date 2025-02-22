@@ -18,6 +18,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -42,8 +43,7 @@ public class ScoreCoral extends Command {
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
-    private static final Transform2d LeftOffset = new Transform2d(CenterToBumper, Inches.of(6), new Rotation2d());
-    private static final Transform2d RightOffset = new Transform2d(CenterToBumper, Inches.of(-6), new Rotation2d());
+    private static final TuneableNumber LeftRightOffset = new TuneableNumber(6, "ScoreCoral/LROffsetInches");
     private static final double DriveToleranceMeters = Units.inchesToMeters(5);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
@@ -51,7 +51,7 @@ public class ScoreCoral extends Command {
 
     private double goalHeightInches;
     private double goalArmDegrees;
-    private Transform2d offset;
+    private Side side;
 
     private Command driveCommand;
     private Command superStructureCommand;
@@ -70,6 +70,7 @@ public class ScoreCoral extends Command {
         // You are in the PresetOnly mode, consider moving this addRequirements line to
         // initialize so it doesn't require drive too early
         addRequirements(Elevator.getInstance(), Arm.getInstance());
+        side = reefSide;
 
         switch (reefLevel) {
             case L1:
@@ -93,8 +94,6 @@ public class ScoreCoral extends Command {
                 goalArmDegrees = Presets.Level1Angle.in(Degrees);
                 break;
         }
-
-        offset = reefSide.equals(Side.Left) ? LeftOffset : RightOffset;
     }
 
     @Override
@@ -106,22 +105,20 @@ public class ScoreCoral extends Command {
         superStructureCommand.schedule();
 
         if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
+            Transform2d leftOffset = new Transform2d(CenterToBumper, Inches.of(LeftRightOffset.get()),
+                new Rotation2d());
+            Transform2d rightOffset = new Transform2d(CenterToBumper, Inches.of(-LeftRightOffset.get()),
+                new Rotation2d());
+            Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
             driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
-            System.out.println("BEFORE scheduled drive command");
             driveCommand.schedule();
-            System.out.println("AFTER scheduled drive command");
         }
     }
 
     @Override
     public void execute() {
         System.out.println(driveCommand.isFinished());
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-        System.out.println("ended" + interrupted);
     }
 
     @Override

@@ -2,6 +2,7 @@ package frc.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.VisionConstants;
 import frc.utils.LimelightHelpers.PoseEstimate;
@@ -139,6 +140,10 @@ public class Vision extends SubsystemBase {
 
     public ObjectRecognized getObjectDetectedType() {
         return inputs.detectedObjectLabel == 0 ? ObjectRecognized.Algae : ObjectRecognized.Coral;
+    }
+
+    public Command switchEndEffectorMode(EndEffectorPipeline mode) {
+        return runOnce(() -> setEndEffectorPipeline(mode));
     }
 
     @Override

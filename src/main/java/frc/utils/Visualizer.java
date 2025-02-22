@@ -27,10 +27,9 @@ public class Visualizer {
     private static void visualizeElevator(Distance height, String key) {
         Pose3d elevatorBase = new Pose3d(0, 0, 0, Rotation3d.kZero);
         Pose3d elevatorStage2 = new Pose3d(0, 0,
-            height.div(ElevatorConstants.MaxHeightInches).times(ElevatorConstants.Stage2Height).in(Meters),
-            Rotation3d.kZero);
+            height.div(ElevatorConstants.MaxHeight).times(ElevatorConstants.Stage2Height).in(Meters), Rotation3d.kZero);
         Pose3d elevatorStage3 = new Pose3d(0, 0,
-            height.div(ElevatorConstants.MaxHeightInches)
+            height.div(ElevatorConstants.MaxHeight)
                 .times(ElevatorConstants.Stage2Height.plus(ElevatorConstants.Stage3Height)).in(Meters),
             Rotation3d.kZero);
         Pose3d carriage = new Pose3d(0, 0, height.in(Meters), Rotation3d.kZero);

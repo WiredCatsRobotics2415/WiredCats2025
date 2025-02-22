@@ -1,7 +1,6 @@
 package frc.subsystems.drive;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -13,11 +12,17 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.constants.Measurements.RobotMeasurements;
+import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.VisionConstants;
 import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.tuning.TuningModeTab;
+import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionPoseFuser {
@@ -30,7 +35,7 @@ public class VisionPoseFuser {
     private final double AngularAccelerationOfRobot = 0;
     private final double PoseLatencyScalar = 0;
     // To disable vision pose fusing: set this to 0
-    private final Distance DistanceFromCurrentPoseCutoffThreshold = Inches.of(0);
+    private final Distance DistanceFromCurrentPoseCutoffThreshold = RobotMeasurements.CenterToFrameRadius;
 
     private StatusSignal<LinearAcceleration> pigeonLinearAccelX;
     private StatusSignal<LinearAcceleration> pigeonLinearAccelY;
@@ -39,6 +44,8 @@ public class VisionPoseFuser {
     private DoubleDifferentiableValue pigeonAngularVeloDDV = new DoubleDifferentiableValue();
 
     private boolean firstRun = true;
+    @Getter
+    @Setter private boolean enabled = true;
 
     private Vision vision = Vision.getInstance();
     private CommandSwerveDrivetrain drivetrain;
@@ -52,6 +59,11 @@ public class VisionPoseFuser {
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, pigeonLinearAccelX, pigeonLinearAccelY, pigeonAngularVeloZ);
         pigeon.optimizeBusUtilization();
+
+        if (RuntimeConstants.TuningMode) {
+            TuningModeTab.getInstance().addCommand("Enable Pose Fuser", new InstantCommand(() -> setEnabled(true)));
+            TuningModeTab.getInstance().addCommand("Disable Pose Fuser", new InstantCommand(() -> setEnabled(false)));
+        }
     }
 
     public void update(SwerveDriveState state) {
@@ -68,6 +80,7 @@ public class VisionPoseFuser {
             return;
         }
 
+        if (!enabled) return;
         PoseEstimate[] estimates = vision.getPoseEstimates();
 
         double[] finalXSTDEVs = new double[estimates.length];
@@ -96,6 +109,7 @@ public class VisionPoseFuser {
                 VecBuilder.fill(xSTDEV, ySTDEV, 9999999));
         }
 
+        Logger.recordOutput("VisionPoseFuser/Enable", enabled);
         Logger.recordOutput("VisionPoseFuser/LinearVelocityOfRobot",
             Algebra.euclideanDistance(state.Speeds.vxMetersPerSecond, state.Speeds.vyMetersPerSecond));
         Logger.recordOutput("VisionPoseFuser/LinearAccelerationOfRobot",

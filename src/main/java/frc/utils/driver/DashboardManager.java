@@ -4,6 +4,7 @@ import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.utils.driver.DashboardManager.LayoutConstants.LayoutInfo;
@@ -43,8 +44,10 @@ public class DashboardManager {
 
     public void addBoolSupplier(boolean onTeleop, String title, BooleanSupplier supplier, LayoutInfo layoutInfo) {
         ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
-        tab.addBoolean(title, supplier).withWidget("Boolean Box").withPosition(layoutInfo.x, layoutInfo.y)
-            .withSize(layoutInfo.width, layoutInfo.height);
+        SuppliedValueWidget<Boolean> widget = tab.addBoolean(title, supplier).withWidget("Boolean Box");
+        if (layoutInfo != null) {
+            widget.withPosition(layoutInfo.x, layoutInfo.y).withSize(layoutInfo.width, layoutInfo.height);
+        }
     }
 
     public void addCommand(boolean onTeleop, String title, Command command, LayoutInfo layoutInfo) {

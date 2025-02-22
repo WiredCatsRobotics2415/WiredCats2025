@@ -74,6 +74,13 @@ public class VisionIOSim implements VisionIO {
         }
 
         poseEstimationCameras = new PhotonCamera[] { frontLeftCam, frontRightCam, backCam };
+
+        // frontLeftSimCam.enableRawStream(true);
+        // frontLeftSimCam.enableProcessedStream(true);
+
+        // // Enable drawing a wireframe visualization of the field to the camera streams.
+        // // This is extremely resource-intensive and is disabled by default.
+        // frontLeftSimCam.enableDrawWireframe(true);
     }
 
     // TODO: Maybe don't need to make this realisitic

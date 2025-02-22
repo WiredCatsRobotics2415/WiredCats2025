@@ -22,6 +22,7 @@ import frc.constants.Controls.Presets;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
+import frc.subsystems.drive.CommandSwerveDrivetrain.PoseEstimationType;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
@@ -71,6 +72,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("SourceIntake",
             superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle)
                 .andThen(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("LockOntoReef", drive.switchToSingleTagWhenAvailable());
+        NamedCommands.registerCommand("SwitchToGlobalPE",
+            new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
 
         autoChooser = AutoBuilder.buildAutoChooser("");
@@ -90,6 +94,7 @@ public class RobotContainer {
     public void neutralizeSubsystems() {
         drive.setDefaultCommand(Commands.idle(drive));
         elevator.setGoal(Inches.of(0));
+        arm.setGoal(Degrees.of(0));
     }
 
     private void configureControls() {
@@ -125,6 +130,9 @@ public class RobotContainer {
             .onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
         oi.binds.get(OI.Bind.IntakeFromHPS)
             .onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
+
+        DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
+            () -> ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign), null);
         oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
             if (ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign)) {
                 ScoreCoral.setCurrentAutomationMode(CoralAutomationMode.PresetOnly);

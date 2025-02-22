@@ -13,6 +13,8 @@ import com.ctre.phoenix6.swerve.SwerveRequest.ForwardPerspectiveValue;
 import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.controller.PIDController;
@@ -27,6 +29,7 @@ import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.constants.Controls;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
@@ -37,6 +40,7 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -70,6 +74,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
         DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
 
+    private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
+
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
 
@@ -100,6 +106,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 resetPoseFromLimelight().ignoringDisable(true));
             TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
                 resetRotationFromLimelightMT1().ignoringDisable(true));
+
+            DriveAutoConstants.PPTranslationP.addListener(() -> {
+                DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
+                    new PIDConstants(DriveAutoConstants.PPTranslationP.get(), 0,
+                        DriveAutoConstants.PPTranslationP.get()),
+                    DriveAutoConstants.RotationPID);
+            });
+            DriveAutoConstants.PPTranslationD.addListener(() -> {
+                DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
+                    new PIDConstants(DriveAutoConstants.PPTranslationP.get(), 0,
+                        DriveAutoConstants.PPTranslationP.get()),
+                    DriveAutoConstants.RotationPID);
+            });
+            DriveAutoConstants.DTTranslationP.addListener(() -> {
+                driveToPositionXController.setP(DriveAutoConstants.DTTranslationP.get());
+                driveToPositionYController.setP(DriveAutoConstants.DTTranslationP.get());
+            });
+            DriveAutoConstants.DTTranslationD.addListener(() -> {
+                driveToPositionXController.setD(DriveAutoConstants.DTTranslationD.get());
+                driveToPositionYController.setD(DriveAutoConstants.DTTranslationD.get());
+            });
             // Add torque safety to all motors
             // Only uncomment this if you are risking grinding a gear, otherwise make sure
             // all swerve requests are Slew Rate Limited to prevent gear wear
@@ -235,7 +262,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> {
             Pose2d currentAvg = vision.getCurrentAveragePose();
             if (currentAvg != null) poses.add(currentAvg);
-        }).until(() -> poses.size() == 40).andThen(runOnce(() -> {
+        }).until(() -> poses.size() == (int) resetPoseSamples.get()).andThen(runOnce(() -> {
             double sumX = 0.0d, sumY = 0.0d;
             for (Pose2d pose : poses) {
                 sumX += pose.getX();
@@ -258,9 +285,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         return run(() -> {
             Rotation2d avgRotation = vision.getCurrentAverageRotation();
             if (avgRotation != null) rotations.add(avgRotation);
-        }).until(() -> rotations.size() == 40).andThen(runOnce(() -> {
+        }).until(() -> rotations.size() == (int) resetPoseSamples.get()).andThen(runOnce(() -> {
             resetRotation(Statistics.circularMeanRemoveOutliers(rotations, rotations.size()));
             rotations.clear();
+        }));
+    }
+
+    public Command switchToSingleTagWhenAvailable() {
+        return new WaitUntilCommand(vision::isReefSingleTagPoseEstimateAvailable).andThen(runOnce(() -> {
+            switchPoseEstimator(PoseEstimationType.SingleTagReef);
         }));
     }
 
