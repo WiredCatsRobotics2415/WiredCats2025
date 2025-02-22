@@ -36,7 +36,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
     private void configureMotors() {
         leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
-        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+        leftMotor.getConfigurator()
+            .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
         rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));

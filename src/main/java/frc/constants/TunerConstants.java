@@ -114,11 +114,11 @@ public class TunerConstants {
     private static final boolean kFrontLeftEncoderInverted = false;
 
     // TITAN
-    // public static final Distance kFrontLeftXPos = Inches.of(12.313);
-    // public static final Distance kFrontLeftYPos = Inches.of(12.313);
+    public static final Distance kFrontLeftXPos = Inches.of(12.313);
+    public static final Distance kFrontLeftYPos = Inches.of(12.313);
     // Bagel launcher
-    public static final Distance kFrontLeftXPos = Inches.of(11.6125);
-    public static final Distance kFrontLeftYPos = Inches.of(12.6125);
+    // public static final Distance kFrontLeftXPos = Inches.of(11.6125);
+    // public static final Distance kFrontLeftYPos = Inches.of(12.6125);
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;

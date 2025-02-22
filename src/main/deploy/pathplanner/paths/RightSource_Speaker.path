@@ -21,7 +21,7 @@
       },
       "prevControl": {
         "x": 2.183778409090909,
-        "y": 1.1980539772727277
+        "y": 1.1980539772727279
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,7 +31,14 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "LockOntoReef",
+      "waypointRelativePos": 0.8998875140607471,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
     "maxVelocity": 1.25,
     "maxAcceleration": 3.0,
