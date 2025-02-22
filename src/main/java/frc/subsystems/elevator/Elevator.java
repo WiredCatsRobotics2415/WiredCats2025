@@ -17,6 +17,7 @@ import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 
 public class Elevator extends SubsystemBase {
+    private boolean coasting;
     @Getter private Distance goal = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
@@ -42,6 +43,15 @@ public class Elevator extends SubsystemBase {
                     ElevatorConstants.AccelerationMax.get())));
             TuningModeTab.getInstance().addCommand("Run to 0", runOnce(() -> setGoal(ElevatorConstants.MinHeight)));
             TuningModeTab.getInstance().addCommand("Run to max", runOnce(() -> setGoal(ElevatorConstants.MaxHeight)));
+            TuningModeTab.getInstance().addCommand("Toggle coast", runOnce(() -> {
+                if (coasting) {
+                    io.setCoast(false);
+                    coasting = false;
+                } else {
+                    io.setCoast(true);
+                    coasting = true;
+                }
+            }));
         }
     }
 

@@ -65,8 +65,20 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.wirePotentiometer = wirePotentiometer.getVoltage();
     }
 
+    @Override
     public void setVoltage(double voltOut) {
         appliedVoltage = voltOut;
         leftMotor.setVoltage(voltOut);
+    }
+
+    @Override
+    public void setCoast(boolean coast) {
+        if (coast) {
+            leftMotor.setNeutralMode(NeutralModeValue.Coast);
+            rightMotor.setNeutralMode(NeutralModeValue.Coast);
+        } else {
+            leftMotor.setNeutralMode(NeutralModeValue.Brake);
+            rightMotor.setNeutralMode(NeutralModeValue.Brake);
+        }
     }
 }
