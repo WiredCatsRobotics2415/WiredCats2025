@@ -226,8 +226,7 @@ public class MapleSimSwerveDrivetrain {
             // Adjust steer inertia
             .withSteerInertia(KilogramSquareMeters.of(0.05))
             .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-            .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage).withSlipCurrent(Amps.of(120))
-            .withSteerInertia(KilogramSquareMeters.of(0.05)).withDriveInertia(KilogramSquareMeters.of(0.05))
-            .withSteerFrictionVoltage(Volts.of(0.1)).withDriveFrictionVoltage(Volts.of(0.1));
+            .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+            .withDriveInertia(KilogramSquareMeters.of(0.05));
     }
 }

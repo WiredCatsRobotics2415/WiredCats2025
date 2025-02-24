@@ -70,10 +70,16 @@ public class Measurements {
             Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(-20)));
         public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
             Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(20)));
-        public static final Transform3d BackCamera = new Transform3d(Inches.of(2.644), Inches.of(-7.530),
-            Inches.of(27.443), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(180)));
+        public static final Transform3d BackCamera = new Transform3d(Inches.of(-2.644), Inches.of(-11.784437),
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(-200)));
 
         public static final Translation2d EECamOnGround = new Translation2d(Inches.of(11.972173), Inches.of(0));
+    }
+
+    public class CoralMeasurements {
+        public static final Translation2d LeftBlueHPSDropPosition = new Translation2d(0, 0);
+        public static final Translation2d RightBlueHPSDropPosition = new Translation2d(0, 0);
+        public static final Distance HPSDropStdDev = Meters.of(0);
     }
 
     public class ReefMeasurements {

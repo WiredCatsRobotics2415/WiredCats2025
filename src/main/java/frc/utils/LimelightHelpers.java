@@ -397,7 +397,7 @@ public class LimelightHelpers {
         public RawFiducial[] rawFiducials;
         public boolean isMegaTag2;
 
-        public static PoseEstimate zero = new PoseEstimate(Pose2d.kZero, 0, 0, 0, 0, 0, 0, null, false);
+        public static PoseEstimate zero = new PoseEstimate(Pose2d.kZero, 0, 0, 0, 0, 0, 0, new RawFiducial[] {}, false);
 
         /**
          * Instantiates a PoseEstimate object with default values

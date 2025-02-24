@@ -1,0 +1,730 @@
+{
+  "version": 1.0,
+  "grid_size": 128,
+  "tabs": [
+    {
+      "name": "Teleoperated",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Match Time",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "Match Time",
+            "properties": {
+              "topic": "/Shuffleboard/Teleoperated/Match Time",
+              "period": 0.06,
+              "data_type": "double",
+              "time_display_mode": "Minutes and Seconds",
+              "red_start_time": 15,
+              "yellow_start_time": 30
+            }
+          },
+          {
+            "title": "Auto drive",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Teleoperated/Auto drive",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Autonomous",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Auto",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/Shuffleboard/Autonomous/Auto",
+              "period": 0.06,
+              "sort_options": false
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tuning",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Swerve",
+            "x": 0.0,
+            "y": 128.0,
+            "width": 384.0,
+            "height": 512.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "HIDDEN"
+            },
+            "children": [
+              {
+                "title": "Translation: Dynamic Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Translation: Dynamic Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Translation: Dynamic Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Translation: Dynamic Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Translation: Quasi Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Translation: Quasi Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Translation: Quasi Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Translation: Quasi Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Steer: Dynamic Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Steer: Dynamic Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Steer: Dynamic Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Steer: Dynamic Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Steer: Quasi Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Steer: Quasi Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Steer: Quasi Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Steer: Quasi Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Wheel Radius Characterization",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Wheel Radius Characterization",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Slip Current Characterization",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Slip Current Characterization",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Rotation: Dynamic Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Rotation: Dynamic Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Rotation: Dynamic Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Rotation: Dynamic Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Rotation: Quasi Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Rotation: Quasi Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Rotation: Quasi Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Swerve/Rotation: Quasi Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Arm",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "HIDDEN"
+            },
+            "children": [
+              {
+                "title": "Arm: Dynamic Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Arm/Arm: Dynamic Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Arm: Dynamic Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Arm/Arm: Dynamic Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Arm: Quasi Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Arm/Arm: Quasi Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Arm: Quasi Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Arm/Arm: Quasi Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "HIDDEN"
+            },
+            "children": [
+              {
+                "title": "Elevator: Dynamic Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Elevator/Elevator: Dynamic Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Elevator: Dynamic Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Elevator/Elevator: Dynamic Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Elevator: Quasi Backward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Elevator/Elevator: Quasi Backward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              },
+              {
+                "title": "Elevator: Quasi Forward",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/Shuffleboard/Tuning/Elevator/Elevator: Quasi Forward",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "Collision Prevented",
+            "x": 768.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Boolean Box",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Collision Prevented",
+              "period": 0.06,
+              "data_type": "boolean",
+              "true_color": 4283215696,
+              "false_color": 4294198070,
+              "true_icon": "None",
+              "false_icon": "None"
+            }
+          },
+          {
+            "title": "Reset Pose from Limelight",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Reset Pose from Limelight",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 1024.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 384.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Disable Pose Fuser",
+            "x": 1024.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Disable Pose Fuser",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Enable Pose Fuser",
+            "x": 1024.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Enable Pose Fuser",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Run to 0",
+            "x": 512.0,
+            "y": 256.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Run to 0",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Run to max",
+            "x": 512.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Run to max",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Toggle Arm Coast Mode",
+            "x": 768.0,
+            "y": 384.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Toggle Arm Coast Mode",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Toggle coast",
+            "x": 512.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Tuning/Toggle coast",
+              "period": 0.06,
+              "show_type": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Simulation",
+      "grid_layout": {
+        "layouts": [],
+        "containers": [
+          {
+            "title": "Drop Coral at Right HPS",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Simulation/Drop Coral at Right HPS",
+              "period": 0.06,
+              "show_type": true
+            }
+          },
+          {
+            "title": "Drop Coral at Left HPS",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/Shuffleboard/Simulation/Drop Coral at Left HPS",
+              "period": 0.06,
+              "show_type": true
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Tuneables",
+      "grid_layout": {
+        "layouts": [
+          {
+            "title": "Drive",
+            "x": 256.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "ResetPoseSamples",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/Drive/ResetPoseSamples",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "DriveAuto",
+            "x": 512.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "DTTranslationD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/DriveAuto/DTTranslationD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "DTTranslationP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/DriveAuto/DTTranslationP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "PPTranslationD",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/DriveAuto/PPTranslationD",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "PPTranslationP",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/DriveAuto/PPTranslationP",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          },
+          {
+            "title": "Elevator",
+            "x": 768.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "AccelMax",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/Elevator/AccelMax",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "GoalTolerance",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/Elevator/GoalTolerance",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "VelocityMax",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/TuneableNumbers/Elevator/VelocityMax",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              }
+            ]
+          }
+        ],
+        "containers": [
+          {
+            "title": "ArmVelocityMultiplier",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/TuneableNumbers/ArmVelocityMultiplier",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
