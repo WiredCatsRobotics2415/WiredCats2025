@@ -89,6 +89,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        System.out.println("auto init");
         RobotContainer.getInstance().getAutonomousCommand().schedule();
     }
 }

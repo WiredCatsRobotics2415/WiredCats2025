@@ -154,5 +154,8 @@ public class RobotContainer {
         // Triggers that interact across multiple subsystems/utils should be defined here
     }
 
-    public Command getAutonomousCommand() { return autoChooser.getSelected(); }
+    public Command getAutonomousCommand() {
+        System.out.println("get selected auto");
+        return autoChooser.getSelected();
+    }
 }

@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.constants.Subsystems.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
-    private TalonFX leftMotor;
-    private TalonFX rightMotor;
+    private TalonFX leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
+    private TalonFX rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
     private double appliedVoltage;
 
     private StatusSignal<Current> leftStator = leftMotor.getStatorCurrent();

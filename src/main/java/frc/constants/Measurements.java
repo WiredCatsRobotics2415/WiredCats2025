@@ -38,7 +38,7 @@ public class Measurements {
 
         public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
 
-        public static final Mass RobotWeight = Pounds.of(115); // TODO: update with real value
+        public static final Mass RobotWeight = Pounds.of(65); // TODO: update with real value
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
             (DriveTrainTrackWidth.in(Meters) / 2) * (DriveAutoConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
@@ -66,12 +66,12 @@ public class Measurements {
             }
         }
 
-        public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(2.644), Inches.of(11.784437),
+        public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
             Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(-20)));
-        public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
+        public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(11.784437),
             Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(20)));
-        public static final Transform3d BackCamera = new Transform3d(Inches.of(2.644), Inches.of(-7.530),
-            Inches.of(27.443), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(180)));
+        public static final Transform3d BackCamera = new Transform3d(Inches.of(-2.644), Inches.of(11.784437),
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(-200)));
 
         public static final Translation2d EECamOnGround = new Translation2d(Inches.of(11.972173), Inches.of(0));
     }

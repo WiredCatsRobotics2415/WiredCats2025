@@ -47,16 +47,13 @@ public class Subsystems {
     }
 
     public class DriveAutoConstants {
-        public static final TuneableNumber PPTranslationP = new TuneableNumber(10.0d, "DriveAuto/PPTranslationP");
-        public static final TuneableNumber PPTranslationD = new TuneableNumber(0d, "DriveAuto/PPTranslationD");
-        public static final TuneableNumber DTTranslationP = new TuneableNumber(5.0d, "DriveAuto/DTTranslationP");
-        public static final TuneableNumber DTTranslationD = new TuneableNumber(0.5d, "DriveAuto/DTTranslationD");
+        public static final TuneableNumber PPTranslationP = new TuneableNumber(20.0d, "DriveAuto/PPTranslationP");
+        public static final TuneableNumber RotationP = new TuneableNumber(15.0d, "DriveAuto/RotationP");
+        public static final TuneableNumber DTTranslationP = new TuneableNumber(0.5, "DriveAuto/DTTranslationP");
 
-        public static final PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0,
-            PPTranslationD.get()); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
-        public static final PIDConstants DTTranslationPID = new PIDConstants(DTTranslationP.get(), 0,
-            DTTranslationD.get());
-        public static final PIDConstants RotationPID = new PIDConstants(7, 0, 0);
+        public static PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
+        public static PIDConstants DTTranslationPID = new PIDConstants(DTTranslationP.get(), 0, 0);
+        public static PIDConstants RotationPID = new PIDConstants(RotationP.get(), 0, 0);
         public static PathFollowingController PathFollowingController = new PPHolonomicDriveController(PPTranslationPID,
             RotationPID);
         public static final PathConstraints DefaultPathConstraints = new PathConstraints(
