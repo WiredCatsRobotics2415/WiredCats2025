@@ -1,10 +1,12 @@
 package frc.utils.tuning;
 
+import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.constants.RuntimeConstants;
 import java.util.function.BooleanSupplier;
 
@@ -14,6 +16,8 @@ public class TuningModeTab {
 
     private TuningModeTab() {
         thisTab = Shuffleboard.getTab("Tuning");
+
+        addCommand("Stop SL", new InstantCommand(() -> SignalLogger.stop()));
     }
 
     /**

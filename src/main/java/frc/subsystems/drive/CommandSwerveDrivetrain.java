@@ -14,6 +14,7 @@ import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.config.PIDConstants;
+import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
@@ -108,25 +109,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 resetRotationFromLimelightMT1().ignoringDisable(true));
 
             DriveAutoConstants.PPTranslationP.addListener(() -> {
+                DriveAutoConstants.PPTranslationPID = new PIDConstants(DriveAutoConstants.PPTranslationP.get());
                 DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
-                    new PIDConstants(DriveAutoConstants.PPTranslationP.get(), 0,
-                        DriveAutoConstants.PPTranslationP.get()),
-                    DriveAutoConstants.RotationPID);
+                    DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
             });
-            DriveAutoConstants.PPTranslationD.addListener(() -> {
+            DriveAutoConstants.RotationP.addListener(() -> {
+                DriveAutoConstants.RotationPID = new PIDConstants(DriveAutoConstants.RotationP.get());
                 DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
-                    new PIDConstants(DriveAutoConstants.PPTranslationP.get(), 0,
-                        DriveAutoConstants.PPTranslationP.get()),
-                    DriveAutoConstants.RotationPID);
+                    DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
             });
             DriveAutoConstants.DTTranslationP.addListener(() -> {
                 driveToPositionXController.setP(DriveAutoConstants.DTTranslationP.get());
                 driveToPositionYController.setP(DriveAutoConstants.DTTranslationP.get());
             });
-            DriveAutoConstants.DTTranslationD.addListener(() -> {
-                driveToPositionXController.setD(DriveAutoConstants.DTTranslationD.get());
-                driveToPositionYController.setD(DriveAutoConstants.DTTranslationD.get());
-            });
+
             // Add torque safety to all motors
             // Only uncomment this if you are risking grinding a gear, otherwise make sure
             // all swerve requests are Slew Rate Limited to prevent gear wear
@@ -155,7 +151,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveAutoConstants.PathFollowingController, config,
+                DriveAutoConstants.PathFollowingController, RobotConfig.fromGUISettings(),
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this // Subsystem for requirements
             );
