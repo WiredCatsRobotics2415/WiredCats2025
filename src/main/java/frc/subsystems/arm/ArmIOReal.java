@@ -1,6 +1,6 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.constants.Subsystems.ArmConstants;
 
 public class ArmIOReal implements ArmIO {
-    private TalonFX motor = new TalonFX(ArmConstants.MotorID);
+    private TalonFX motor;
     private double appliedVoltage;
 
     private StatusSignal<Current> motorStator = motor.getStatorCurrent();
@@ -22,10 +22,7 @@ public class ArmIOReal implements ArmIO {
     private DutyCycleEncoder throughbore;
 
     public ArmIOReal() {
-        // I'm not sure this is correct
-        throughbore = new DutyCycleEncoder(ArmConstants.ThroughborePort,
-            (ArmConstants.MaxDegreesFront.minus(ArmConstants.MaxDegreesBack)).in(Degrees),
-            ((ArmConstants.MaxDegreesFront.minus(ArmConstants.MaxDegreesBack).div(2))).in(Degrees));
+        throughbore = new DutyCycleEncoder(ArmConstants.ThroughborePort);
 
         configureMotors();
     }
@@ -47,7 +44,7 @@ public class ArmIOReal implements ArmIO {
         inputs.motorSupplyCurrent = motorSupply.getValue();
         inputs.motorTemp = motorTemp.getValue();
 
-        inputs.appliedVoltage = appliedVoltage;
+        inputs.appliedVoltage = Volts.of(appliedVoltage);
         inputs.throughborePosition = throughbore.get();
     }
 

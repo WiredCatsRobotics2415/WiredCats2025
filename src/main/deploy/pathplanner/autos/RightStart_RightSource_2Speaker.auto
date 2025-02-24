@@ -11,15 +11,39 @@
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "L4"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "Speaker_RightSource"
           }
         },
         {
+          "type": "named",
+          "data": {
+            "name": "SourceIntake"
+          }
+        },
+        {
           "type": "path",
           "data": {
             "pathName": "RightSource_Speaker"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "L4"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "SwitchToGlobalPE"
           }
         }
       ]

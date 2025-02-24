@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Controls;
 import frc.constants.Controls.GulikitButtons;
+import frc.constants.Controls.NumpadButtons;
+import frc.utils.math.Algebra;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,14 +18,16 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, PresetIntakeFromSource, AutoScoreLeftL1,
-        AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3,
-        AutoScoreRightL4, SeedFieldCentric
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
+        ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
+        AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
+        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
     private SlewRateLimiter xLimiter = new SlewRateLimiter(Controls.SlewRate);
     private SlewRateLimiter yLimiter = new SlewRateLimiter(Controls.SlewRate);
+    private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Controls.SlewRate);
 
     private static OI instance;
 
@@ -42,18 +46,27 @@ public class OI {
 
         binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
-        binds.put(Bind.ManualArmForward, controller.povUp());
-        binds.put(Bind.ManualArmBack, controller.povDown());
+        binds.put(Bind.ManualArmForward, controller.povRight());
+        binds.put(Bind.ManualArmBack, controller.povLeft());
 
-        binds.put(Bind.PresetIntakeFromSource, numpad.button(1));
-        binds.put(Bind.AutoScoreLeftL1, numpad.button(2));
-        binds.put(Bind.AutoScoreLeftL2, numpad.button(5));
-        binds.put(Bind.AutoScoreLeftL3, numpad.button(8));
-        binds.put(Bind.AutoScoreLeftL4, numpad.button(10)); // Slash
-        binds.put(Bind.AutoScoreRightL1, numpad.button(3));
-        binds.put(Bind.AutoScoreRightL2, numpad.button(6));
-        binds.put(Bind.AutoScoreRightL3, numpad.button(9));
-        binds.put(Bind.AutoScoreRightL4, numpad.button(11)); // Asterisk
+        binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
+        binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
+        binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
+
+        binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
+        binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
+        binds.put(Bind.DealgaePreset, numpad.button(NumpadButtons.NumberSeven));
+        binds.put(Bind.AutoScoreLeftL1, numpad.button(NumpadButtons.NumberTwo));
+        binds.put(Bind.AutoScoreLeftL2, numpad.button(NumpadButtons.NumberFive));
+        binds.put(Bind.AutoScoreLeftL3, numpad.button(NumpadButtons.NumberEight));
+        binds.put(Bind.AutoScoreLeftL4, numpad.button(NumpadButtons.ForwardSlash));
+        binds.put(Bind.AutoScoreRightL1, numpad.button(NumpadButtons.NumberThree));
+        binds.put(Bind.AutoScoreRightL2, numpad.button(NumpadButtons.NumberSix));
+        binds.put(Bind.AutoScoreRightL3, numpad.button(NumpadButtons.NumberNine));
+        binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
+        binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
+
+        binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
     }
 
     private double deadbandCompensation(double r) {
@@ -70,12 +83,12 @@ public class OI {
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
-            double magInitial = Math.sqrt(x * x + y * y);
+            double magInitial = Algebra.euclideanDistance(x, y);
             if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
             double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
             double powerCompensated = minimumPowerCompensation(magCurved);
-            newX = Math.cos(angle) * powerCompensated;
-            newY = Math.sin(angle) * powerCompensated;
+            newX = Algebra.cosizzle(angle) * powerCompensated;
+            newY = Algebra.sizzle(angle) * powerCompensated;
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;
@@ -88,10 +101,11 @@ public class OI {
         double deadbanded = deadbandCompensation(
             MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX), Controls.Deadband));
         if (Controls.UseCurve) {
-            return Math.pow(minimumPowerCompensation(deadbanded), Controls.CurveExponent);
+            deadbanded = Math.pow(minimumPowerCompensation(deadbanded), Controls.CurveExponent);
         } else {
-            return minimumPowerCompensation(deadbanded);
+            deadbanded = minimumPowerCompensation(deadbanded);
         }
+        return rotationLimiter.calculate(deadbanded);
     }
 
     public XboxController getHIDOfController() { return controller.getHID(); }

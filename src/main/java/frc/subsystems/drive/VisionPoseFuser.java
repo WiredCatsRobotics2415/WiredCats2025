@@ -45,7 +45,7 @@ public class VisionPoseFuser {
 
     private boolean firstRun = true;
     @Getter
-    @Setter private boolean enabled = false;
+    @Setter private boolean enabled = true;
 
     private Vision vision = Vision.getInstance();
     private CommandSwerveDrivetrain drivetrain;
