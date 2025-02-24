@@ -1,30 +1,42 @@
 package frc.subsystems.endeffector;
 
-import com.revrobotics.servohub.ServoHub.ResetMode;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Celsius;
+
 import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
+import edu.wpi.first.wpilibj.AnalogInput;
 import frc.constants.Subsystems.EndEffectorConstants;
 
 public class EndEffectorIOReal implements EndEffectorIO {
-    private SparkMax motor;
+    private SparkMax motor = new SparkMax(EndEffectorConstants.MotorID, MotorType.kBrushless);
+    private AnalogInput irSensor = new AnalogInput(EndEffectorConstants.IRSensorPort);
 
     public EndEffectorIOReal() {
-
+        configureMotor();
     }
 
-    public void configureMotor() {
-        motor = new SparkMax(EndEffectorConstants.MotorPort, MotorType.kBrushless);
+    private void configureMotor() {
         SparkMaxConfig config = new SparkMaxConfig();
-        config.smartCurrentLimit(50).idleMode(IdleMode.kBrake);
-        // weird error w/ spark, commenting so that I can commit. 
-        // spark.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        motor.configure(config.smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake), ResetMode.kResetSafeParameters,
+            PersistMode.kPersistParameters);
     }
 
-    public void setVoltage(double voltOut) {
-        motor.setVoltage(voltOut);
+    @Override
+    public void updateInputs(EndEffectorIOInputs inputs) {
+        inputs.sensorValue = irSensor.getValue();
+
+        inputs.motorConnected = true;
+        inputs.motorStatorCurrent = Amps.of(motor.getOutputCurrent());
+        inputs.motorTemp = Celsius.of(motor.getMotorTemperature());
     }
 
+    @Override
+    public void setPower(double power) {
+        motor.set(power);
+    }
 }

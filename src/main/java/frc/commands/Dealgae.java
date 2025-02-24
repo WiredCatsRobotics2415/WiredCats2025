@@ -17,6 +17,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import lombok.Getter;
 import lombok.Setter;
 
 public class Dealgae extends Command {
@@ -24,7 +25,8 @@ public class Dealgae extends Command {
         PresetOnly, PresetAndAlign
     }
 
-    @Setter private static DealgaeAutomationMode currentAutomationMode = DealgaeAutomationMode.PresetAndAlign;
+    @Setter
+    @Getter private static DealgaeAutomationMode currentAutomationMode = DealgaeAutomationMode.PresetAndAlign;
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
@@ -33,9 +35,6 @@ public class Dealgae extends Command {
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
-
-    private double goalHeightInches;
-    private double goalArmDegrees;
 
     private Command driveCommand;
     private Command superStructureCommand;
