@@ -69,7 +69,7 @@ public class DriveCharacterization extends Characterizer {
 
         commands.add(new WheelRadiusCharacterization(driveSubsystem, 10).withName("Wheel Radius Characterization"));
         commands.add(
-            new CurrentLimitCharacterization(driveSubsystem, 20, 2.5, 0.5).withName("Slip Current Characterization"));
+            new CurrentLimitCharacterization(driveSubsystem, 20, 2, 0.5).withName("Slip Current Characterization"));
 
         commands.add(sysIdRoutineRotation.dynamic(Direction.kForward).withName("Rotation: Dynamic Forward"));
         commands.add(sysIdRoutineRotation.dynamic(Direction.kReverse).withName("Rotation: Dynamic Backward"));

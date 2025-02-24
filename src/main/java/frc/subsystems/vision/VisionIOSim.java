@@ -5,6 +5,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.constants.Measurements;
 import frc.constants.Measurements.LimelightSpecs;
@@ -16,6 +17,7 @@ import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Triangle2d;
 import java.util.List;
 import org.ironmaple.simulation.SimulatedArena;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
@@ -136,14 +138,17 @@ public class VisionIOSim implements VisionIO {
             inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
         }
 
+        Pose2d currentEndEffectorPosition = CommandSwerveDrivetrain.getInstance()
+            .getMapleSimSwerveDrivetrain().mapleSimDrive.getSimulatedDriveTrainPose()
+                .plus(new Transform2d(RobotMeasurements.EECamOnGround, Rotation2d.kZero));
+        Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(currentEndEffectorPosition.getTranslation(),
+            LimelightSpecs.TwoPlusMaxObjectDetectionDistance, LimelightSpecs.TwoPlusHorizontalFOV,
+            currentEndEffectorPosition.getRotation().getMeasure());
+        Logger.recordOutput("Visualization/VisionIOSim/EETriangle",
+            new Translation2d[] { fovTriangle.getA(), fovTriangle.getB(), fovTriangle.getC(), fovTriangle.getA() });
         if (currentPipeline == EndEffectorPipeline.DriverView) {
             inputs.endEffectorCameraAveragePixelValue = 255;
         } else {
-            Translation2d currentEndEffectorPosition = CommandSwerveDrivetrain.getInstance()
-                .getMapleSimSwerveDrivetrain().mapleSimDrive.getSimulatedDriveTrainPose().getTranslation()
-                    .plus(RobotMeasurements.EECamOnGround);
-            Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(currentEndEffectorPosition,
-                LimelightSpecs.TwoPlusMaxObjectDetectionDistance, LimelightSpecs.TwoPlusHorizontalFOV);
             List<Pose3d> allCoralsOnField = SimulatedArena.getInstance().getGamePiecesByType("Coral");
 
             boolean seesACoral = false;
@@ -153,7 +158,8 @@ public class VisionIOSim implements VisionIO {
                 Pose2d coral2d = coral.toPose2d();
                 if (fovTriangle.isInside(coral2d.getTranslation())) {
                     seesACoral = true;
-                    double thisCoralDistance = coral2d.getTranslation().getDistance(currentEndEffectorPosition);
+                    double thisCoralDistance = coral2d.getTranslation()
+                        .getDistance(currentEndEffectorPosition.getTranslation());
                     if (thisCoralDistance < closestCoralDistance) {
                         closestCoral = coral2d;
                     }

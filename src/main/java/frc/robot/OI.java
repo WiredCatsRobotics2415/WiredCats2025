@@ -21,7 +21,8 @@ public class OI {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
         ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
         AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
-        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive
+        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, MinorDriveForward, MinorDriveBackward,
+        MinorDriveLeft, MinorDriveRight
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -44,14 +45,19 @@ public class OI {
 
         binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
 
-        binds.put(Bind.ManualElevatorUp, controller.rightTrigger());
+        binds.put(Bind.ManualElevatorUp, controller.leftBumper());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
-        binds.put(Bind.ManualArmForward, controller.povRight());
-        binds.put(Bind.ManualArmBack, controller.povLeft());
+        binds.put(Bind.ManualArmForward, controller.rightBumper());
+        binds.put(Bind.ManualArmBack, controller.rightTrigger());
 
         binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
         binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
         binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
+
+        binds.put(Bind.MinorDriveForward, controller.povUp());
+        binds.put(Bind.MinorDriveBackward, controller.povDown());
+        binds.put(Bind.MinorDriveLeft, controller.povLeft());
+        binds.put(Bind.MinorDriveRight, controller.povRight());
 
         binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));

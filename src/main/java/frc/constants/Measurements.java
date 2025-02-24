@@ -76,6 +76,12 @@ public class Measurements {
         public static final Translation2d EECamOnGround = new Translation2d(Inches.of(11.972173), Inches.of(0));
     }
 
+    public class CoralMeasurements {
+        public static final Translation2d LeftBlueHPSDropPosition = new Translation2d(0, 0);
+        public static final Translation2d RightBlueHPSDropPosition = new Translation2d(0, 0);
+        public static final Distance HPSDropStdDev = Meters.of(0);
+    }
+
     public class ReefMeasurements {
         public static final Pose2d blueReefABApriltag = new Pose2d(new Translation2d(3.6576, 4.0259),
             Rotation2d.fromDegrees(0)); // ID 18

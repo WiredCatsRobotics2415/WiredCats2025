@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.Dealgae;
 import frc.commands.Dealgae.DealgaeAutomationMode;
+import frc.commands.MinorDriveAdjuster;
+import frc.commands.MinorDriveAdjuster.Direction;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.commands.ScoreCoral.Level;
@@ -106,6 +108,11 @@ public class RobotContainer {
                 .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
                 .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
         }));
+
+        oi.binds.get(OI.Bind.MinorDriveForward).whileTrue(new MinorDriveAdjuster(Direction.Forward));
+        oi.binds.get(OI.Bind.MinorDriveBackward).whileTrue(new MinorDriveAdjuster(Direction.Backward));
+        oi.binds.get(OI.Bind.MinorDriveLeft).whileTrue(new MinorDriveAdjuster(Direction.Left));
+        oi.binds.get(OI.Bind.MinorDriveRight).whileTrue(new MinorDriveAdjuster(Direction.Right));
 
         oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(1.0)));
         oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(-1.0)));

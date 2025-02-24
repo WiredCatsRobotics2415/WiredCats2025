@@ -118,7 +118,7 @@ public class ScoreCoral extends Command {
 
     @Override
     public void execute() {
-        System.out.println(driveCommand.isFinished());
+        if (driveCommand != null) System.out.println(driveCommand.isFinished());
     }
 
     @Override
