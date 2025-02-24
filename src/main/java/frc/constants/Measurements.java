@@ -3,38 +3,21 @@ package frc.constants;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
-import com.pathplanner.lib.config.ModuleConfig;
-import com.pathplanner.lib.config.RobotConfig;
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.units.measure.MomentOfInertia;
-import frc.constants.Subsystems.DriveAutoConstants;
 import java.util.List;
 
 public class Measurements {
-    public static final AprilTagFieldLayout ApriltagFieldLayout = AprilTagFieldLayout
-        .loadField(AprilTagFields.k2025Reefscape);
-
     public class RobotMeasurements {
-        // Front of the robot: coral scoring side
-        public static final Distance BumperLength = Inches.of(3.204);
-        public static final Distance BumperToBumper = Inches.of(36);
+        public static final Distance BumperLength = Inches.of(3);
 
         public static final Distance CenterToFrameRadius = Inches.of(21.313);
         public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
-        public static final Distance DriveTrainRadius = Inches.of(18.432785);
-        public static final Distance DriveTrainTrackWidth = Inches.of(24.625);
 
         public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
 
@@ -103,8 +86,6 @@ public class Measurements {
         public static final Pose2d redReefKLApriltag = new Pose2d(new Translation2d(13.474446, 3.306318),
             Rotation2d.fromDegrees(300)); // ID 6
 
-        public static final int[] allReefApriltagIds = new int[] { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
-
         public static final List<Pose2d> reefBlueApriltags;
         static {
             reefBlueApriltags = List.of(blueReefABApriltag, blueReefCDApriltag, blueReefEFApriltag, blueReefGHApriltag,
@@ -139,13 +120,7 @@ public class Measurements {
             BreakerCurrentAndTripTimes.put(2.5, 1.25 - TimeSafetyTolerace);
         }
 
-        /**
-         * Uses the BreakerCurrentAndTripTimes to find the most optimal possible supply lower limit and time
-         *
-         * @param targetSupply The desired supply current. Can and should be above 40. This will be the maxiumum possible supply current allowance.
-         * @param targetStator The desired stator current.
-         * @return A CurrentLimitsConfigs object with lower limit and time set optimally.
-         */
+        // TODO: look back at this
         public static CurrentLimitsConfigs getCurrentLimitsForSupply(Current targetSupply, Current targetStator) {
             CurrentLimitsConfigs config = new CurrentLimitsConfigs();
             config.SupplyCurrentLimitEnable = true;
@@ -158,21 +133,5 @@ public class Measurements {
         }
 
         public static final double UniversalTorqueCutoffCurrentSeconds = 45 / 0.02; // No current spike greater than 40 amps in one robot loop, 0.02
-    }
-
-    public static class LimelightSpecs {
-        public static final Angle ThreeGHorizontalFOV = Degrees.of(82);
-        public static final Angle ThreeGVerticalFOV = Degrees.of(56.2);
-        public static final double ThreeGDiagnolFOV = 2 *
-            Math.atan(Math.sqrt(Math.pow(Math.tan(ThreeGHorizontalFOV.in(Radians) / 2), 2) +
-                Math.pow(Math.tan(ThreeGVerticalFOV.in(Radians) / 2), 2)));
-
-        public static final Angle TwoPlusHorizontalFOV = Degrees.of(62.5);
-        public static final Angle TwoPlusVerticalFOV = Degrees.of(48.9);
-        public static final double TwoPlusDiagnolFOV = 2 *
-            Math.atan(Math.sqrt(Math.pow(Math.tan(TwoPlusHorizontalFOV.in(Radians) / 2), 2) +
-                Math.pow(Math.tan(TwoPlusVerticalFOV.in(Radians) / 2), 2)));
-
-        public static final Distance TwoPlusMaxObjectDetectionDistance = Feet.of(6);
     }
 }

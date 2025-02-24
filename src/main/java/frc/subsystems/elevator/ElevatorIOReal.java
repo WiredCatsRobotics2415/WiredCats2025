@@ -1,16 +1,10 @@
 package frc.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Volts;
-
-import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.AnalogInput;
 import frc.constants.Subsystems.ElevatorConstants;
 
@@ -31,43 +25,29 @@ public class ElevatorIOReal implements ElevatorIO {
 
     public ElevatorIOReal() {
         wirePotentiometer = new AnalogInput(ElevatorConstants.AnalogPotentiometerPort);
-        configureMotors();
+        // configureMotors();
     }
 
     private void configureMotors() {
+        FeedbackConfigs feedbackConfigs = new FeedbackConfigs()
+            .withFeedbackSensorSource(FeedbackSensorSourceValue.RotorSensor);
+
         leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
-        leftMotor.getConfigurator()
-            .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+        leftMotor.getConfigurator().apply(feedbackConfigs);
 
         rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
-        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
         leftMotor.setNeutralMode(NeutralModeValue.Brake);
         rightMotor.setNeutralMode(NeutralModeValue.Brake);
-
-        BaseStatusSignal.setUpdateFrequencyForAll(50, leftStator, leftSupply, leftTemp, rightStator, rightSupply,
-            rightTemp);
     }
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
-        inputs.isConnectedLeft = leftMotor.isAlive();
-        inputs.temperatureLeft = leftTemp.getValue();
-        inputs.statorCurrentLeft = leftStator.getValue();
-        inputs.supplyCurrentLeft = leftSupply.getValue();
-
-        inputs.isConnectedRight = rightMotor.isAlive();
-        inputs.temperatureRight = rightTemp.getValue();
-        inputs.statorCurrentRight = rightStator.getValue();
-        inputs.supplyCurrentRight = rightSupply.getValue();
-
-        inputs.appliedVoltage = Volts.of(appliedVoltage);
-        inputs.wirePotentiometer = wirePotentiometer.getVoltage();
+        inputs.wirePotentiometerValue = wirePotentiometer.getVoltage();
     }
 
     public void setVoltage(double voltOut) {
-        appliedVoltage = voltOut;
-        leftMotor.setVoltage(voltOut);
+        // leftMotor.setVoltage(voltOut);
     }
 }

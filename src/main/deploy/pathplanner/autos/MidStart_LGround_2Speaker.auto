@@ -11,39 +11,15 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "Speaker_LGround"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "GroundIntake"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "LGround_Speaker"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "L4"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "SwitchToGlobalPE"
           }
         }
       ]

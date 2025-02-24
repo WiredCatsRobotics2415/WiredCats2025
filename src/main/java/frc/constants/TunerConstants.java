@@ -45,7 +45,7 @@ public class TunerConstants {
     // This needs to be tuned to your individual robot
     // 1/31 - keep this at 40 until it is tuned, for safety reasons
     // 2/7 - tuned: this is 40 (on 24 robot)
-    public static final Current kSlipCurrent = Amps.of(40);
+    private static final Current kSlipCurrent = Amps.of(40.0);
 
     // Initial configs for the drive and steer motors and the azimuth encoder; these cannot be null.
     // Some configs will be overwritten; check the `with*InitialConfigs()` API documentation.
@@ -53,28 +53,27 @@ public class TunerConstants {
     private static final TalonFXConfiguration steerInitialConfigs = new TalonFXConfiguration()
         .withCurrentLimits(new CurrentLimitsConfigs()
             // Swerve azimuth does not require much torque output, so we can set a relatively low
-            // stator current limit to help avoid brownouts without impacting performance.n
-            .withStatorCurrentLimit(Amps.of(60)).withStatorCurrentLimitEnable(true));
+            // stator current limit to help avoid brownouts without impacting performance.
+            // 1/31: keep this at 40 to preserve gears, reevaulate later in the season
+            .withStatorCurrentLimit(Amps.of(40)).withStatorCurrentLimitEnable(true));
     private static final CANcoderConfiguration encoderInitialConfigs = new CANcoderConfiguration();
     // Configs for the Pigeon 2; leave this null to skip applying Pigeon 2 configs
     private static final Pigeon2Configuration pigeonConfigs = null;
 
     // CAN bus that the devices are located on;
     // All swerve devices must share the same CAN bus
-    // TITAN
-    // public static final CANBus kCANBus = new CANBus("Swerve", "./logs/example.hoot");
-    // BL
     public static final CANBus kCANBus = new CANBus("", "./logs/example.hoot");
 
     // Theoretical free speed (m/s) at 12 V applied output;
     // This needs to be tuned to your individual robot
-    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.33);
+    public static final LinearVelocity kSpeedAt12Volts = MetersPerSecond.of(4.14);
 
     // Every 1 rotation of the azimuth results in kCoupleRatio drive motor turns;
     // This may need to be tuned to your individual robot
     private static final double kCoupleRatio = 3.5714285714285716;
 
-    public static final double kDriveGearRatio = 7.125; // L1+
+    // TODO: account for drive motor being a kraken w/ a different spline
+    private static final double kDriveGearRatio = 6.746031746031747;
     private static final double kSteerGearRatio = 21.428571428571427;
     public static final Distance kWheelRadius = Inches.of(1.99);
 
@@ -84,12 +83,11 @@ public class TunerConstants {
     private static final int kPigeonId = 0;
 
     // These are only used for simulation
-    // https://docs.advantagekit.org/getting-started/template-projects/talonfx-swerve-template/
-    private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.05);
-    private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.05);
+    private static final MomentOfInertia kSteerInertia = KilogramSquareMeters.of(0.01);
+    private static final MomentOfInertia kDriveInertia = KilogramSquareMeters.of(0.01);
     // Simulated voltage necessary to overcome friction
-    private static final Voltage kSteerFrictionVoltage = Volts.of(0.1);
-    private static final Voltage kDriveFrictionVoltage = Volts.of(0.1);
+    private static final Voltage kSteerFrictionVoltage = Volts.of(0.2);
+    private static final Voltage kDriveFrictionVoltage = Volts.of(0.2);
 
     public static final SwerveDrivetrainConstants DrivetrainConstants = new SwerveDrivetrainConstants()
         .withCANBusName(kCANBus.getName()).withPigeon2Id(kPigeonId).withPigeon2Configs(pigeonConfigs);
@@ -113,12 +111,10 @@ public class TunerConstants {
     private static final boolean kFrontLeftSteerMotorInverted = true;
     private static final boolean kFrontLeftEncoderInverted = false;
 
-    // TITAN
-    public static final Distance kFrontLeftXPos = Inches.of(12.313);
-    public static final Distance kFrontLeftYPos = Inches.of(12.313);
-    // Bagel launcher
-    // public static final Distance kFrontLeftXPos = Inches.of(11.6125);
-    // public static final Distance kFrontLeftYPos = Inches.of(12.6125);
+    private static final Distance kFrontLeftXPos = Inches.of(13);
+    private static final Distance kFrontLeftYPos = Inches.of(11);
+    private static final double FrontLeftInchesFromCenter = Math
+        .sqrt(Math.pow(kFrontLeftXPos.in(Inches), 2) + Math.pow(kFrontLeftYPos.in(Inches), 2));
 
     // Front Right
     private static final int kFrontRightDriveMotorId = 2;

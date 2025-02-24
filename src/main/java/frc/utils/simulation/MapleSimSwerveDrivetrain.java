@@ -19,7 +19,6 @@ import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveDrivetrain;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
@@ -59,12 +58,15 @@ public class MapleSimSwerveDrivetrain {
      * @param robotMassWithBumpers the total mass of the robot, including bumpers
      * @param bumperLengthX        the length of the bumper along the X-axis (influences the collision space of the robot)
      * @param bumperWidthY         the width of the bumper along the Y-axis (influences the collision space of the robot)
-     * @param driveMotorModel      the {@link DCMotor} model for the drive motor, typically <code>DCMotor.getKrakenX60Foc()
+     * @param driveMotorModel      the {@link DCMotor} model for the drive motor, typically <code>
+     *     DCMotor.getKrakenX60Foc()
      *     </code>
-     * @param steerMotorModel      the {@link DCMotor} model for the steer motor, typically <code>DCMotor.getKrakenX60Foc()
+     * @param steerMotorModel      the {@link DCMotor} model for the steer motor, typically <code>
+     *     DCMotor.getKrakenX60Foc()
      *     </code>
      * @param wheelCOF             the coefficient of friction of the drive wheels
-     * @param moduleLocations      the locations of the swerve modules on the robot, in the order <code>FL, FR, BL, BR</code>
+     * @param moduleLocations      the locations of the swerve modules on the robot, in the order <code>
+     *     FL, FR, BL, BR</code>
      * @param pigeon               the {@link Pigeon2} IMU used in the drivetrain
      * @param modules              the {@link SwerveModule}s, typically obtained via {@link SwerveDrivetrain#getModules()}
      * @param moduleConstants      the constants for the swerve modules
@@ -102,7 +104,6 @@ public class MapleSimSwerveDrivetrain {
      * Updates the Maple-Sim simulation and injects the results into the simulated CTRE devices, including motors and the IMU.
      */
     public void update() {
-        SimulatedArena.getInstance().simulationPeriodic();
         pigeonSim.setRawYaw(mapleSimDrive.getSimulatedDriveTrainPose().getRotation().getMeasure());
         pigeonSim.setAngularVelocityZ(RadiansPerSecond
             .of(mapleSimDrive.getDriveTrainSimulatedChassisSpeedsRobotRelative().omegaRadiansPerSecond));
@@ -224,10 +225,6 @@ public class MapleSimSwerveDrivetrain {
             // Adjust friction voltages
             .withDriveFrictionVoltage(Volts.of(0.1)).withSteerFrictionVoltage(Volts.of(0.15))
             // Adjust steer inertia
-            .withSteerInertia(KilogramSquareMeters.of(0.05))
-            .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-            .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage).withSlipCurrent(Amps.of(120))
-            .withSteerInertia(KilogramSquareMeters.of(0.05)).withDriveInertia(KilogramSquareMeters.of(0.05))
-            .withSteerFrictionVoltage(Volts.of(0.1)).withDriveFrictionVoltage(Volts.of(0.1));
+            .withSteerInertia(KilogramSquareMeters.of(0.05));
     }
 }

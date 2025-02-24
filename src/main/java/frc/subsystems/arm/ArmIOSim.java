@@ -1,9 +1,7 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -13,15 +11,16 @@ import frc.constants.Subsystems.ArmConstants;
 public class ArmIOSim implements ArmIO {
     private double appliedVoltage;
 
-    private final double moi = SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.ApproximateMassKg);
-
-    private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
-        ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.MaxDegreesBack.in(Radians), ArmConstants.MaxDegreesFront.in(Radians), true, 0);
+    private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getFalcon500(1),
+        ArmConstants.RotorToArmGearRatio,
+        // Should the length be in meters?
+        SingleJointedArmSim.estimateMOI(ArmConstants.EffectiveLengthInches.div(39.37009424).in(Inches),
+            ArmConstants.ApproximateMassKg),
+        ArmConstants.EffectiveLengthInches.div(39.37009424).in(Inches), ArmConstants.MaxDegreesBack.in(Radians),
+        ArmConstants.MaxDegreesFront.in(Radians), true, ArmConstants.MaxDegreesBack.in(Radians));
 
     public ArmIOSim() {
-        simArm.setState(0, 0);
+        simArm.setState(ArmConstants.MaxDegreesBack.in(Radians), 0);
     }
 
     @Override
@@ -29,9 +28,7 @@ public class ArmIOSim implements ArmIO {
         simArm.update(0.02);
 
         inputs.motorConnected = true;
-        inputs.motorSupplyCurrent = Amps.of(simArm.getCurrentDrawAmps());
-        inputs.appliedVoltage = Volts.of(appliedVoltage);
-
+        inputs.appliedVoltage = appliedVoltage;
         inputs.throughborePosition = Units.radiansToRotations(simArm.getAngleRads());
     }
 
