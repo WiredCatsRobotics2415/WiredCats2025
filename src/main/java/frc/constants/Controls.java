@@ -8,13 +8,13 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class Controls {
     public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-    public static final double MaxAngularRadS = 1.2*Math.PI;
+    public static final double MaxAngularRadS = Math.PI;
     public static final double MinimumDrivePower = 0.05d;
     public static final double RumbleSoftValue = 0.2d;
     public static final double RumbleHardValue = 0.6d;
     public static final boolean UseCurve = true;
     public static final double CurveExponent = 3;
-    public static final double SlewRate = 8; // ie. 8 units/sec, so 0.125 acceleration limit
+    public static final double SlewRate = 4; // ie. 4 units/sec, so 0.25 acceleration limit
     public static final double Deadband = 0.05d;
 
     public class GulikitButtons {
@@ -35,24 +35,6 @@ public class Controls {
         public static final int RightTrigger = XboxController.Axis.kRightTrigger.value;
     }
 
-    public class NumpadButtons {
-        public static final int NumberZero = 1;
-        public static final int Dot = 2;
-        public static final int NumberOne = 3;
-        public static final int NumberTwo = 4;
-        public static final int NumberThree = 5;
-        public static final int NumberFour = 6;
-        public static final int NumberFive = 7;
-        public static final int NumberSix = 8;
-        public static final int NumberSeven = 9;
-        public static final int NumberEight = 10;
-        public static final int NumberNine = 11;
-        public static final int ForwardSlash = 12;
-        public static final int Asterisk = 13;
-        public static final int Minus = 14;
-        public static final int Plus = 15;
-    }
-
     public class Presets {
         public static final Angle Level1Angle = Degrees.of(120);
         public static final Distance Level1Height = Inches.of(12);
@@ -67,11 +49,5 @@ public class Controls {
         public static final Distance BottomAlgaeDescoreHeight = Inches.of(16);
         public static final Angle TopAlgaeDescoreAngle = Degrees.of(75);
         public static final Distance TopAlgaeDescoreHeight = Inches.of(32);
-
-        public static final Angle IntakeFromHPSAngle = Degrees.of(-45);
-        public static final Distance IntakeFromHPSHeight = Inches.of(0);
-
-        public static final Angle GroundIntakeAngle = Degrees.of(-100);
-        public static final Distance GroundIntakeHeight = Inches.of(0);
     }
 }

@@ -16,12 +16,12 @@ public class Util {
      * @param replay The replay IO
      * @return The instantiated IO (MUST be cast to correct IO class)
      */
-    public static Object getIOImplementation(Class<?> real, Class<?> sim, Object replay) {
+    public static Object getIOImplementation(Class<?> real, Class<?> sim, Class<?> replay) {
         Class<?> attemptedInstantationType = real;
         try {
             if (Robot.isSimulation()) {
-                if (RuntimeConstants.SimMode == Mode.REPLAY) {
-                    return replay;
+                if (RuntimeConstants.simMode == Mode.REPLAY) {
+                    attemptedInstantationType = replay;
                 } else {
                     attemptedInstantationType = sim;
                 }
@@ -38,5 +38,17 @@ public class Util {
 
         }
         return new Object();
+    }
+
+    /**
+     * Changes the range of an input linearly, exactly like Arduino's "map()" function
+     *
+     * @param inputMin  minimum (lowest number on number line) input can take
+     * @param inputMax  maximum (highest number on number line) input can take
+     * @param outputMin min value of output
+     * @param outputMax max value of output
+     */
+    public static double linearMap(double input, double inputMin, double inputMax, double outputMin, double outputMax) {
+        return (input / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
     }
 }

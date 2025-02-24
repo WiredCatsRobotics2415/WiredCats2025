@@ -1,12 +1,10 @@
 package frc.robot;
 
-import com.ctre.phoenix6.HootReplay;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
-import frc.utils.simulation.SimulationTab;
 import frc.utils.tuning.TuningModeTab;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -21,6 +19,8 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
  */
 public class Robot extends LoggedRobot {
     public Robot() {
+        RobotContainer.getInstance();
+
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
@@ -40,17 +40,15 @@ public class Robot extends LoggedRobot {
         }
 
         // Set up data receivers & replay source
-        switch (RuntimeConstants.CurrentMode) {
+        switch (RuntimeConstants.currentMode) {
             case REAL:
                 // Running on a real robot, log to a USB stick ("/U/logs")
                 Logger.addDataReceiver(new WPILOGWriter("/home/lvuser/logs"));
                 Logger.addDataReceiver(new NT4Publisher());
-                SignalLogger.start();
                 break;
 
             case SIM:
                 // Running a physics simulator, log to NT
-                SimulationTab.enableSimulationControls();
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
 
@@ -60,17 +58,12 @@ public class Robot extends LoggedRobot {
                 String logPath = LogFileUtil.findReplayLog();
                 Logger.setReplaySource(new WPILOGReader(logPath));
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
-                if (!RuntimeConstants.HootFileName.equals("")) {
-                    HootReplay.loadFile(RuntimeConstants.HootFileName);
-                    HootReplay.play();
-                    System.out.println("Playing replay file " + RuntimeConstants.HootFileName);
-                }
                 break;
         }
         Logger.start();
 
-        RobotContainer.getInstance();
         if (RuntimeConstants.TuningMode) {
+            SignalLogger.start();
             TuningModeTab.enableTuningMode();
         }
     }

@@ -186,4 +186,3 @@ compile_commands.json
 # Version file
 src/main/java/frc/robot/BuildConstants.java
 .vscode/settings.json
-src/main/java/frc/constants/RuntimeConstants.java
