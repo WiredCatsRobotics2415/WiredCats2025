@@ -27,6 +27,7 @@ public class AutoIntake extends Command {
 
     @Override
     public void initialize() {
+        vision.switchEndEffectorMode(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
         if (RobotState.isAutonomous()) {
             PPHolonomicDriveController.overrideXYFeedback(() -> {
@@ -110,6 +111,7 @@ public class AutoIntake extends Command {
     public boolean isFinished() {
         PPHolonomicDriveController.clearXYFeedbackOverride();
         PPHolonomicDriveController.clearRotationFeedbackOverride();
+        vision.switchEndEffectorMode(Vision.EndEffectorPipeline.DriverView);
         return endEffector.hasCoral();
     }
 }
