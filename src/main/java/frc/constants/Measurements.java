@@ -10,6 +10,7 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
@@ -42,7 +43,7 @@ public class Measurements {
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
             (DriveTrainTrackWidth.in(Meters) / 2) * (DriveAutoConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
-            TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with spring test: cof = fs/(m*g)
+            TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with slip current characerization
             DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);
 
         public static final RobotConfig PPRobotConfig = new RobotConfig(RobotWeight, RobotMOI, SwerveModuleConfig,
@@ -67,16 +68,23 @@ public class Measurements {
         }
 
         public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
-            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(-20)));
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 17.5), Degrees.of(-20)));
         public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(11.784437),
-            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(-3.7), Degrees.of(20)));
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 17.5), Degrees.of(20)));
         public static final Transform3d BackCamera = new Transform3d(Inches.of(-2.644), Inches.of(11.784437),
             Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(-200)));
+        public static final Transform3d[] PECameraTransforms = new Transform3d[] { FrontLeftCamera, FrontRightCamera,
+            BackCamera };
 
-        public static final Translation2d EECamOnGround = new Translation2d(Inches.of(11.972173), Inches.of(0));
+        public static final Transform2d EECamOnGround = new Transform2d(Inches.of(-11.972173), Inches.of(0),
+            Rotation2d.fromDegrees(180));
+        public static final Distance EECamHeightOffGround = Inches.of(13.82);
+        public static final Angle EECamForward = Degrees.of(1.284);
     }
 
     public class CoralMeasurements {
+        public static final Distance HeightFromCenterOffGround = Inches.of(4.5);
+
         public static final Translation2d LeftBlueHPSDropPosition = new Translation2d(0, 0);
         public static final Translation2d RightBlueHPSDropPosition = new Translation2d(0, 0);
         public static final Distance HPSDropStdDev = Meters.of(0);
@@ -169,9 +177,7 @@ public class Measurements {
     public static class LimelightSpecs {
         public static final Angle ThreeGHorizontalFOV = Degrees.of(82);
         public static final Angle ThreeGVerticalFOV = Degrees.of(56.2);
-        public static final double ThreeGDiagnolFOV = 2 *
-            Math.atan(Math.sqrt(Math.pow(Math.tan(ThreeGHorizontalFOV.in(Radians) / 2), 2) +
-                Math.pow(Math.tan(ThreeGVerticalFOV.in(Radians) / 2), 2)));
+        public static final double ThreeGDiagnolFOV = 91.144;
 
         public static final Angle TwoPlusHorizontalFOV = Degrees.of(62.5);
         public static final Angle TwoPlusVerticalFOV = Degrees.of(48.9);

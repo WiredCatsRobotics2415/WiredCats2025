@@ -9,8 +9,9 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
 import frc.commands.Dealgae.DealgaeAutomationMode;
 import frc.commands.MinorDriveAdjuster;
@@ -94,7 +95,6 @@ public class RobotContainer {
     }
 
     public void neutralizeSubsystems() {
-        drive.setDefaultCommand(Commands.idle(drive));
         elevator.setGoal(Inches.of(0));
         arm.setGoal(Degrees.of(0));
     }
@@ -107,7 +107,7 @@ public class RobotContainer {
             return drive.driveOpenLoopRequest.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
                 .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
                 .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
-        }));
+        }).withName("Teleop Default"));
 
         oi.binds.get(OI.Bind.MinorDriveForward).whileTrue(new MinorDriveAdjuster(Direction.Forward));
         oi.binds.get(OI.Bind.MinorDriveBackward).whileTrue(new MinorDriveAdjuster(Direction.Backward));
@@ -154,11 +154,20 @@ public class RobotContainer {
             }
         }));
 
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new AutoIntake());
+
         // oi.binds.get(OI.Bind.StowPreset).onTrue();
     }
 
     private void configureTriggers() {
         // Triggers that interact across multiple subsystems/utils should be defined here
+        new Trigger(() -> {
+            return arm.getMeasurement().in(Degrees) > 0.0d;
+        }).onTrue(new InstantCommand(() -> {
+            vision.setEndEffectorStreamOrientation(true);
+        })).onFalse(new InstantCommand(() -> {
+            vision.setEndEffectorStreamOrientation(false);
+        }));
     }
 
     public Command getAutonomousCommand() { return autoChooser.getSelected(); }

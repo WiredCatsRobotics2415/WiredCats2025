@@ -7,8 +7,6 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
@@ -42,12 +40,12 @@ public class Arm extends SubsystemBase {
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, new ArmIO() {});
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", new InstantCommand(() -> {
+            TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", runOnce(() -> {
                 if (isCoasting)
                     brake();
                 else
                     coast();
-            }, this));
+            }));
         }
     }
 
@@ -67,28 +65,28 @@ public class Arm extends SubsystemBase {
      * @return A command to increase the arm's current goal by one degree. Does not go above max rotations defined in constants.
      */
     public Command increaseGoal() {
-        return new RepeatCommand(new InstantCommand(() -> {
+        return runOnce(() -> {
             if (goal.gt(ArmConstants.MaxDegreesFront)) {
                 goal = ArmConstants.MaxDegreesFront;
                 return;
             }
             goal = goal.plus(Degrees.of(0.5));
             this.setGoal(goal);
-        }));
+        });
     }
 
     /**
      * @return A command to decrease the arm's current goal by one degree. Does not go below min rotations defined in constants.
      */
     public Command decreaseGoal() {
-        return new RepeatCommand(new InstantCommand(() -> {
+        return runOnce(() -> {
             if (goal.lt(ArmConstants.MaxDegreesBack)) {
                 goal = ArmConstants.MaxDegreesBack;
                 return;
             }
             goal = goal.minus(Degrees.of(0.5));
             this.setGoal(goal);
-        }));
+        });
     }
 
     public void coast() {

@@ -3,9 +3,13 @@ package frc.subsystems.drive;
 import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.SignalLogger;
+import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
+import com.ctre.phoenix6.controls.TorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain.SwerveControlParameters;
 import com.ctre.phoenix6.swerve.SwerveModule;
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveModule.SteerRequestType;
@@ -27,20 +31,42 @@ public class DriveCharacterization extends Characterizer {
     private static DriveCharacterization instance;
     private CommandSwerveDrivetrain driveSubsystem;
 
-    /* Swerve requests to apply during SysId characterization */
-    private static final SwerveRequest.SysIdSwerveTranslation translationCharacterization = new SwerveRequest.SysIdSwerveTranslation();
-    private static final SwerveRequest.SysIdSwerveSteerGains steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
-    private static final SwerveRequest.SysIdSwerveRotation rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+    private final SwerveRequest.SysIdSwerveSteerGains steerCharacterization = new SwerveRequest.SysIdSwerveSteerGains();
+    private final SwerveRequest.SysIdSwerveRotation rotationCharacterization = new SwerveRequest.SysIdSwerveRotation();
+
+    private class TranslationCharWithTorqueCurrent implements SwerveRequest {
+        private Current output;
+        private TorqueCurrentFOC driveRequest = new TorqueCurrentFOC(0.0d);
+        private MotionMagicExpoVoltage steerRequest = new MotionMagicExpoVoltage(0.0d);
+
+        public SwerveRequest withCurrent(Current output) {
+            this.output = output;
+            return this;
+        }
+
+        @Override
+        public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) {
+            for (SwerveModule<?, ?, ?> m : modulesToApply) {
+                m.getDriveMotor().setControl(driveRequest.withOutput(output));
+                m.getSteerMotor().setControl(steerRequest);
+            }
+            return StatusCode.OK;
+        }
+    }
+
+    private final TranslationCharWithTorqueCurrent translationCharacterization = new TranslationCharWithTorqueCurrent();
 
     private DriveCharacterization(CommandSwerveDrivetrain driveSubsystem) {
         this.driveSubsystem = driveSubsystem;
 
+        // see here for workaround explanation: https://www.chiefdelphi.com/t/sysid-with-ctre-swerve-characterization/452631/8
         SysIdRoutine sysIdRoutineTranslation = new SysIdRoutine(
-            new SysIdRoutine.Config(null, Volts.of(4), null,
+            new SysIdRoutine.Config(Volts.of(4).per(Second), Volts.of(10), null,
                 state -> SignalLogger.writeString("SysIdTranslationState", state.toString())),
             new SysIdRoutine.Mechanism(
-                output -> driveSubsystem.setControl(translationCharacterization.withVolts(output)), null,
-                driveSubsystem));
+                output -> driveSubsystem
+                    .setControl(translationCharacterization.withCurrent(Amps.of(output.magnitude()))),
+                null, driveSubsystem));
 
         SysIdRoutine sysIdRoutineSteer = new SysIdRoutine(
             new SysIdRoutine.Config(null, Volts.of(7), null,

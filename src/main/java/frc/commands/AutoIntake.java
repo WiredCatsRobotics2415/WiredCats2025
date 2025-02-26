@@ -1,13 +1,19 @@
 
 package frc.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls;
+import frc.constants.Measurements.CoralMeasurements;
+import frc.constants.Measurements.RobotMeasurements;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
@@ -18,28 +24,29 @@ public class AutoIntake extends Command {
     private EndEffector endEffector = EndEffector.getInstance();
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
 
-    private final SwerveRequest.RobotCentric driveForward = new SwerveRequest.RobotCentric()
-        .withVelocityX(0.5 * Controls.MaxDriveMeterS);
+    private final SwerveRequest.RobotCentric driveBackward = new SwerveRequest.RobotCentric()
+        .withVelocityX(-0.5 * Controls.MaxDriveMeterS); // back of robot = intaking side
+
+    private boolean hasSeenCoral = true;
+    private Timer countSinceLastSeenCoral = new Timer();
 
     public AutoIntake() {
-        addRequirements(drive, endEffector);
+        addRequirements(drive);
     }
 
     @Override
     public void initialize() {
-        vision.switchEndEffectorMode(Vision.EndEffectorPipeline.NeuralNetwork);
+        vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
         if (RobotState.isAutonomous()) {
             PPHolonomicDriveController.overrideXYFeedback(() -> {
                 if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
                     double ty = vision.getObjectDetectedTy();
                     double tx = vision.getObjectDetectedTx();
-                    // Temp values, can move to constants
-                    double cameraHeight = 1.0; // Camera height in meters
-                    double targetHeight = 0.0; // Target height in meters
-                    double cameraAngle = 0.0; // Camera angle in degrees
-                    double distance = (targetHeight - cameraHeight) /
-                        Math.tan(Units.degreesToRadians(cameraAngle + ty));
+
+                    double distance = (CoralMeasurements.HeightFromCenterOffGround
+                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
+                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
                     Rotation2d pose = drive.getState().Pose.getRotation();
 
                     double objectAngle = pose.getRadians() - Units.degreesToRadians(tx);
@@ -52,16 +59,13 @@ public class AutoIntake extends Command {
             }, () -> {
                 if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
                     double ty = vision.getObjectDetectedTy();
-                    double tx = vision.getObjectDetectedTx();
-                    // Temp values
-                    double cameraHeight = 1.0; // Camera height in meters
-                    double targetHeight = 0.0; // Target height in meters
-                    double cameraAngle = 0.0; // Camera angle in degrees
-                    double distance = (targetHeight - cameraHeight) /
-                        Math.tan(Units.degreesToRadians(cameraAngle + ty));
+
+                    double distance = (CoralMeasurements.HeightFromCenterOffGround
+                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
+                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
                     Rotation2d pose = drive.getState().Pose.getRotation();
 
-                    double objectAngle = pose.getRadians() - Units.degreesToRadians(tx);
+                    double objectAngle = pose.getRadians() - Units.degreesToRadians(ty);
                     double minTimeToObject = distance / Controls.MaxDriveMeterS;
                     double yFeedback = distance * Math.sin(objectAngle) / minTimeToObject;
                     return yFeedback;
@@ -73,12 +77,11 @@ public class AutoIntake extends Command {
                 if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
                     double ty = vision.getObjectDetectedTy();
                     double tx = vision.getObjectDetectedTx();
-                    // Temp values
-                    double cameraHeight = 1.0; // Camera height in meters
-                    double targetHeight = 0.0; // Target height in meters
-                    double cameraAngle = 0.0; // Camera angle in degrees
-                    double distance = (targetHeight - cameraHeight) /
-                        Math.tan(Units.degreesToRadians(cameraAngle + ty));
+
+                    double distance = (CoralMeasurements.HeightFromCenterOffGround
+                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
+                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
+
                     double minTimeToObject = distance / Controls.MaxDriveMeterS;
                     return Units.degreesToRadians(tx) / minTimeToObject;
                 } else {
@@ -93,25 +96,40 @@ public class AutoIntake extends Command {
     public void execute() {
         if (RobotState.isAutonomous()) return;
         if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
+            if (!hasSeenCoral) {
+                System.out.println("Seen a coral");
+                countSinceLastSeenCoral.stop();
+                countSinceLastSeenCoral.reset();
+                hasSeenCoral = true;
+            }
             double ty = vision.getObjectDetectedTy();
             double tx = vision.getObjectDetectedTx();
-            // Temp values
-            double cameraHeight = 1.0; // Camera height in meters
-            double targetHeight = 0.0; // Target height in meters
-            double cameraAngle = 0.0; // Camera angle in degrees
-            double distance = (targetHeight - cameraHeight) / Math.tan(Units.degreesToRadians(cameraAngle + ty));
+
+            double distance = (CoralMeasurements.HeightFromCenterOffGround.minus(RobotMeasurements.EECamHeightOffGround)
+                .in(Meters)) / Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
+
             double minTimeToObject = distance / Controls.MaxDriveMeterS;
             // kp used to control rotational rate of robot
             double kp = 1 / minTimeToObject;
-            drive.setControl(driveForward.withRotationalRate(Units.degreesToRadians(tx) * kp));
+            drive.setControl(driveBackward.withRotationalRate(Units.degreesToRadians(tx) * kp));
+        } else {
+            if (hasSeenCoral) {
+                System.out.println("lost sight of coral");
+                countSinceLastSeenCoral.start();
+                hasSeenCoral = false;
+            }
         }
     }
 
     @Override
-    public boolean isFinished() {
+    public void end(boolean interrupted) {
         PPHolonomicDriveController.clearXYFeedbackOverride();
         PPHolonomicDriveController.clearRotationFeedbackOverride();
-        vision.switchEndEffectorMode(Vision.EndEffectorPipeline.DriverView);
-        return endEffector.hasCoral();
+        vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
+        countSinceLastSeenCoral.stop();
+        countSinceLastSeenCoral.reset();
     }
+
+    @Override
+    public boolean isFinished() { return endEffector.hasCoral() || countSinceLastSeenCoral.hasElapsed(0.5); }
 }

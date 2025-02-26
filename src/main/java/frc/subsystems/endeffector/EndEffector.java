@@ -102,7 +102,7 @@ public class EndEffector extends SubsystemBase {
     }
 
     private boolean sensorTrigger() {
-        return inputs.sensorValue > EndEffectorConstants.IRThreshold;
+        return inputs.sensorValue >= EndEffectorConstants.IRThreshold;
     }
 
     private boolean cameraTrigger() {

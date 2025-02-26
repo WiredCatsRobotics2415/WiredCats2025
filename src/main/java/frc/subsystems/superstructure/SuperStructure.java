@@ -42,14 +42,14 @@ public class SuperStructure {
     public Command changeArmGoalBy(Angle changeBy) {
         return new RepeatCommand(new InstantCommand(() -> {
             this.setArmGoalSafely((arm.getGoal().plus(changeBy)));
-        }));
+        }, arm));
     }
 
     /** Change elevator goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
     public Command changeElevatorGoalBy(Distance changeBy) {
         return new RepeatCommand(new InstantCommand(() -> {
             this.setElevatorGoalSafely((elevator.getGoal().plus(changeBy)));
-        }));
+        }, elevator));
     }
 
     /**
@@ -66,7 +66,7 @@ public class SuperStructure {
             } else {
                 elevator.setGoal(elevatorGoal);
             }
-        })).until(this::bothAtGoal);
+        }, elevator, arm)).until(this::bothAtGoal);
     }
 
     public void setArmGoalSafely(Angle armGoal) {

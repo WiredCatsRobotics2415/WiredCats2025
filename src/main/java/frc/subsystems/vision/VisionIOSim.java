@@ -5,7 +5,6 @@ import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import frc.constants.Measurements;
 import frc.constants.Measurements.LimelightSpecs;
@@ -47,7 +46,7 @@ public class VisionIOSim implements VisionIO {
         visionSystemSim.addAprilTags(AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape));
 
         SimCameraProperties limelightCameraProps = new SimCameraProperties();
-        limelightCameraProps.setCalibration(640, 480, Rotation2d.fromDegrees(LimelightSpecs.ThreeGDiagnolFOV));
+        limelightCameraProps.setCalibration(1280, 800, Rotation2d.fromDegrees(LimelightSpecs.ThreeGDiagnolFOV));
         limelightCameraProps.setCalibError(0.25, 0.08);
         limelightCameraProps.setFPS(20);
         limelightCameraProps.setAvgLatencyMs(60);
@@ -56,9 +55,9 @@ public class VisionIOSim implements VisionIO {
         frontLeftSimCam = new PhotonCameraSim(new PhotonCamera("Front Left LL"), limelightCameraProps);
         frontLeftCam = frontLeftSimCam.getCamera();
         frontRightSimCam = new PhotonCameraSim(new PhotonCamera("Front Right LL"), limelightCameraProps);
-        frontRightCam = frontLeftSimCam.getCamera();
+        frontRightCam = frontRightSimCam.getCamera();
         backSimCam = new PhotonCameraSim(new PhotonCamera("Back LL"), limelightCameraProps);
-        backCam = frontLeftSimCam.getCamera();
+        backCam = backSimCam.getCamera();
 
         visionSystemSim.addCamera(frontLeftSimCam, RobotMeasurements.FrontLeftCamera);
         visionSystemSim.addCamera(frontRightSimCam, RobotMeasurements.FrontRightCamera);
@@ -76,13 +75,6 @@ public class VisionIOSim implements VisionIO {
         }
 
         poseEstimationCameras = new PhotonCamera[] { frontLeftCam, frontRightCam, backCam };
-
-        // frontLeftSimCam.enableRawStream(true);
-        // frontLeftSimCam.enableProcessedStream(true);
-
-        // // Enable drawing a wireframe visualization of the field to the camera streams.
-        // // This is extremely resource-intensive and is disabled by default.
-        // frontLeftSimCam.enableDrawWireframe(true);
     }
 
     // TODO: Maybe don't need to make this realisitic
@@ -140,15 +132,16 @@ public class VisionIOSim implements VisionIO {
 
         Pose2d currentEndEffectorPosition = CommandSwerveDrivetrain.getInstance()
             .getMapleSimSwerveDrivetrain().mapleSimDrive.getSimulatedDriveTrainPose()
-                .plus(new Transform2d(RobotMeasurements.EECamOnGround, Rotation2d.kZero));
-        Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(currentEndEffectorPosition.getTranslation(),
-            LimelightSpecs.TwoPlusMaxObjectDetectionDistance, LimelightSpecs.TwoPlusHorizontalFOV,
-            currentEndEffectorPosition.getRotation().getMeasure());
-        Logger.recordOutput("Visualization/VisionIOSim/EETriangle",
-            new Translation2d[] { fovTriangle.getA(), fovTriangle.getB(), fovTriangle.getC(), fovTriangle.getA() });
+                .plus(RobotMeasurements.EECamOnGround);
         if (currentPipeline == EndEffectorPipeline.DriverView) {
+            Logger.recordOutput("Visualization/VisionIOSim/EETriangle", new Translation2d[] {});
             inputs.endEffectorCameraAveragePixelValue = 255;
         } else {
+            Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(
+                currentEndEffectorPosition.getTranslation(), LimelightSpecs.TwoPlusMaxObjectDetectionDistance,
+                LimelightSpecs.TwoPlusHorizontalFOV, currentEndEffectorPosition.getRotation().getMeasure());
+            Logger.recordOutput("Visualization/VisionIOSim/EETriangle",
+                new Translation2d[] { fovTriangle.getA(), fovTriangle.getB(), fovTriangle.getC(), fovTriangle.getA() });
             List<Pose3d> allCoralsOnField = SimulatedArena.getInstance().getGamePiecesByType("Coral");
 
             boolean seesACoral = false;

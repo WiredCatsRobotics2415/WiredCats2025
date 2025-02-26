@@ -22,7 +22,7 @@ public class OI {
         ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
         AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
         SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, MinorDriveForward, MinorDriveBackward,
-        MinorDriveLeft, MinorDriveRight
+        MinorDriveLeft, MinorDriveRight, AutoIntakeFromGround
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -53,6 +53,7 @@ public class OI {
         binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
         binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
         binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
+        binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.Y));
 
         binds.put(Bind.MinorDriveForward, controller.povUp());
         binds.put(Bind.MinorDriveBackward, controller.povDown());

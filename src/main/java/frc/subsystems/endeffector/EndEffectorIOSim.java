@@ -6,10 +6,8 @@ import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.DIOSim;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import org.ironmaple.simulation.IntakeSimulation;
@@ -18,7 +16,6 @@ import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 public class EndEffectorIOSim implements EndEffectorIO {
     private DCMotorSim motor = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getNeo550(1), 1, 1),
         DCMotor.getNeo550(1));
-    private DIOSim sensorInput = new DIOSim(new DigitalInput(EndEffectorConstants.IRSensorPort));
 
     private final IntakeSimulation intakeSimulation;
 
@@ -30,7 +27,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
 
     @Override
     public void updateInputs(EndEffectorIOInputs inputs) {
-        inputs.sensorValue = sensorInput.getValue() ? EndEffectorConstants.IRThreshold : 0;
+        inputs.sensorValue = intakeSimulation.getGamePiecesAmount() != 0 ? EndEffectorConstants.IRThreshold : 0;
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = Amps.of(motor.getCurrentDrawAmps());
