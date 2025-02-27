@@ -2,10 +2,8 @@ package frc.robot;
 
 import com.ctre.phoenix6.HootReplay;
 import com.ctre.phoenix6.SignalLogger;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
-import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.simulation.SimulationTab;

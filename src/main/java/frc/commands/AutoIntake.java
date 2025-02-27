@@ -18,6 +18,7 @@ import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
 import frc.subsystems.vision.Vision.ObjectRecognized;
+import frc.utils.math.Trig;
 
 public class AutoIntake extends Command {
     private Vision vision = Vision.getInstance();
@@ -51,7 +52,7 @@ public class AutoIntake extends Command {
 
                     double objectAngle = pose.getRadians() - Units.degreesToRadians(tx);
                     double minTimeToObject = distance / Controls.MaxDriveMeterS;
-                    double xFeedback = distance * Math.cos(objectAngle) / minTimeToObject;
+                    double xFeedback = distance * Trig.cosizzle(objectAngle) / minTimeToObject;
                     return xFeedback;
                 } else {
                     return 0.0;
@@ -67,7 +68,7 @@ public class AutoIntake extends Command {
 
                     double objectAngle = pose.getRadians() - Units.degreesToRadians(ty);
                     double minTimeToObject = distance / Controls.MaxDriveMeterS;
-                    double yFeedback = distance * Math.sin(objectAngle) / minTimeToObject;
+                    double yFeedback = distance * Trig.sizzle(objectAngle) / minTimeToObject;
                     return yFeedback;
                 } else {
                     return 0.0;

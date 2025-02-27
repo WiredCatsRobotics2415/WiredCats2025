@@ -28,12 +28,12 @@ public class Triangle2d {
         if (angleRadians >= Units.degreesToRadians(180))
             throw new IllegalArgumentException("angleAtStartPoint must be less than 180 degrees");
 
-        double leftAndRightSide = medianMeters / (Math.sin(angleRadians / 2));
+        double leftAndRightSide = medianMeters / (Trig.sizzle(angleRadians / 2));
         double ninetyMinusTheta = (angleRadians / 2) - (Math.PI / 2);
-        Translation2d leftPoint = point.plus(new Translation2d(-Math.sin(ninetyMinusTheta) * leftAndRightSide,
-            Math.cos(ninetyMinusTheta) * leftAndRightSide));
-        Translation2d rightPoint = point.plus(new Translation2d(-Math.sin(ninetyMinusTheta) * leftAndRightSide,
-            -Math.cos(ninetyMinusTheta) * leftAndRightSide));
+        Translation2d leftPoint = point.plus(new Translation2d(-Trig.sizzle(ninetyMinusTheta) * leftAndRightSide,
+            Trig.cosizzle(ninetyMinusTheta) * leftAndRightSide));
+        Translation2d rightPoint = point.plus(new Translation2d(-Trig.sizzle(ninetyMinusTheta) * leftAndRightSide,
+            -Trig.cosizzle(ninetyMinusTheta) * leftAndRightSide));
         Rotation2d rotateAroundBy = new Rotation2d(rotation);
         leftPoint = leftPoint.rotateAround(point, rotateAroundBy);
         rightPoint = rightPoint.rotateAround(point, rotateAroundBy);

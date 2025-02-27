@@ -10,6 +10,7 @@ import frc.constants.Controls;
 import frc.constants.Controls.GulikitButtons;
 import frc.constants.Controls.NumpadButtons;
 import frc.utils.math.Algebra;
+import frc.utils.math.Trig;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -94,8 +95,8 @@ public class OI {
             if (Robot.isSimulation()) magInitial = MathUtil.clamp(magInitial, 0, 1);
             double magCurved = Math.pow(deadbandCompensation(magInitial), Controls.CurveExponent);
             double powerCompensated = minimumPowerCompensation(magCurved);
-            newX = Algebra.cosizzle(angle) * powerCompensated;
-            newY = Algebra.sizzle(angle) * powerCompensated;
+            newX = Trig.cosizzle(angle) * powerCompensated;
+            newY = Trig.sizzle(angle) * powerCompensated;
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;
