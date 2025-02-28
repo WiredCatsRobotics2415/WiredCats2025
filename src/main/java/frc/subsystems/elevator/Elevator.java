@@ -15,10 +15,12 @@ import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 
 public class Elevator extends SubsystemBase {
     private boolean coasting;
-    @Getter private Distance goal = Inches.of(0.0);
+    @Getter
+    @AutoLogOutput(key = "Elevator/Goal") private Distance goal = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,

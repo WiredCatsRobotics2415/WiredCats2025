@@ -77,23 +77,23 @@ public class Subsystems {
         public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
         public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
         public static final Distance MinHeight = Inches.of(0.0d);
-        public static final Distance MaxHeight = Inches.of(69.0d);
+        public static final Distance MaxHeight = Inches.of(79.0d);
 
-        public static final double kS = 0;
-        public static final double kG = 0;
-        public static final double kV = 0;
-        public static final double kA = 1e-4;
-        public static final double kP = 0;
-        public static final double kD = 0;
+        public static final double kS = 0.1;
+        public static final double kG = 0.21;
+        public static final double kV = 3.93;
+        public static final double kA = 0.03;
+        public static final double kP = 0.2;
+        public static final double kD = 0.02;
 
         public static final TuneableNumber VelocityMax = new TuneableNumber(50.0d, "Elevator/VelocityMax"); // (2/18) copied from akit2024
         public static final TuneableNumber AccelerationMax = new TuneableNumber(50.0d, "Elevator/AccelMax"); // (2/18) copied from akit2024
         public static final TuneableNumber GoalTolerance = new TuneableNumber(0.5, "Elevator/GoalTolerance");
 
-        public static final float RotorToArmGearRatio = 5 / 1; // Planetaries amount unknown as of 2/7
-        public static final Distance BaseHeight = Inches.of(38);
-        public static final Distance Stage2Height = Inches.of(35);
-        public static final Distance Stage3Height = Inches.of(34);
+        public static final float RotorToArmGearRatio = 5 / 1;
+        public static final Distance BaseHeight = Inches.of(36);
+        public static final Distance Stage2Height = Inches.of(34);
+        public static final Distance Stage3Height = Inches.of(33);
     }
 
     public class ArmConstants {
@@ -101,28 +101,28 @@ public class Subsystems {
         public static final int ThroughborePort = 19;
 
         // 0 degrees: the arm beam is parallel to the elevator
-        // positive: front of the robot: coral scoring side
+        // positive: front of the robot: coral scoring side (side with both LLs)
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 0;
-        public static final Angle MaxDegreesBack = Degrees.of(-135); // 107 is safe
-        public static final Angle MaxDegreesFront = Degrees.of(135);
+        public static final Angle MaxDegreesBack = Degrees.of(-170);
+        public static final Angle MaxDegreesFront = Degrees.of(170);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
-        public static final double kS = 0;
-        public static final double kV = 0;
-        public static final double kA = 0;
-        public static final double kG = 0;
-        public static final double kP = 0;
-        public static final double kD = 0;
+        public static final double kS = 0.05;
+        public static final double kG = 1.08;
+        public static final double kV = 0.29;
+        public static final double kA = 0.07;
+        public static final double kP = 0.2;
+        public static final double kD = 0.02;
 
         public static final double VelocityMax = 50.0d; // (2/18) copied from akit2024
         public static final double AccelerationMax = 50.0d; // (2/18) copied from akit2024
-        public static final double GoalTolerance = 0.5;
+        public static final Angle GoalTolerance = Degrees.of(0.5);
 
-        public static final double ApproximateMassKg = 1.5; // Approximated from CAD at 2/7
+        public static final double ApproximateMassKg = 3; // Approximated from CAD at 2/7
         public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
         public static final Distance EffectiveLength = Inches.of(28);
     }

@@ -1,6 +1,7 @@
 package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -17,10 +18,12 @@ import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
-    @Getter private Angle goal = Degrees.of(0.0);
+    @Getter
+    @AutoLogOutput(key = "Arm/Goal") private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
 
@@ -36,7 +39,7 @@ public class Arm extends SubsystemBase {
     private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0, "ArmVelocityMultiplier");
 
     private Arm() {
-        pid.setTolerance(ArmConstants.GoalTolerance);
+        pid.setTolerance(ArmConstants.GoalTolerance.in(Degrees));
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, new ArmIO() {});
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
@@ -58,7 +61,7 @@ public class Arm extends SubsystemBase {
     public void setGoal(Angle goal) {
         if (goal.gt(ArmConstants.MaxDegreesFront) || goal.lt(ArmConstants.MaxDegreesBack)) return;
         this.goal = goal;
-        pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
+        pid.setGoal(new TrapezoidProfile.State(goal.in(Radians), 0.0d));
     }
 
     /**
@@ -110,7 +113,7 @@ public class Arm extends SubsystemBase {
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position, setpoint.velocity);
+        double feedforward = ff.calculate(setpoint.position + (Math.PI / 2), setpoint.velocity);
         double voltOut = output + feedforward + elevatorVelocityMultiplier.get() * elevatorDDV.getFirstDerivative();
         if (!isCoasting) {
             io.setVoltage(voltOut);

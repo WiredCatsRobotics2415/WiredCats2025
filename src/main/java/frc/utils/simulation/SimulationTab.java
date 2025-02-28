@@ -54,7 +54,7 @@ public class SimulationTab {
                 Rotation2d.fromDegrees(-126));
             SimulatedArena.getInstance()
                 .addGamePiece(new ReefscapeCoralOnField(new Pose2d(dropInField, Rotation2d.kZero)));
-        }).withName("Left HPS"));
+        }).withName("Left HPS").ignoringDisable(true));
 
         thisTab.add("Drop Coral at Right HPS", new InstantCommand(() -> {
             Translation2d drop = getRandomPositionInSemicircle(
@@ -63,7 +63,7 @@ public class SimulationTab {
                 Rotation2d.fromDegrees(-36));
             SimulatedArena.getInstance()
                 .addGamePiece(new ReefscapeCoralOnField(new Pose2d(dropInField, Rotation2d.kZero)));
-        }).withName("Right HPS"));
+        }).withName("Right HPS").ignoringDisable(true));
     }
 
     public static void enableSimulationControls() {
