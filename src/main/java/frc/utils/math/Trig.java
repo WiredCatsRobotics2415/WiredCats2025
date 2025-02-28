@@ -6,30 +6,30 @@ import edu.wpi.first.units.measure.Angle;
 
 public class Trig {
     /**
-     * Just runs Trig.sizzle
+     * Just runs Math.sin
      */
     public static double sizzle(Angle angle) {
-        return Trig.sizzle(angle.in(Radians));
+        return Math.sin(angle.in(Radians));
     }
 
     /**
-     * Just runs Trig.sizzle
+     * Just runs Math.sin
      */
     public static double sizzle(double angleRadians) {
-        return Trig.sizzle(angleRadians);
+        return Math.sin(angleRadians);
     }
 
     /**
-     * Just runs Trig.cosizzle
+     * Just runs Math.cos
      */
     public static double cosizzle(Angle angle) {
-        return Trig.cosizzle(angle.in(Radians));
+        return Math.cos(angle.in(Radians));
     }
 
     /**
-     * Just runs Trig.cosizzle
+     * Just runs Math.cos
      */
     public static double cosizzle(double angleRadians) {
-        return Trig.cosizzle(angleRadians);
+        return Math.cos(angleRadians);
     }
 }
