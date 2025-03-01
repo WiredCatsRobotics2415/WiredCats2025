@@ -18,7 +18,7 @@ public class ElevatorIOSim implements ElevatorIO {
         ElevatorConstants.MinHeight.in(Meters));
 
     public ElevatorIOSim() {
-        simElevator.setState(0, 0);
+
     }
 
     @Override

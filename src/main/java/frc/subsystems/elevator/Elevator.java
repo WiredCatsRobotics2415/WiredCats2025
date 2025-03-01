@@ -16,6 +16,7 @@ import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
     private boolean coasting;
@@ -88,9 +89,14 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
+        Logger.processInputs("Elevator", inputs);
 
         double measurementInches = getMeasurement().in(Inches);
         differentiableMeasurementInches.update(measurementInches);
         useOutput(pid.calculate(measurementInches), pid.getSetpoint());
+
+        Logger.recordOutput("Elevator/Error", pid.getPositionError());
+        Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());
+        Logger.recordOutput("Elevator/ActualAcceleration", differentiableMeasurementInches.getSecondDerivative());
     }
 }

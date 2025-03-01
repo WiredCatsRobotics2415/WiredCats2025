@@ -59,8 +59,8 @@ public class SuperStructure {
         return new RepeatCommand(new InstantCommand(() -> {
             arm.setGoal(armGoal);
             double elevatorHeightNextTimestep = elevator.getDifferentiableMeasurementInches()
-                .secondDerivativeLinearApprox(0.02);
-            double armAngleNextTimestep = arm.getDifferentiableMeasurementDegrees().secondDerivativeLinearApprox(0.02);
+                .firstDerivativeLinearApprox(0.02);
+            double armAngleNextTimestep = arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(0.02);
             if (positionsWillCollide(Inches.of(elevatorHeightNextTimestep), Degrees.of(armAngleNextTimestep))) {
                 elevator.setGoal(elevator.getMeasurement());
             } else {

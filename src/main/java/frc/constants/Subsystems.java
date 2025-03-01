@@ -75,13 +75,13 @@ public class Subsystems {
         public static final int RightMotorPort = 10; // (2/14): this is Elevator2
 
         public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
-        public static final Voltage PotentiometerMaxVolt = Volts.of(0.0d);
+        public static final Voltage PotentiometerMaxVolt = Volts.of(3.3d);
         public static final Distance MinHeight = Inches.of(0.0d);
         public static final Distance MaxHeight = Inches.of(79.0d);
 
         public static final double kS = 0.1;
         public static final double kG = 0.21;
-        public static final double kV = 3.93;
+        public static final double kV = 2.5;
         public static final double kA = 0.03;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
@@ -104,9 +104,9 @@ public class Subsystems {
         // positive: front of the robot: coral scoring side (side with both LLs)
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
-        public static final double ThroughboreMax = 0;
-        public static final Angle MaxDegreesBack = Degrees.of(-170);
-        public static final Angle MaxDegreesFront = Degrees.of(170);
+        public static final double ThroughboreMax = 1;
+        public static final Angle MaxDegreesBack = Degrees.of(-155);
+        public static final Angle MaxDegreesFront = Degrees.of(155);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);

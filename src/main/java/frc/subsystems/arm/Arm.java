@@ -15,11 +15,11 @@ import frc.subsystems.elevator.Elevator;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
-import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Arm extends SubsystemBase {
     @Getter
@@ -36,7 +36,7 @@ public class Arm extends SubsystemBase {
     private static Arm instance;
 
     private DoubleDifferentiableValue elevatorDDV = Elevator.getInstance().getDifferentiableMeasurementInches();
-    private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0, "ArmVelocityMultiplier");
+    private LoggedNetworkNumber elevatorVelocityMultiplier = new LoggedNetworkNumber("ArmVelocityMultiplier", 0);
 
     private Arm() {
         pid.setTolerance(ArmConstants.GoalTolerance.in(Degrees));
@@ -57,7 +57,7 @@ public class Arm extends SubsystemBase {
         return instance;
     }
 
-    /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
+    /** Sets the goal height. If goal is out of the physical range, it is not set. */
     public void setGoal(Angle goal) {
         if (goal.gt(ArmConstants.MaxDegreesFront) || goal.lt(ArmConstants.MaxDegreesBack)) return;
         this.goal = goal;
@@ -129,6 +129,8 @@ public class Arm extends SubsystemBase {
         differentiableMeasurementDegrees.update(measurementDegrees);
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
 
-        if (RuntimeConstants.TuningMode) Logger.recordOutput("Arm/Error", pid.getPositionError());
+        Logger.recordOutput("Arm/Error", pid.getPositionError());
+        Logger.recordOutput("Arm/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
+        Logger.recordOutput("Arm/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());
     }
 }

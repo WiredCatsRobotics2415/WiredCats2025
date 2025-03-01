@@ -27,6 +27,8 @@ public class Controls {
         public static final int Minus = XboxController.Button.kBack.value;
         public static final int LeftBumper = XboxController.Button.kLeftBumper.value;
         public static final int RightBumper = XboxController.Button.kRightBumper.value;
+        public static final int LeftPaddle = 9;
+        public static final int RightPaddle = 10;
 
         public static final int LeftJoystickX = XboxController.Axis.kLeftX.value;
         public static final int LeftJoystickY = XboxController.Axis.kLeftY.value;

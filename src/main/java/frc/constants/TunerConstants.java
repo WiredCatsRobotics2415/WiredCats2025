@@ -18,7 +18,7 @@ public class TunerConstants {
 
     // Actual drive gains to be used with torquecurrentfoc
     public static final Slot0Configs driveGains = new Slot0Configs().withKP(0.18).withKI(0).withKD(0).withKS(0.21)
-        .withKV(0.12).withKA(0).withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+        .withKV(0.12).withKA(0.01).withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
 
     // Fake drive gains to be used with simulation and voltage closed loop output type
     public static final Slot0Configs simulatedDriveGains = new Slot0Configs().withKP(0.18).withKI(0).withKD(0)

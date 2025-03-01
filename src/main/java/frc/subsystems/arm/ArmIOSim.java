@@ -18,10 +18,10 @@ public class ArmIOSim implements ArmIO {
 
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
         ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.MaxDegreesBack.in(Radians), ArmConstants.MaxDegreesFront.in(Radians), true, 0);
+        ArmConstants.MaxDegreesBack.in(Radians), ArmConstants.MaxDegreesFront.in(Radians), true, Math.PI / 2);
 
     public ArmIOSim() {
-        simArm.setState(0, 0);
+        System.out.println("Arm MOI: " + moi);
     }
 
     @Override
