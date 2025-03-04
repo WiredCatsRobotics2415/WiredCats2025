@@ -15,6 +15,7 @@ import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
+import org.littletonrobotics.urcl.URCL;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to each mode, as described in the TimedRobot documentation. If you change the name of this class or the package after creating this project, you must also update the build.gradle file in the project.
@@ -67,9 +68,15 @@ public class Robot extends LoggedRobot {
                 }
                 break;
         }
+        if (RuntimeConstants.TuningMode) {
+            Logger.registerURCL(URCL.startExternal());
+        }
         Logger.start();
 
+        // DO NOT REMOVE THIS LINE
+        // constructs the robot container, which constructs all subsystems
         RobotContainer.getInstance();
+
         if (RuntimeConstants.TuningMode) {
             TuningModeTab.enableTuningMode();
         }

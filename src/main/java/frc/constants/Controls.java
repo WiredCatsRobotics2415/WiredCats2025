@@ -57,17 +57,26 @@ public class Controls {
     }
 
     public class Presets {
-        public static final Angle Level1Angle = Degrees.of(120);
-        public static final Distance Level1Height = Inches.of(12);
-        public static final Angle Level2Angle = Degrees.of(120);
-        public static final Distance Level2Height = Inches.of(24);
-        public static final Angle Level3Angle = Degrees.of(120);
-        public static final Distance Level3Height = Inches.of(36);
-        public static final Angle Level4Angle = Degrees.of(135);
-        public static final Distance Level4Height = Inches.of(72);
+        // Positive: coral scoring side
+        public static final Angle Level1Angle = Degrees.of(109);
+        public static final Distance Level1Height = Inches.of(26);
+        public static final Distance Level1DriveOffset = Inches.of(4.05);
+
+        public static final Angle Level2Angle = Degrees.of(109);
+        public static final Distance Level2Height = Inches.of(50);
+        public static final Distance Level2DriveOffset = Inches.of(4.05);
+
+        public static final Angle Level3Angle = Degrees.of(109);
+        public static final Distance Level3Height = Inches.of(50);
+        public static final Distance Level3DriveOffset = Inches.of(5.35);
+
+        public static final Angle Level4Angle = Degrees.of(115);
+        public static final Distance Level4Height = Inches.of(77);
+        public static final Distance Level4DriveOffset = Inches.of(6.65);
 
         public static final Angle BottomAlgaeDescoreAngle = Degrees.of(75);
         public static final Distance BottomAlgaeDescoreHeight = Inches.of(16);
+
         public static final Angle TopAlgaeDescoreAngle = Degrees.of(75);
         public static final Distance TopAlgaeDescoreHeight = Inches.of(32);
 

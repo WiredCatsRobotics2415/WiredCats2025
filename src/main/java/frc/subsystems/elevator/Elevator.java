@@ -23,6 +23,7 @@ public class Elevator extends SubsystemBase {
     @Getter
     @AutoLogOutput(key = "Elevator/Goal") private Distance goal = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
+    private boolean hasResetPidController = false;
 
     private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA);
@@ -81,7 +82,7 @@ public class Elevator extends SubsystemBase {
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position);
+        double feedforward = ff.calculate(setpoint.velocity);
         double voltOut = output + feedforward;
         io.setVoltage(voltOut);
     }
@@ -93,6 +94,11 @@ public class Elevator extends SubsystemBase {
 
         double measurementInches = getMeasurement().in(Inches);
         differentiableMeasurementInches.update(measurementInches);
+
+        if (!hasResetPidController) {
+            pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));
+            hasResetPidController = true;
+        }
         useOutput(pid.calculate(measurementInches), pid.getSetpoint());
 
         Logger.recordOutput("Elevator/Error", pid.getPositionError());

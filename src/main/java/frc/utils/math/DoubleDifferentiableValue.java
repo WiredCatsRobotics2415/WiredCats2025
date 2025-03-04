@@ -16,9 +16,8 @@ public class DoubleDifferentiableValue {
     public DoubleDifferentiableValue() {}
 
     /**
-     * Updates the value and its derivatives using Timer.getFPGATimestamp.
-     * Note that accuracy depends on the magnitude of the actual change in the quantity,
-     * and that the higher order we differentiate, the less accurate we will be.
+     * Updates the value and its derivatives using Timer.getFPGATimestamp. Note that accuracy depends on the magnitude of the actual change in the quantity, and that the higher order we differentiate, the less accurate we will be.
+     *
      * @param update
      */
     public void update(double update) {
@@ -53,9 +52,7 @@ public class DoubleDifferentiableValue {
     }
 
     /**
-     * Does linear approximation taking the 2nd derivative into account
-     * Note: Treat this with caution - the 2nd derivatives are unpredictable according to experience, so test before
-     * using this method for anything important.
+     * Does linear approximation taking the 2nd derivative into account Note: Treat this with caution - the 2nd derivatives are unpredictable according to experience, so test before using this method for anything important.
      *
      * @param time the delta t that you want an approximation at
      * @return the approximation

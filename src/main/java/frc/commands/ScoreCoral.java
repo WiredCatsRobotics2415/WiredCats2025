@@ -51,6 +51,7 @@ public class ScoreCoral extends Command {
 
     private double goalHeightInches;
     private double goalArmDegrees;
+    private Distance goalDriveOffset;
     private Side side;
 
     private Command driveCommand;
@@ -66,9 +67,6 @@ public class ScoreCoral extends Command {
     }
 
     public ScoreCoral(Side reefSide, Level reefLevel) {
-        // TODO: Note that if the robot is not driveable while the preset is going even though
-        // You are in the PresetOnly mode, consider moving this addRequirements line to
-        // initialize so it doesn't require drive too early
         addRequirements(Elevator.getInstance(), Arm.getInstance());
         side = reefSide;
 
@@ -76,39 +74,42 @@ public class ScoreCoral extends Command {
             case L1:
                 goalHeightInches = Presets.Level1Height.in(Inches);
                 goalArmDegrees = Presets.Level1Angle.in(Degrees);
+                goalDriveOffset = Presets.Level1DriveOffset;
                 break;
             case L2:
                 goalHeightInches = Presets.Level2Height.in(Inches);
                 goalArmDegrees = Presets.Level2Angle.in(Degrees);
+                goalDriveOffset = Presets.Level2DriveOffset;
                 break;
             case L3:
                 goalHeightInches = Presets.Level3Height.in(Inches);
                 goalArmDegrees = Presets.Level3Angle.in(Degrees);
+                goalDriveOffset = Presets.Level3DriveOffset;
                 break;
             case L4:
                 goalHeightInches = Presets.Level4Height.in(Inches);
                 goalArmDegrees = Presets.Level4Angle.in(Degrees);
+                goalDriveOffset = Presets.Level4DriveOffset;
                 break;
             default:
                 goalHeightInches = Presets.Level1Height.in(Inches);
                 goalArmDegrees = Presets.Level1Angle.in(Degrees);
+                goalDriveOffset = Presets.Level1DriveOffset;
                 break;
         }
     }
 
     @Override
     public void initialize() {
-        System.out.println("test initialize 2");
         superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
             Degrees.of(goalArmDegrees));
-        System.out.println("scheduled super structure command");
         superStructureCommand.schedule();
 
         if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
-            Transform2d leftOffset = new Transform2d(CenterToBumper, Inches.of(LeftRightOffset.get()),
-                new Rotation2d());
-            Transform2d rightOffset = new Transform2d(CenterToBumper, Inches.of(-LeftRightOffset.get()),
-                new Rotation2d());
+            Transform2d leftOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset),
+                Inches.of(LeftRightOffset.get()), new Rotation2d());
+            Transform2d rightOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset),
+                Inches.of(-LeftRightOffset.get()), new Rotation2d());
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
             driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);

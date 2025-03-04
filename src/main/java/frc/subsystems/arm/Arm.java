@@ -1,11 +1,11 @@
 package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -15,6 +15,7 @@ import frc.subsystems.elevator.Elevator;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.math.Trig;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -26,6 +27,7 @@ public class Arm extends SubsystemBase {
     @AutoLogOutput(key = "Arm/Goal") private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
+    private boolean hasResetPidController = false;
 
     private ArmFeedforward ff = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
     private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
@@ -61,7 +63,7 @@ public class Arm extends SubsystemBase {
     public void setGoal(Angle goal) {
         if (goal.gt(ArmConstants.MaxDegreesFront) || goal.lt(ArmConstants.MaxDegreesBack)) return;
         this.goal = goal;
-        pid.setGoal(new TrapezoidProfile.State(goal.in(Radians), 0.0d));
+        pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
     }
 
     /**
@@ -113,8 +115,14 @@ public class Arm extends SubsystemBase {
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.position + (Math.PI / 2), setpoint.velocity);
-        double voltOut = output + feedforward + elevatorVelocityMultiplier.get() * elevatorDDV.getFirstDerivative();
+        double unitCirclePosition = Units.degreesToRadians(setpoint.position + 90);
+        double feedforward = ff.calculate(unitCirclePosition, setpoint.velocity);
+        double voltOut = output + feedforward;
+
+        double elevatorVelocity = elevatorDDV.getFirstDerivative();
+        if (elevatorVelocity > 0.0d) voltOut += Math.signum(voltOut) *
+            (elevatorVelocityMultiplier.get() * elevatorVelocity * Trig.cosizzle(unitCirclePosition));
+
         if (!isCoasting) {
             io.setVoltage(voltOut);
         }
@@ -127,6 +135,11 @@ public class Arm extends SubsystemBase {
 
         double measurementDegrees = getMeasurement().in(Degrees);
         differentiableMeasurementDegrees.update(measurementDegrees);
+
+        if (!hasResetPidController) {
+            pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
+            hasResetPidController = true;
+        }
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
 
         Logger.recordOutput("Arm/Error", pid.getPositionError());

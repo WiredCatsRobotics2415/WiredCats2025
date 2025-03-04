@@ -79,10 +79,10 @@ public class Subsystems {
         public static final Distance MinHeight = Inches.of(0.0d);
         public static final Distance MaxHeight = Inches.of(79.0d);
 
-        public static final double kS = 0.1;
-        public static final double kG = 0.21;
-        public static final double kV = 2.5;
-        public static final double kA = 0.03;
+        public static final double kS = 0.05;
+        public static final double kG = 0.07;
+        public static final double kV = 3.77;
+        public static final double kA = 0.01;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
@@ -105,8 +105,8 @@ public class Subsystems {
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 1;
-        public static final Angle MaxDegreesBack = Degrees.of(-155);
-        public static final Angle MaxDegreesFront = Degrees.of(155);
+        public static final Angle MaxDegreesBack = Degrees.of(-120);
+        public static final Angle MaxDegreesFront = Degrees.of(120);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
@@ -143,9 +143,32 @@ public class Subsystems {
     }
 
     public class CoralIntakeConstants {
-        public static final int MotorID = 13;
+        public static final int PivotMotorId = 13;
+        public static final int IntakeMotorId = 14;
+
+        public static final int ThroughborePort = 18;
+        public static final double ThroughboreZero = 0;
+        public static final double ThroughboreMin = 0;
+        public static final double ThroughboreMax = 1;
+
+        public static final double RotorToArmRatio = 15;
+        public static final Distance EffectiveLength = Inches.of(20);
+
+        public static final double kS = 0.0;
+        public static final double kG = 0.88;
+        public static final double kV = 0.29;
+        public static final double kA = 0.03;
+        public static final double kP = 0.2;
+        public static final double kD = 0.02;
+
+        public static final double BaseMaxVelocity = 180;
+        public static final double BaseMaxAcceleration = 360;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
+
+        public static final Angle MaxAngle = Degrees.of(100);
+        public static final Angle StowAngle = Degrees.of(90);
+        public static final Angle GroundAngle = Degrees.of(0);
     }
 }
