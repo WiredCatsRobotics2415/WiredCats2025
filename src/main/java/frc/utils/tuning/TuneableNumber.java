@@ -47,7 +47,6 @@ public class TuneableNumber {
     private void updateFromNT() {
         double entry = thisNetworkNumber.get();
         if (entry != previousNumber) {
-            System.out.println("Value change: " + previousNumber + " to " + entry);
             previousNumber = entry;
             for (Consumer<Double> r : listeners)
                 r.accept(entry);

@@ -49,6 +49,7 @@ public class Arm extends SubsystemBase {
             ArmCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to cintake side",
                 runOnce(() -> setGoal(ArmConstants.MaxDegreesBack)));
+            TuningModeTab.getInstance().addCommand("Run to stow", runOnce(() -> setGoal(Degrees.of(90))));
             TuningModeTab.getInstance().addCommand("Run to scoring side",
                 runOnce(() -> setGoal(ArmConstants.MinDegreesFront)));
             TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", runOnce(() -> {

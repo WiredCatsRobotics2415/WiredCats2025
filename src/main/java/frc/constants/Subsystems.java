@@ -94,9 +94,9 @@ public class Subsystems {
         public static final double BaseGoalTolerance = .5d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
-        public static final Distance BaseHeight = Inches.of(36);
-        public static final Distance Stage2Height = Inches.of(34);
-        public static final Distance Stage3Height = Inches.of(33);
+        public static final Distance BaseHeight = Inches.of(25.75 + 0.5833333333);
+        public static final Distance Stage2Height = Inches.of(25.75 + 0.5833333333);
+        public static final Distance Stage3Height = Inches.of(25.75 + 0.5833333333);
     }
 
     public class ArmConstants {
