@@ -7,7 +7,6 @@ import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -31,9 +30,9 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
 import frc.utils.driver.DashboardManager;
-import frc.utils.driver.DashboardManager.LayoutConstants;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class RobotContainer {
     private static RobotContainer instance;
@@ -46,7 +45,7 @@ public class RobotContainer {
     private @Getter OI oi = OI.getInstance();
     private Vision vision = Vision.getInstance();
 
-    private SendableChooser<Command> autoChooser;
+    private LoggedDashboardChooser<Command> autoChooser;
 
     private RobotContainer() {
         setupAuto();
@@ -80,8 +79,7 @@ public class RobotContainer {
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
 
-        autoChooser = AutoBuilder.buildAutoChooser("");
-        DashboardManager.getInstance().addChooser(false, "Auto", autoChooser, LayoutConstants.AutoSelector);
+        autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser(""));
 
         PathPlannerLogging.setLogActivePathCallback((activePath) -> {
             Logger.recordOutput("Pathplanner/Trajectory", activePath.toArray(new Pose2d[activePath.size()]));
@@ -95,8 +93,7 @@ public class RobotContainer {
     }
 
     public void neutralizeSubsystems() {
-        elevator.setGoal(Inches.of(0));
-        arm.setGoal(Degrees.of(0));
+        // TODO: should be stow cmd or something like that
     }
 
     private void configureControls() {
@@ -170,5 +167,5 @@ public class RobotContainer {
         }));
     }
 
-    public Command getAutonomousCommand() { return autoChooser.getSelected(); }
+    public Command getAutonomousCommand() { return autoChooser.get(); }
 }

@@ -18,10 +18,12 @@ import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -42,6 +44,7 @@ import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuneableNumber;
+import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import java.util.ArrayList;
 import java.util.function.Supplier;
@@ -68,10 +71,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
-    PIDController driveToPositionXController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
-        DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
-    PIDController driveToPositionYController = new PIDController(DriveAutoConstants.DTTranslationPID.kP,
-        DriveAutoConstants.DTTranslationPID.kI, DriveAutoConstants.DTTranslationPID.kD);
+    TuneableProfiledPIDController driveToPositionXController = new TuneableProfiledPIDController(
+        DriveAutoConstants.DTTranslationPID, new Constraints(0, 0), "DriveToX");
+    TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
+        DriveAutoConstants.DTTranslationPID, new Constraints(0, 0), "DriveToY");
     PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
         DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
 
@@ -108,19 +111,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
                 resetRotationFromLimelightMT1().ignoringDisable(true));
 
-            DriveAutoConstants.PPTranslationP.addListener(() -> {
-                DriveAutoConstants.PPTranslationPID = new PIDConstants(DriveAutoConstants.PPTranslationP.get());
+            DriveAutoConstants.PPTranslationP.addListener(newP -> {
+                DriveAutoConstants.PPTranslationPID = new PIDConstants(newP);
                 DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
                     DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
             });
-            DriveAutoConstants.RotationP.addListener(() -> {
-                DriveAutoConstants.RotationPID = new PIDConstants(DriveAutoConstants.RotationP.get());
+            DriveAutoConstants.RotationP.addListener(newP -> {
+                DriveAutoConstants.RotationPID = new PIDConstants(newP);
                 DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
                     DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
-            });
-            DriveAutoConstants.DTTranslationP.addListener(() -> {
-                driveToPositionXController.setP(DriveAutoConstants.DTTranslationP.get());
-                driveToPositionYController.setP(DriveAutoConstants.DTTranslationP.get());
             });
 
             // Add torque safety to all motors
@@ -245,11 +244,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }).until(() -> {
             return driveToPositionXController.atSetpoint() && driveToPositionYController.atSetpoint()
                 && driveToPositionHeadingController.atSetpoint();
-        }).finallyDo(() -> {
-            driveToPositionXController.reset();
-            driveToPositionYController.reset();
+        }).beforeStarting(() -> {
+            SwerveDriveState currentState = getState();
+            Pose2d currentPose = currentState.Pose;
+            ChassisSpeeds speeds = currentState.Speeds;
+            driveToPositionXController.reset(new State(currentPose.getX(), speeds.vxMetersPerSecond));
+            driveToPositionYController.reset(new State(currentPose.getY(), speeds.vyMetersPerSecond));
             driveToPositionHeadingController.reset();
-        });
+        }, this);
     }
 
     public Command resetPoseFromLimelight() {

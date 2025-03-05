@@ -11,7 +11,7 @@ public abstract class GenericSlapdown extends SubsystemBase {
 
     public abstract Command stow();
 
-    public abstract void setGoal(Angle goal);
+    public abstract void setPivotGoal(Angle goal);
 
     public abstract Angle getPivotAngle();
 

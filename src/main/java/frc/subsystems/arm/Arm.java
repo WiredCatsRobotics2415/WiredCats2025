@@ -2,8 +2,6 @@ package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
@@ -16,6 +14,8 @@ import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
+import frc.utils.tuning.TuneableArmFF;
+import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -29,9 +29,11 @@ public class Arm extends SubsystemBase {
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
 
-    private ArmFeedforward ff = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
-    private ProfiledPIDController pid = new ProfiledPIDController(ArmConstants.kP, 0.0d, ArmConstants.kD,
-        new TrapezoidProfile.Constraints(ArmConstants.VelocityMax, ArmConstants.AccelerationMax));
+    private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA,
+        "ArmFF");
+    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
+        ArmConstants.kD, new TrapezoidProfile.Constraints(ArmConstants.VelocityMax, ArmConstants.AccelerationMax),
+        "ArmPID");
 
     @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();

@@ -1,46 +1,62 @@
 package frc.utils.tuning;
 
-import edu.wpi.first.networktables.DoubleEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.constants.RuntimeConstants;
 import java.util.ArrayList;
-import org.littletonrobotics.junction.Logger;
+import java.util.function.Consumer;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class TuneableNumber {
-    private static NetworkTable mainTable;
+    private static ArrayList<TuneableNumber> all = new ArrayList<TuneableNumber>();
 
-    private DoubleEntry thisEntry;
+    private LoggedNetworkNumber thisNetworkNumber;
     private double previousNumber;
-    private String name;
-    private ArrayList<Runnable> listeners;
+    private ArrayList<Consumer<Double>> listeners;
+    private String key;
 
-    public TuneableNumber(double defaultNumber, String name) {
+    public TuneableNumber(double defaultNumber, String key) {
         this.previousNumber = defaultNumber;
+        this.key = key;
         if (RuntimeConstants.TuningMode) {
-            this.name = name;
-            if (mainTable == null) mainTable = NetworkTableInstance.getDefault().getTable("/TuneableNumbers");
-            thisEntry = mainTable.getDoubleTopic(name).getEntry(defaultNumber);
-            thisEntry.accept(defaultNumber);
-            listeners = new ArrayList<Runnable>();
+            thisNetworkNumber = new LoggedNetworkNumber("/Tuning/" + key);
+            thisNetworkNumber.setDefault(defaultNumber);
+            listeners = new ArrayList<Consumer<Double>>();
+            all.add(this);
         }
     }
 
     public double get() {
-        if (RuntimeConstants.TuningMode) {
-            double entry = thisEntry.get();
-            if (entry != previousNumber) {
-                previousNumber = entry;
-                for (Runnable r : listeners)
-                    r.run();
-            }
-            Logger.recordOutput("TuneableNumbers/" + name, entry);
-            return entry;
-        }
         return previousNumber;
     }
 
-    public void addListener(Runnable toCall) {
+    public void set(double newNumber) {
+        if (RuntimeConstants.TuningMode) {
+            previousNumber = newNumber;
+            thisNetworkNumber.set(newNumber);
+        }
+    }
+
+    /**
+     * Consumer to call when value is changed from NT. Do NOT call get() on this tuneable, because the value will not have changed yet.
+     *
+     * @param toCall
+     */
+    public void addListener(Consumer<Double> toCall) {
         listeners.add(toCall);
+    }
+
+    private void updateFromNT() {
+        double entry = thisNetworkNumber.get();
+        if (entry != previousNumber) {
+            System.out.println("Value change: " + previousNumber + " to " + entry);
+            previousNumber = entry;
+            for (Consumer<Double> r : listeners)
+                r.accept(entry);
+        }
+    }
+
+    public static void periodic() {
+        for (TuneableNumber number : all) {
+            number.updateFromNT();
+        }
     }
 }

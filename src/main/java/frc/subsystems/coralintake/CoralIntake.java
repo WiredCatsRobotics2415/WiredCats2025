@@ -2,8 +2,6 @@ package frc.subsystems.coralintake;
 
 import static edu.wpi.first.units.Units.Degrees;
 
-import edu.wpi.first.math.controller.ArmFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -22,7 +20,10 @@ import frc.subsystems.slapdown.GenericSlapdownIOSim;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.tuning.TuneableArmFF;
+import frc.utils.tuning.TuneableProfiledPIDController;
 import lombok.Getter;
+import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntake extends GenericSlapdown {
@@ -30,11 +31,15 @@ public class CoralIntake extends GenericSlapdown {
     private GenericSlapdownIOInputsAutoLogged inputs = new GenericSlapdownIOInputsAutoLogged();
     private static CoralIntake instance;
 
-    private ArmFeedforward ff = new ArmFeedforward(CoralIntakeConstants.kS, CoralIntakeConstants.kG,
-        CoralIntakeConstants.kV, CoralIntakeConstants.kA);
-    private ProfiledPIDController pid = new ProfiledPIDController(CoralIntakeConstants.kP, 0, CoralIntakeConstants.kD,
-        new Constraints(CoralIntakeConstants.BaseMaxVelocity, CoralIntakeConstants.BaseMaxAcceleration));
+    private TuneableArmFF ff = new TuneableArmFF(CoralIntakeConstants.kS, CoralIntakeConstants.kG,
+        CoralIntakeConstants.kV, CoralIntakeConstants.kA, "CoralIntakeFF");
+    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(CoralIntakeConstants.kP, 0,
+        CoralIntakeConstants.kD,
+        new Constraints(CoralIntakeConstants.BaseMaxVelocity, CoralIntakeConstants.BaseMaxAcceleration),
+        "CoralIntakePID");
 
+    @Getter
+    @AutoLogOutput(key = "CoralIntake/Goal") private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     @Getter private boolean intaking = false;
     @Getter private boolean outtaking = false;
@@ -75,9 +80,11 @@ public class CoralIntake extends GenericSlapdown {
         });
     }
 
-    public void setGoal(Angle goal) {
-        if (goal.lte(CoralIntakeConstants.MaxAngle) && goal.gte(CoralIntakeConstants.GroundAngle))
+    public void setPivotGoal(Angle goal) {
+        if (goal.lte(CoralIntakeConstants.MaxAngle) && goal.gte(CoralIntakeConstants.GroundAngle)) {
+            this.goal = goal;
             pid.setGoal(goal.in(Degrees));
+        }
     }
 
     @Override

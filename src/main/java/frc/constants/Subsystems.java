@@ -49,10 +49,11 @@ public class Subsystems {
     public class DriveAutoConstants {
         public static final TuneableNumber PPTranslationP = new TuneableNumber(20.0d, "DriveAuto/PPTranslationP");
         public static final TuneableNumber RotationP = new TuneableNumber(15.0d, "DriveAuto/RotationP");
-        public static final TuneableNumber DTTranslationP = new TuneableNumber(0.5, "DriveAuto/DTTranslationP");
+
+        public static final double BaseVelocityMax = Controls.MaxDriveMeterS;
+        public static final double BaseAccelerationMax = 2 * Controls.MaxDriveMeterS;
 
         public static PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
-        public static PIDConstants DTTranslationPID = new PIDConstants(DTTranslationP.get(), 0, 0);
         public static PIDConstants RotationPID = new PIDConstants(RotationP.get(), 0, 0);
         public static PathFollowingController PathFollowingController = new PPHolonomicDriveController(PPTranslationPID,
             RotationPID);
@@ -61,6 +62,7 @@ public class Subsystems {
             MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
             RadiansPerSecond.of(Math.PI), RadiansPerSecondPerSecond.of(Math.PI / 2));
 
+        public static final PIDConstants DTTranslationPID = new PIDConstants(0.5, 0, 0);
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
         public static final double HeadingkP = 3;
@@ -79,16 +81,17 @@ public class Subsystems {
         public static final Distance MinHeight = Inches.of(0.0d);
         public static final Distance MaxHeight = Inches.of(79.0d);
 
-        public static final double kS = 0.05;
-        public static final double kG = 0.07;
-        public static final double kV = 3.77;
-        public static final double kA = 0.01;
+        // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
+        public static final double kS = 0.025;
+        public static final double kG = 0.11;
+        public static final double kV = 0.3;
+        public static final double kA = 0.02;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
-        public static final TuneableNumber VelocityMax = new TuneableNumber(50.0d, "Elevator/VelocityMax"); // (2/18) copied from akit2024
-        public static final TuneableNumber AccelerationMax = new TuneableNumber(50.0d, "Elevator/AccelMax"); // (2/18) copied from akit2024
-        public static final TuneableNumber GoalTolerance = new TuneableNumber(0.5, "Elevator/GoalTolerance");
+        public static final double BaseVelocityMax = 79.0d; // (2/18) copied from akit2024
+        public static final double BaseAccelerationMax = 50.0d; // (2/18) copied from akit2024
+        public static final double BaseGoalTolerance = .5d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
         public static final Distance BaseHeight = Inches.of(36);
@@ -111,10 +114,11 @@ public class Subsystems {
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
+        // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.05;
-        public static final double kG = 1.08;
-        public static final double kV = 0.29;
-        public static final double kA = 0.07;
+        public static final double kG = 0.38;
+        public static final double kV = 0.01;
+        public static final double kA = 1e-4;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 

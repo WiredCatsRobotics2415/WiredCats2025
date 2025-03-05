@@ -3,8 +3,6 @@ package frc.subsystems.elevator;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Volts;
 
-import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -13,6 +11,8 @@ import frc.constants.Subsystems.ElevatorConstants;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.tuning.TuneableElevatorFF;
+import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
@@ -25,10 +25,12 @@ public class Elevator extends SubsystemBase {
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
-    private ElevatorFeedforward ff = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kV,
-        ElevatorConstants.kG, ElevatorConstants.kA);
-    private ProfiledPIDController pid = new ProfiledPIDController(ElevatorConstants.kP, 0, ElevatorConstants.kD,
-        new TrapezoidProfile.Constraints(ElevatorConstants.VelocityMax.get(), ElevatorConstants.AccelerationMax.get()));
+    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
+        ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
+    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
+        ElevatorConstants.kD,
+        new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax),
+        "ElevatorPID");
 
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -38,13 +40,6 @@ public class Elevator extends SubsystemBase {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
-            ElevatorConstants.GoalTolerance.addListener(() -> pid.setTolerance(ElevatorConstants.GoalTolerance.get()));
-            ElevatorConstants.VelocityMax.addListener(
-                () -> pid.setConstraints(new TrapezoidProfile.Constraints(ElevatorConstants.VelocityMax.get(),
-                    pid.getConstraints().maxAcceleration)));
-            ElevatorConstants.AccelerationMax
-                .addListener(() -> pid.setConstraints(new TrapezoidProfile.Constraints(pid.getConstraints().maxVelocity,
-                    ElevatorConstants.AccelerationMax.get())));
             TuningModeTab.getInstance().addCommand("Run to 0", runOnce(() -> setGoal(ElevatorConstants.MinHeight)));
             TuningModeTab.getInstance().addCommand("Run to max", runOnce(() -> setGoal(ElevatorConstants.MaxHeight)));
             TuningModeTab.getInstance().addCommand("Toggle coast", runOnce(() -> {

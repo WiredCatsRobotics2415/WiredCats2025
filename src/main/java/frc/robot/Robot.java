@@ -7,6 +7,8 @@ import frc.constants.RuntimeConstants;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.simulation.SimulationTab;
+import frc.utils.tuning.TuneableBoolean;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
@@ -89,9 +91,13 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
-        if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
+        if (RuntimeConstants.TuningMode) {
+            TuneableNumber.periodic();
+            TuneableBoolean.periodic();
+        }
         TorqueSafety.getInstance().periodic();
         CommandScheduler.getInstance().run();
+        if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
     }
 
     @Override

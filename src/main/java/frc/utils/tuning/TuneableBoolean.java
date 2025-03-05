@@ -1,46 +1,52 @@
 package frc.utils.tuning;
 
-import edu.wpi.first.networktables.BooleanEntry;
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import frc.constants.RuntimeConstants;
 import java.util.ArrayList;
-import org.littletonrobotics.junction.Logger;
+import java.util.function.Consumer;
+import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class TuneableBoolean {
-    private static NetworkTable mainTable;
+    private static ArrayList<TuneableBoolean> all = new ArrayList<TuneableBoolean>();
 
-    private BooleanEntry thisEntry;
+    private LoggedNetworkBoolean thisNetworkBoolean;
     private boolean previousValue;
-    private String name;
-    private ArrayList<Runnable> listeners;
+    private ArrayList<Consumer<Boolean>> listeners;
 
-    public TuneableBoolean(boolean defaultValue, String name) {
+    public TuneableBoolean(boolean defaultValue, String key) {
         this.previousValue = defaultValue;
         if (RuntimeConstants.TuningMode) {
-            this.name = name;
-            if (mainTable == null) mainTable = NetworkTableInstance.getDefault().getTable("/TuneableBooleans");
-            thisEntry = mainTable.getBooleanTopic(name).getEntry(defaultValue);
-            thisEntry.accept(defaultValue);
-            listeners = new ArrayList<Runnable>();
+            thisNetworkBoolean = new LoggedNetworkBoolean("/Tuning/" + key);
+            thisNetworkBoolean.setDefault(defaultValue);
+            listeners = new ArrayList<Consumer<Boolean>>();
+            all.add(this);
         }
     }
 
     public boolean get() {
-        if (RuntimeConstants.TuningMode) {
-            boolean entry = thisEntry.get();
-            if (entry != previousValue) {
-                previousValue = entry;
-                for (Runnable r : listeners)
-                    r.run();
-            }
-            Logger.recordOutput("TuneableBooleans/" + name, entry);
-            return entry;
-        }
         return previousValue;
     }
 
-    public void addListener(Runnable toCall) {
+    /**
+     * Consumer to call when value is changed from NT. Do NOT call get() on this tuneable, because the value will not have changed yet.
+     *
+     * @param toCall
+     */
+    public void addListener(Consumer<Boolean> toCall) {
         listeners.add(toCall);
+    }
+
+    private void updateFromNT() {
+        boolean entry = thisNetworkBoolean.get();
+        if (entry != previousValue) {
+            previousValue = entry;
+            for (Consumer<Boolean> r : listeners)
+                r.accept(entry);
+        }
+    }
+
+    public static void periodic() {
+        for (TuneableBoolean bool : all) {
+            bool.updateFromNT();
+        }
     }
 }

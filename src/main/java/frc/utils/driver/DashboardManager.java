@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.shuffleboard.SuppliedValueWidget;
-import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.utils.driver.DashboardManager.LayoutConstants.LayoutInfo;
 import java.util.function.BooleanSupplier;
@@ -53,12 +52,6 @@ public class DashboardManager {
     public void addCommand(boolean onTeleop, String title, Command command, LayoutInfo layoutInfo) {
         ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
         tab.add(title, command).withWidget("Command").withPosition(layoutInfo.x, layoutInfo.y)
-            .withSize(layoutInfo.width, layoutInfo.height);
-    }
-
-    public void addChooser(boolean onTeleop, String title, SendableChooser chooser, LayoutInfo layoutInfo) {
-        ShuffleboardTab tab = onTeleop ? teleopTab : autoTab;
-        tab.add(title, chooser).withWidget("ComboBox Chooser").withPosition(layoutInfo.x, layoutInfo.y)
             .withSize(layoutInfo.width, layoutInfo.height);
     }
 
