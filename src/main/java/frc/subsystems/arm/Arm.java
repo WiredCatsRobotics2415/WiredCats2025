@@ -47,6 +47,10 @@ public class Arm extends SubsystemBase {
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, new ArmIO() {});
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
+            TuningModeTab.getInstance().addCommand("Run to cintake side",
+                runOnce(() -> setGoal(ArmConstants.MaxDegreesBack)));
+            TuningModeTab.getInstance().addCommand("Run to scoring side",
+                runOnce(() -> setGoal(ArmConstants.MinDegreesFront)));
             TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", runOnce(() -> {
                 if (isCoasting)
                     brake();
@@ -63,7 +67,7 @@ public class Arm extends SubsystemBase {
 
     /** Sets the goal height. If goal is out of the physical range, it is not set. */
     public void setGoal(Angle goal) {
-        if (goal.gt(ArmConstants.MaxDegreesFront) || goal.lt(ArmConstants.MaxDegreesBack)) return;
+        if (goal.gt(ArmConstants.MaxDegreesBack) || goal.lt(ArmConstants.MinDegreesFront)) return;
         this.goal = goal;
         pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
     }
@@ -73,8 +77,8 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return runOnce(() -> {
-            if (goal.gt(ArmConstants.MaxDegreesFront)) {
-                goal = ArmConstants.MaxDegreesFront;
+            if (goal.gt(ArmConstants.MaxDegreesBack)) {
+                goal = ArmConstants.MaxDegreesBack;
                 return;
             }
             goal = goal.plus(Degrees.of(0.5));
@@ -87,8 +91,8 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return runOnce(() -> {
-            if (goal.lt(ArmConstants.MaxDegreesBack)) {
-                goal = ArmConstants.MaxDegreesBack;
+            if (goal.lt(ArmConstants.MinDegreesFront)) {
+                goal = ArmConstants.MinDegreesFront;
                 return;
             }
             goal = goal.minus(Degrees.of(0.5));
@@ -113,17 +117,16 @@ public class Arm extends SubsystemBase {
     public Angle getMeasurement() {
         return Degrees.of(Algebra.linearMap(inputs.throughborePosition + ArmConstants.ThroughboreZero,
             ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax, ArmConstants.MaxDegreesBack.in(Degrees),
-            ArmConstants.MaxDegreesFront.in(Degrees)));
+            ArmConstants.MinDegreesFront.in(Degrees)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double unitCirclePosition = Units.degreesToRadians(setpoint.position + 90);
-        double feedforward = ff.calculate(unitCirclePosition, setpoint.velocity);
+        double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
         double voltOut = output + feedforward;
 
         double elevatorVelocity = elevatorDDV.getFirstDerivative();
-        if (elevatorVelocity > 0.0d) voltOut += Math.signum(voltOut) *
-            (elevatorVelocityMultiplier.get() * elevatorVelocity * Trig.cosizzle(unitCirclePosition));
+        if (elevatorVelocity > 0.0d) voltOut += Math.signum(voltOut) * (elevatorVelocityMultiplier.get() *
+            elevatorVelocity * Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
 
         if (!isCoasting) {
             io.setVoltage(voltOut);

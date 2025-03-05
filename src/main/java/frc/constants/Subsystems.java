@@ -89,8 +89,8 @@ public class Subsystems {
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
-        public static final double BaseVelocityMax = 79.0d; // (2/18) copied from akit2024
-        public static final double BaseAccelerationMax = 50.0d; // (2/18) copied from akit2024
+        public static final double BaseVelocityMax = 39.5d; // (2/18) copied from akit2024
+        public static final double BaseAccelerationMax = 79d; // (2/18) copied from akit2024
         public static final double BaseGoalTolerance = .5d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
@@ -103,22 +103,22 @@ public class Subsystems {
         public static final int MotorID = 11;
         public static final int ThroughborePort = 19;
 
-        // 0 degrees: the arm beam is parallel to the elevator
-        // positive: front of the robot: coral scoring side (side with both LLs)
+        // 0 degrees: the arm rail is parallel with the drivebase on the scoring side (front of robot)
+        // 180 degrees: the arm rail is with the drive base on the cintake side (back of robot)
         public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 1;
-        public static final Angle MaxDegreesBack = Degrees.of(-120);
-        public static final Angle MaxDegreesFront = Degrees.of(120);
+        public static final Angle MaxDegreesBack = Degrees.of(210);
+        public static final Angle MinDegreesFront = Degrees.of(-30);
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kS = 0.05;
+        public static final double kS = 0.025;
         public static final double kG = 0.38;
-        public static final double kV = 0.01;
-        public static final double kA = 1e-4;
+        public static final double kV = 0.48;
+        public static final double kA = 0.02;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
@@ -126,8 +126,8 @@ public class Subsystems {
         public static final double AccelerationMax = 50.0d; // (2/18) copied from akit2024
         public static final Angle GoalTolerance = Degrees.of(0.5);
 
-        public static final double ApproximateMassKg = 3; // Approximated from CAD at 2/7
-        public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 2/7
+        public static final double ApproximateMassKg = 2.27;
+        public static final float RotorToArmGearRatio = 15 / 1; // Planetaries amount unknown as of 3/5
         public static final Distance EffectiveLength = Inches.of(28);
     }
 

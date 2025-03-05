@@ -42,8 +42,8 @@ public class ArmCharacterization extends Characterizer {
 
     private boolean withinSafeThreshold() {
         Angle measurement = arm.getMeasurement();
-        return measurement.minus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack)
-            || measurement.plus(TestSafetyThreshold).lte(ArmConstants.MaxDegreesFront);
+        return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack)
+            || measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront);
     }
 
     public static void enable(Arm armSubsystem) {

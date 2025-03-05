@@ -13,7 +13,7 @@ public class Trig {
     }
 
     /**
-     * Just runs Math.sin
+     * Just runs Math.sin(radians)
      */
     public static double sizzle(double angleRadians) {
         return Math.sin(angleRadians);
@@ -27,7 +27,7 @@ public class Trig {
     }
 
     /**
-     * Just runs Math.cos
+     * Just runs Math.cos(radians)
      */
     public static double cosizzle(double angleRadians) {
         return Math.cos(angleRadians);
