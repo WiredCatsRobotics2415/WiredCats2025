@@ -61,8 +61,7 @@ public class Visualizer {
     }
 
     private static void visualizeArm(Angle angle, Pose3d carriage, String key) {
-        Pose3d arm = carriage
-            .plus(new Transform3d(new Translation3d(0, 0, 0.25), new Rotation3d(0, angle.in(Radians), 0)));
+        Pose3d arm = carriage.plus(new Transform3d(new Translation3d(0, 0, 0), new Rotation3d(0, 0, 0)));
 
         Logger.recordOutput("Visualization/" + key + "/ArmAndEndEffector", arm);
     }
