@@ -10,7 +10,7 @@ public class Algebra {
      * @param outputMax max value of output
      */
     public static double linearMap(double input, double inputMin, double inputMax, double outputMin, double outputMax) {
-        return (input / (inputMax - inputMin)) * (outputMax - outputMin) + outputMin;
+        return (input - inputMin) * (outputMax - outputMin) / (inputMax - inputMin) + outputMin;
     }
 
     /**

@@ -105,7 +105,6 @@ public class Subsystems {
 
         // 0 degrees: the arm rail is parallel with the drivebase on the scoring side (front of robot)
         // 180 degrees: the arm rail is with the drive base on the cintake side (back of robot)
-        public static final double ThroughboreZero = 0.0d;
         public static final double ThroughboreMin = 0;
         public static final double ThroughboreMax = 1;
         public static final Angle MaxDegreesBack = Degrees.of(210);

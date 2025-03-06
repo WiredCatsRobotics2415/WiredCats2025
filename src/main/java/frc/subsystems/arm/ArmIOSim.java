@@ -1,6 +1,7 @@
 package frc.subsystems.arm;
 
 import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Volts;
@@ -9,6 +10,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.constants.Subsystems.ArmConstants;
+import frc.utils.math.Algebra;
 
 public class ArmIOSim implements ArmIO {
     private double appliedVoltage;
@@ -18,7 +20,7 @@ public class ArmIOSim implements ArmIO {
 
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
         ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.MaxDegreesBack.in(Radians), ArmConstants.MinDegreesFront.in(Radians), true, Math.PI / 2);
+        ArmConstants.MinDegreesFront.in(Radians), ArmConstants.MaxDegreesBack.in(Radians), true, Math.PI / 2);
 
     public ArmIOSim() {
         System.out.println("Arm MOI: " + moi);
@@ -34,7 +36,9 @@ public class ArmIOSim implements ArmIO {
         inputs.motorSupplyCurrent = Amps.of(simArm.getCurrentDrawAmps());
         inputs.appliedVoltage = Volts.of(appliedVoltage);
 
-        inputs.throughborePosition = Units.radiansToRotations(-simArm.getAngleRads());
+        inputs.throughborePosition = Algebra.linearMap(Units.radiansToDegrees(simArm.getAngleRads()),
+            ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees),
+            ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax);
     }
 
     @Override
