@@ -96,7 +96,7 @@ public class SuperStructure {
         return elevator.atGoal() && arm.atGoal();
     }
 
-    private boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle) {
+    public boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle) {
         boolean willCollide = (elevatorHeight.in(Inches) +
             Trig.sizzle(armAngle) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
         this.collisionPrevented = willCollide;

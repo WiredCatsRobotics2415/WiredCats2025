@@ -15,6 +15,7 @@ import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableArmFF;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
@@ -40,7 +41,7 @@ public class Arm extends SubsystemBase {
     private static Arm instance;
 
     private DoubleDifferentiableValue elevatorDDV = Elevator.getInstance().getDifferentiableMeasurementInches();
-    private LoggedNetworkNumber elevatorVelocityMultiplier = new LoggedNetworkNumber("ArmVelocityMultiplier", 0);
+    private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0.0d, "Arm/ArmVelocityMultiplier");
 
     private Arm() {
         pid.setTolerance(ArmConstants.GoalTolerance.in(Degrees));
@@ -121,13 +122,20 @@ public class Arm extends SubsystemBase {
                 ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees)));
     }
 
-    private void useOutput(double output, TrapezoidProfile.State setpoint) {
+    private void useOutput(double output, TrapezoidProfile.State setpoint, double measurementDegrees) {
         double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
         double voltOut = output + feedforward;
 
         double elevatorVelocity = elevatorDDV.getFirstDerivative();
-        if (elevatorVelocity > 0.0d) voltOut += Math.signum(voltOut) * (elevatorVelocityMultiplier.get() *
-            elevatorVelocity * Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
+        if (elevatorVelocity > 0) {
+            double toAdd = (elevatorVelocityMultiplier.get() * elevatorVelocity * Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
+            if (measurementDegrees < 90 && pid.getPositionError() > 0) {
+                voltOut += toAdd;
+            }
+            if (measurementDegrees > 90 && pid.getPositionError() < 0) {
+                voltOut -= toAdd;
+            }
+        }
 
         if (!isCoasting) {
             io.setVoltage(voltOut);
@@ -146,7 +154,7 @@ public class Arm extends SubsystemBase {
             pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
             hasResetPidController = true;
         }
-        useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
+        useOutput(pid.calculate(measurementDegrees), pid.getSetpoint(), measurementDegrees);
 
         Logger.recordOutput("Arm/Error", pid.getPositionError());
         Logger.recordOutput("Arm/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());

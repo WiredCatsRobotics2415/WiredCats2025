@@ -7,10 +7,12 @@ import static edu.wpi.first.units.Units.Volts;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.constants.Subsystems.ArmConstants;
+import frc.subsystems.elevator.Elevator;
+import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.tuning.Characterizer;
 import frc.utils.tuning.TuningModeTab;
 
@@ -42,8 +44,10 @@ public class ArmCharacterization extends Characterizer {
 
     private boolean withinSafeThreshold() {
         Angle measurement = arm.getMeasurement();
-        return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack)
-            || measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront);
+        Distance elevatorHeight = Elevator.getInstance().getMeasurement();
+        return !SuperStructure.getInstance().positionsWillCollide(elevatorHeight, measurement.plus(TestSafetyThreshold))
+            && !SuperStructure.getInstance().positionsWillCollide(elevatorHeight,
+                measurement.minus(TestSafetyThreshold));
     }
 
     public static void enable(Arm armSubsystem) {

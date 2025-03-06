@@ -8,9 +8,11 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
+import frc.subsystems.arm.Arm;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
@@ -78,7 +80,7 @@ public class Elevator extends SubsystemBase {
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.velocity);
-        double voltOut = output + feedforward;
+        double voltOut = output + feedforward + Trig.cosizzle(Arm.getInstance().getMeasurement())*ElevatorConstants.kGForArm.get();
         io.setVoltage(voltOut);
     }
 
