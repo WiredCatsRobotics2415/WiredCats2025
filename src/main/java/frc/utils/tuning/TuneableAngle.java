@@ -10,11 +10,15 @@ public class TuneableAngle extends TuneableNumber {
         super(defaultDegrees, key);
     }
 
+    public TuneableAngle(Angle initial, String key) {
+        super(initial.in(Degrees), key);
+    }
+
     public double in(AngleUnit unit) {
         return unit.convertFrom(get(), Degrees);
     }
 
-    public Angle asMeasure() {
+    public Angle angle() {
         return Degrees.of(get());
     }
 }

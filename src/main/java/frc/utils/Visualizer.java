@@ -14,14 +14,19 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 import frc.constants.Measurements;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.constants.Subsystems.VisionConstants;
+import frc.robot.Robot;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.vision.Vision;
 import frc.utils.math.Trig;
 import frc.utils.tuning.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
+import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /**
  * Reads from the elevator and publishes pose to NT for advantagescope
@@ -31,6 +36,12 @@ public class Visualizer {
     private static Arm armSubsystem = Arm.getInstance();
     private static CoralIntake coralIntakeSubsystem = CoralIntake.getInstance();
     private static Vision vision = Vision.getInstance();
+    private static LEDStrip ledStripSubsystem = LEDStrip.getInstance();
+
+    private static LoggedMechanism2d ledStrip = new LoggedMechanism2d(1, 1);
+    private static LoggedMechanismRoot2d ledStripRoot = ledStrip.getRoot("LEDStrip", 0.5, 0.2);
+    private static LoggedMechanismLigament2d ledStripLine = ledStripRoot
+        .append(new LoggedMechanismLigament2d("LEDStripLine", .35, 90, 6, new Color8Bit(Color.kBlack)));
 
     private static Pose3d visualizeElevator(Distance height, String key) {
         Pose3d elevatorBase = Pose3d.kZero;
@@ -101,9 +112,18 @@ public class Visualizer {
         visualizeCoralIntake(coralIntakeGoal, "Goal");
         visualizeCoralIntake(coralIntakeActual, "Actual");
 
-        Pose3d[] coralPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
-        Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
+        if (Robot.isSimulation()) {
+            Pose3d[] coralPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
+            Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
+        }
 
         visualizePECameraTargets();
+
+        ledStripLine.setColor(new Color8Bit(ledStripSubsystem.getCurrentColor()));
+        Logger.recordOutput("Visualization/LEDStrip", ledStrip);
+    }
+
+    public static void setLEDStripColor(Color8Bit color) {
+        ledStripLine.setColor(color);
     }
 }

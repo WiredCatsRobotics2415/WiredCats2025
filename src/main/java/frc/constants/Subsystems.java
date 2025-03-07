@@ -8,12 +8,9 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathConstraints;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
+import frc.subsystems.leds.TuneableColor;
 import frc.utils.tuning.TuneableNumber;
 
 public class Subsystems {
@@ -34,16 +31,31 @@ public class Subsystems {
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
             BackCenterName };
         public static final int[] ReefFacingLLs = new int[] { 0, 1 };
-
-        public static final Matrix<N3, N1> MegaTag2StdDev = VecBuilder.fill(.7, .7, 9999999);
     }
 
     public class LEDStripConstants {
         public static final int PortPWM = 9;
-        public static final int Length = 60;
-        public static final Distance LedSpacing = Meters.of(1 / 120.0);
+        public static final int BlinkinPort = 13;
+        public static final int NumberOfLeds = 5 * 60; // https://www.revrobotics.com/rev-11-1197/
+        public static final Distance LedSpacing = Meters.of(1.0 / 60.0);
 
-        public static final Color WestminsterGreen = new Color(30, 72, 47);
+        public static final TuneableColor WestminsterGreen = new TuneableColor(30, 72, 47, "WestminsterGreen");
+
+        public enum UseableColor {
+            BreathingGreen(new Color(30, 72, 47), 0.11), FlashingGreen(new Color(30, 72, 47), 0.01),
+            Green(new Color(30, 72, 47), 0.75), Orange(Color.kOrange, 0.65), Purple(Color.kPurple, 0.91),
+            Red(Color.kRed, 0.61), Blue(Color.kBlue, 0.87), SkyBlue(Color.kSkyBlue, 0.83), Yellow(Color.kYellow, 0.69),
+            White(Color.kWhite, 0.93), Gray(Color.kGray, 0.97), Black(Color.kBlack, 0.99),
+            Rainbow(new Color(255, 255, 255), -0.45);
+
+            public Color color;
+            public double sparkPWMLevel;
+
+            private UseableColor(Color color, double sparkPWMLevel) {
+                this.color = color;
+                this.sparkPWMLevel = sparkPWMLevel;
+            }
+        }
     }
 
     public class DriveAutoConstants {

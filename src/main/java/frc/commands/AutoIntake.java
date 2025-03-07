@@ -8,22 +8,28 @@ import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.wpilibj.RobotState;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls;
 import frc.constants.Measurements.CoralMeasurements;
 import frc.constants.Measurements.RobotMeasurements;
+import frc.robot.RobotStatus;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
 import frc.subsystems.vision.Vision.ObjectRecognized;
 import frc.utils.math.Trig;
+import frc.utils.tuning.TuneableNumber;
+import frc.utils.tuning.TuneableTime;
 
 public class AutoIntake extends Command {
     private Vision vision = Vision.getInstance();
     private EndEffector endEffector = EndEffector.getInstance();
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
+
+    private TuneableNumber hasSeenCoralSeconds = new TuneableNumber(0.5, "AutoIntaking/hasSeenCoralSeconds");
 
     private final SwerveRequest.RobotCentric driveBackward = new SwerveRequest.RobotCentric()
         .withVelocityX(-0.5 * Controls.MaxDriveMeterS); // back of robot = intaking side
@@ -37,9 +43,10 @@ public class AutoIntake extends Command {
 
     @Override
     public void initialize() {
+        this.deadlineFor(RobotStatus.keepStateUntilInterrupted(RobotState.AutoGroundIntaking));
         vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
-        if (RobotState.isAutonomous()) {
+        if (DriverStation.isAutonomous()) {
             PPHolonomicDriveController.overrideXYFeedback(() -> {
                 if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
                     double ty = vision.getObjectDetectedTy();
@@ -95,7 +102,7 @@ public class AutoIntake extends Command {
 
     @Override
     public void execute() {
-        if (RobotState.isAutonomous()) return;
+        if (DriverStation.isAutonomous()) return;
         if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
             if (!hasSeenCoral) {
                 System.out.println("Seen a coral");
@@ -132,5 +139,5 @@ public class AutoIntake extends Command {
     }
 
     @Override
-    public boolean isFinished() { return endEffector.hasCoral() || countSinceLastSeenCoral.hasElapsed(0.5); }
+    public boolean isFinished() { return endEffector.hasCoral() || countSinceLastSeenCoral.hasElapsed(hasSeenCoralSeconds.get()); }
 }

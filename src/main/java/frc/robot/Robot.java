@@ -4,6 +4,7 @@ import com.ctre.phoenix6.HootReplay;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
+import frc.robot.RobotStatus.RobotState;
 import frc.utils.TorqueSafety;
 import frc.utils.Visualizer;
 import frc.utils.simulation.SimulationTab;
@@ -103,5 +104,15 @@ public class Robot extends LoggedRobot {
     @Override
     public void autonomousInit() {
         RobotContainer.getInstance().getAutonomousCommand().schedule();
+    }
+
+    @Override
+    public void disabledInit() {
+        RobotStatus.setRobotState(RobotState.Disabled);
+    }
+
+    @Override
+    public void disabledExit() {
+        RobotStatus.setRobotState(RobotState.Enabled);
     }
 }

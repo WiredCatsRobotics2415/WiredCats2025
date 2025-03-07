@@ -2,6 +2,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
@@ -9,6 +10,7 @@ import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
@@ -21,12 +23,15 @@ import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
+import frc.constants.Subsystems.LEDStripConstants.UseableColor;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.drive.CommandSwerveDrivetrain.PoseEstimationType;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.endeffector.EndEffector;
+import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
 import frc.utils.driver.DashboardManager;
@@ -42,6 +47,7 @@ public class RobotContainer {
     private SuperStructure superstructure = SuperStructure.getInstance();
     private EndEffector endEffector = EndEffector.getInstance();
     private CoralIntake coralIntake = CoralIntake.getInstance();
+    private LEDStrip ledStrip = LEDStrip.getInstance();
     private @Getter OI oi = OI.getInstance();
     private Vision vision = Vision.getInstance();
 
@@ -158,13 +164,28 @@ public class RobotContainer {
 
     private void configureTriggers() {
         // Triggers that interact across multiple subsystems/utils should be defined here
+        // Flip driver camera based on arm angle
         new Trigger(() -> {
-            return arm.getMeasurement().in(Degrees) > 0.0d;
+            return arm.getMeasurement().in(Degrees) > 90.0d;
         }).onTrue(new InstantCommand(() -> {
             vision.setEndEffectorStreamOrientation(true);
         })).onFalse(new InstantCommand(() -> {
             vision.setEndEffectorStreamOrientation(false);
         }));
+
+        // Flash the leds when a coral is scored
+        new Trigger(() -> {
+            return endEffector.isOuttaking() && !endEffector.irSensorTrigger();
+        }).onTrue(new WaitCommand(0.5)
+            .andThen(ledStrip.flash(UseableColor.Purple, Seconds.of(0.2), Seconds.of(0.2)).withTimeout(1)).andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
+
+        new Trigger(() -> {
+            return endEffector.irSensorTrigger();
+        }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingCoral));
+        
+        new Trigger(() -> {
+            return endEffector.cameraTrigger();
+        }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE));
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

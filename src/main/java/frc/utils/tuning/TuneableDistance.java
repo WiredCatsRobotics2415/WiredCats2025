@@ -10,11 +10,15 @@ public class TuneableDistance extends TuneableNumber {
         super(defaultInches, key);
     }
 
+    public TuneableDistance(Distance initial, String key) {
+        super(initial.in(Inches), key);
+    }
+
     public double in(DistanceUnit unit) {
         return unit.convertFrom(get(), Inches);
     }
 
-    public Distance asMeasure() {
+    public Distance distance() {
         return Inches.of(get());
     }
 }
