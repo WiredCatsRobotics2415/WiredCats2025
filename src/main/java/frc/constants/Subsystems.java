@@ -89,7 +89,7 @@ public class Subsystems {
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
-        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG, "ElevatorFF/kGForArm"); //TODO: the first value should be the kg from SysID when the arm is at 0degrees
+        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
         public static final double BaseVelocityMax = 39.5d; // (2/18) copied from akit2024
         public static final double BaseAccelerationMax = 79d; // (2/18) copied from akit2024

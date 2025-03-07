@@ -80,7 +80,8 @@ public class Elevator extends SubsystemBase {
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.velocity);
-        double voltOut = output + feedforward + Trig.cosizzle(Arm.getInstance().getMeasurement())*ElevatorConstants.kGForArm.get();
+        double voltOut = output + feedforward +
+            Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
         io.setVoltage(voltOut);
     }
 

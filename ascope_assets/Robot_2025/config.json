@@ -127,6 +127,27 @@
         0.0,
         0.01
       ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 0
+        },
+        {
+          "axis": "y",
+          "degrees": 180
+        },
+        {
+          "axis": "z",
+          "degrees": -90
+        }
+      ],
+      "zeroedPosition": [
+        -0.52,
+        -0.28,
+        -0.405
+      ]
     }
   ]
 }

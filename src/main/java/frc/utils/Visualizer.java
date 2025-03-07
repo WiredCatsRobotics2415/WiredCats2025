@@ -19,11 +19,9 @@ import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.vision.Vision;
 import frc.utils.math.Trig;
+import frc.utils.tuning.*;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
-import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /**
  * Reads from the elevator and publishes pose to NT for advantagescope
@@ -33,15 +31,6 @@ public class Visualizer {
     private static Arm armSubsystem = Arm.getInstance();
     private static CoralIntake coralIntakeSubsystem = CoralIntake.getInstance();
     private static Vision vision = Vision.getInstance();
-
-    private static Color8Bit goalColor = new Color8Bit(Color.kOrange);
-    private static Color8Bit actualColor = new Color8Bit(Color.kBlack);
-
-    private static LoggedMechanism2d coralIntakeMech2d = new LoggedMechanism2d(0, 3);
-    private static LoggedMechanismRoot2d coralIntakeRoot = coralIntakeMech2d.getRoot("CoralIntake",
-        Units.inchesToMeters(-10.394), Units.inchesToMeters(0.5));
-    private static LoggedMechanismLigament2d coralIntake = coralIntakeRoot
-        .append(new LoggedMechanismLigament2d("Pivot", Units.inchesToMeters(21), 0, 3, goalColor));
 
     private static Pose3d visualizeElevator(Distance height, String key) {
         Pose3d elevatorBase = Pose3d.kZero;
@@ -77,10 +66,10 @@ public class Visualizer {
         Logger.recordOutput("Visualization/" + key + "/ArmAndEndEffector", arm);
     }
 
-    private static void visualizeCoralIntake(Angle angle, String key, Color8Bit color) {
-        coralIntake.setAngle(angle.in(Degrees));
-        coralIntake.setColor(color);
-        Logger.recordOutput("Visualization/" + key + "/CoralIntake", coralIntakeMech2d);
+    private static void visualizeCoralIntake(Angle angle, String key) {
+        Pose3d coralIntake = new Pose3d(new Translation3d(Inches.of(-8.75), Inches.of(3.25), Inches.of(6.5)),
+            new Rotation3d(0, -angle.in(Radians), Math.PI));
+        Logger.recordOutput("Visualization/" + key + "/CoralIntake", coralIntake);
     }
 
     private static void visualizePECameraTargets() {
@@ -109,8 +98,8 @@ public class Visualizer {
 
         Angle coralIntakeGoal = coralIntakeSubsystem.getGoal();
         Angle coralIntakeActual = coralIntakeSubsystem.getPivotAngle();
-        visualizeCoralIntake(coralIntakeGoal, "Goal", goalColor);
-        visualizeCoralIntake(coralIntakeActual, "Actual", actualColor);
+        visualizeCoralIntake(coralIntakeGoal, "Goal");
+        visualizeCoralIntake(coralIntakeActual, "Actual");
 
         Pose3d[] coralPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
         Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);

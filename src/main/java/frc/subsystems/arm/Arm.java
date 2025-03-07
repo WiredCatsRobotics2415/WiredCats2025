@@ -21,7 +21,6 @@ import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class Arm extends SubsystemBase {
     @Getter
@@ -128,7 +127,8 @@ public class Arm extends SubsystemBase {
 
         double elevatorVelocity = elevatorDDV.getFirstDerivative();
         if (elevatorVelocity > 0) {
-            double toAdd = (elevatorVelocityMultiplier.get() * elevatorVelocity * Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
+            double toAdd = (elevatorVelocityMultiplier.get() * elevatorVelocity *
+                Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
             if (measurementDegrees < 90 && pid.getPositionError() > 0) {
                 voltOut += toAdd;
             }
