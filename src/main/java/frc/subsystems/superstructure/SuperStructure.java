@@ -173,7 +173,7 @@ public class SuperStructure extends SubsystemBase {
         boolean willCollideElevator = ((elevatorHeight.in(Inches) +
             Trig.cosizzle(armAngle) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches))) < 0);
         if (cintakeAngle.in(Degrees) > 0) {
-            willCollideCintake = (Tipy.minus(Inches.of(0.5)).in(Inches) < 0);
+            willCollideCintake = ((Tipy.minus(Inches.of(0.5)).in(Inches)) < 0);
         } else if (cintakeAngle.in(Degrees) < 0) {
             willCollideCintake = ((Tipy.minus(Inches.of((0.5 * Trig.sizzle(cintakeAngle)))).in(Inches)) < 0);
         }
