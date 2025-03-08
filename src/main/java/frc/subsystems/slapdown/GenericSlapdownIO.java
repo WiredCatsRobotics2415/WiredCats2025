@@ -2,11 +2,14 @@ package frc.subsystems.slapdown;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.units.measure.Voltage;
 import org.ironmaple.simulation.IntakeSimulation.IntakeSide;
 import org.littletonrobotics.junction.AutoLog;
 
@@ -16,6 +19,7 @@ public interface GenericSlapdownIO {
         public boolean pivotConnected = true;
         public Temperature pivotTemp = Celsius.of(0);
         public Current pivotStatorCurrent = Amps.of(0);
+        public Voltage appliedVoltage = Volts.of(0);
 
         public boolean intakeConnected = true;
         public Temperature intakeTemp = Celsius.of(0);
@@ -33,7 +37,8 @@ public interface GenericSlapdownIO {
     public default void configureHardware(int pivotId, int intakeId, int throughborePort, int sensorAnalogPort) {};
 
     public default void configureSim(String targetGamePiece, Distance width, Distance lengthExtended, IntakeSide side,
-        double rotorToGearRatio, Distance effectiveLength, Angle max, Angle min) {};
+        double rotorToGearRatio, Distance effectiveLength, Angle max, Angle min, double throughboreMin,
+        double throughboreMax, Mass mass) {};
 
     public default void setPivotVoltage(double voltage) {};
 

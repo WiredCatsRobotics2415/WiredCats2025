@@ -19,21 +19,19 @@ import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
-    @Getter
-    @AutoLogOutput(key = "Arm/Goal") private Angle goal = Degrees.of(0.0);
+    @Getter private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
 
     private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA,
         "ArmFF");
-    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
-        ArmConstants.kD, new TrapezoidProfile.Constraints(ArmConstants.VelocityMax, ArmConstants.AccelerationMax),
-        "ArmPID");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
+        ArmConstants.kD,
+        new TrapezoidProfile.Constraints(ArmConstants.BaseVelocityMax, ArmConstants.BaseAccelerationMax), "ArmPID");
 
     @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();
@@ -156,6 +154,7 @@ public class Arm extends SubsystemBase {
         }
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint(), measurementDegrees);
 
+        Logger.recordOutput("Arm/Goal", goal);
         Logger.recordOutput("Arm/Error", pid.getPositionError());
         Logger.recordOutput("Arm/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
         Logger.recordOutput("Arm/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());

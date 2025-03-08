@@ -47,4 +47,18 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
         super.setTolerance(positionTolerance);
         this.tolerance.set(positionTolerance);
     }
+
+    /**
+     * Calculates the time for this mechanism to acieve its goal.
+     */
+    public double timeToGetTo(double goal, double current) {
+        Constraints constraints = this.getConstraints();
+        double absError = Math.abs(goal - current);
+        return (absError / constraints.maxVelocity) + (constraints.maxVelocity / constraints.maxAcceleration);
+    }
+
+    public double timeToStop() {
+        Constraints constraints = this.getConstraints();
+        return constraints.maxVelocity / constraints.maxAcceleration;
+    }
 }

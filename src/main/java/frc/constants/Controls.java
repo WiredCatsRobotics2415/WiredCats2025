@@ -2,9 +2,10 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.constants.Subsystems.CoralIntakeConstants;
+import frc.subsystems.superstructure.TuneableSuperStructureState;
+import frc.utils.tuning.TuneableDistance;
 
 public class Controls {
     public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -57,33 +58,44 @@ public class Controls {
     }
 
     public class Presets {
+        public static final TuneableSuperStructureState Stow = new TuneableSuperStructureState(Inches.of(0),
+            Degrees.of(90), CoralIntakeConstants.StowAngle, "Stow");
+
         // Positive: coral scoring side
-        public static final Angle Level1Angle = Degrees.of(109);
-        public static final Distance Level1Height = Inches.of(26);
-        public static final Distance Level1DriveOffset = Inches.of(4.05);
+        public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(26),
+            Degrees.of(-15), "Level1");
+        public static final TuneableDistance Level1DriveOffset = new TuneableDistance(Inches.of(-4.05), // These should be negative because they back away
+            "Presets/L1Offset");
 
-        public static final Angle Level2Angle = Degrees.of(109);
-        public static final Distance Level2Height = Inches.of(50);
-        public static final Distance Level2DriveOffset = Inches.of(4.05);
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(50),
+            Degrees.of(-15), "Level2");
+        public static final TuneableDistance Level2DriveOffset = new TuneableDistance(Inches.of(-4.05),
+            "Presets/L2Offset");
 
-        public static final Angle Level3Angle = Degrees.of(109);
-        public static final Distance Level3Height = Inches.of(50);
-        public static final Distance Level3DriveOffset = Inches.of(5.35);
+        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(60),
+            Degrees.of(-15), "Level3");
+        public static final TuneableDistance Level3DriveOffset = new TuneableDistance(Inches.of(-5.35),
+            "Presets/L3Offset");
 
-        public static final Angle Level4Angle = Degrees.of(115);
-        public static final Distance Level4Height = Inches.of(77);
-        public static final Distance Level4DriveOffset = Inches.of(6.65);
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77),
+            Degrees.of(-20), "Level4");
+        public static final TuneableDistance Level4DriveOffset = new TuneableDistance(Inches.of(-6.65),
+            "Presets/L4Offset");
 
-        public static final Angle BottomAlgaeDescoreAngle = Degrees.of(75);
-        public static final Distance BottomAlgaeDescoreHeight = Inches.of(16);
+        public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(16),
+            Degrees.of(0), "BottomDeAlgae");
+        public static final TuneableDistance BottomDADriveOffset = new TuneableDistance(Inches.of(-6),
+            "Presets/BottomDADriveOffset");
 
-        public static final Angle TopAlgaeDescoreAngle = Degrees.of(75);
-        public static final Distance TopAlgaeDescoreHeight = Inches.of(32);
+        public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(32),
+            Degrees.of(0), "TopDeAlgae");
+        public static final TuneableDistance TopDADriveOffset = new TuneableDistance(Inches.of(-6),
+            "Presets/TopDADriveOffset");
 
-        public static final Angle IntakeFromHPSAngle = Degrees.of(-12);
-        public static final Distance IntakeFromHPSHeight = Inches.of(20.6);
+        public static final TuneableSuperStructureState IntakeFromCPS = new TuneableSuperStructureState(Inches.of(26),
+            Degrees.of(192), "IntakeFromCPS");
 
-        public static final Angle GroundIntakeAngle = Degrees.of(-100);
-        public static final Distance GroundIntakeHeight = Inches.of(0);
+        public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
+            Degrees.of(180), "GroundIntake");
     }
 }

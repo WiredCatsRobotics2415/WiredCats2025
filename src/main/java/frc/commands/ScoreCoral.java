@@ -1,6 +1,5 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -14,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Measurements.RobotMeasurements;
-import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
-import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import frc.subsystems.superstructure.TuneableSuperStructureState;
+import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import lombok.Setter;
@@ -49,9 +48,8 @@ public class ScoreCoral extends Command {
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
 
-    private double goalHeightInches;
-    private double goalArmDegrees;
-    private Distance goalDriveOffset;
+    private TuneableSuperStructureState superStructureState;
+    private TuneableDistance goalDriveOffset;
     private Side side;
 
     private Command driveCommand;
@@ -67,33 +65,28 @@ public class ScoreCoral extends Command {
     }
 
     public ScoreCoral(Side reefSide, Level reefLevel) {
-        addRequirements(Elevator.getInstance(), Arm.getInstance());
+        addRequirements(SuperStructure.getInstance());
         side = reefSide;
 
         switch (reefLevel) {
             case L1:
-                goalHeightInches = Presets.Level1Height.in(Inches);
-                goalArmDegrees = Presets.Level1Angle.in(Degrees);
+                superStructureState = Presets.Level1;
                 goalDriveOffset = Presets.Level1DriveOffset;
                 break;
             case L2:
-                goalHeightInches = Presets.Level2Height.in(Inches);
-                goalArmDegrees = Presets.Level2Angle.in(Degrees);
+                superStructureState = Presets.Level2;
                 goalDriveOffset = Presets.Level2DriveOffset;
                 break;
             case L3:
-                goalHeightInches = Presets.Level3Height.in(Inches);
-                goalArmDegrees = Presets.Level3Angle.in(Degrees);
+                superStructureState = Presets.Level3;
                 goalDriveOffset = Presets.Level3DriveOffset;
                 break;
             case L4:
-                goalHeightInches = Presets.Level4Height.in(Inches);
-                goalArmDegrees = Presets.Level4Angle.in(Degrees);
+                superStructureState = Presets.Level4;
                 goalDriveOffset = Presets.Level4DriveOffset;
                 break;
             default:
-                goalHeightInches = Presets.Level1Height.in(Inches);
-                goalArmDegrees = Presets.Level1Angle.in(Degrees);
+                superStructureState = Presets.Level1;
                 goalDriveOffset = Presets.Level1DriveOffset;
                 break;
         }
@@ -101,14 +94,13 @@ public class ScoreCoral extends Command {
 
     @Override
     public void initialize() {
-        superStructureCommand = superStructure.runToPositionCommand(Inches.of(goalHeightInches),
-            Degrees.of(goalArmDegrees));
+        superStructureCommand = superStructure.beThereAsap(superStructureState);
         superStructureCommand.schedule();
 
         if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
-            Transform2d leftOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset),
+            Transform2d leftOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset.distance()),
                 Inches.of(LeftRightOffset.get()), new Rotation2d());
-            Transform2d rightOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset),
+            Transform2d rightOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset.distance()),
                 Inches.of(-LeftRightOffset.get()), new Rotation2d());
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);

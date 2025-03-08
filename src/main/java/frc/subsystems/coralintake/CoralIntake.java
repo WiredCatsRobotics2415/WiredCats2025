@@ -23,7 +23,6 @@ import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableArmFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import lombok.Getter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralIntake extends GenericSlapdown {
@@ -33,13 +32,12 @@ public class CoralIntake extends GenericSlapdown {
 
     private TuneableArmFF ff = new TuneableArmFF(CoralIntakeConstants.kS, CoralIntakeConstants.kG,
         CoralIntakeConstants.kV, CoralIntakeConstants.kA, "CoralIntakeFF");
-    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(CoralIntakeConstants.kP, 0,
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(CoralIntakeConstants.kP, 0,
         CoralIntakeConstants.kD,
-        new Constraints(CoralIntakeConstants.BaseMaxVelocity, CoralIntakeConstants.BaseMaxAcceleration),
+        new Constraints(CoralIntakeConstants.BaseVelocityMax, CoralIntakeConstants.BaseAccelerationMax),
         "CoralIntakePID");
 
-    @Getter
-    @AutoLogOutput(key = "CoralIntake/Goal") private Angle goal = Degrees.of(0.0);
+    @Getter private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     @Getter private boolean intaking = false;
     @Getter private boolean outtaking = false;
@@ -48,10 +46,12 @@ public class CoralIntake extends GenericSlapdown {
     private CoralIntake() {
         io = (GenericSlapdownIO) Util.getIOImplementation(GenericSlapdownIOReal.class, GenericSlapdownIOSim.class,
             new GenericSlapdownIO() {});
+        pid.setTolerance(CoralIntakeConstants.BaseGoalTolerance);
         io.configureHardware(CoralIntakeConstants.PivotMotorId, CoralIntakeConstants.IntakeMotorId,
             CoralIntakeConstants.ThroughborePort, -1);
         io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
-            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle, CoralIntakeConstants.MaxAngle);
+            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle, CoralIntakeConstants.GroundAngle,
+            CoralIntakeConstants.ThroughboreMin, CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
 
         new Trigger(EndEffector.getInstance()::hasCoral).onTrue(turnOffRollers());
 
@@ -131,6 +131,10 @@ public class CoralIntake extends GenericSlapdown {
         });
     }
 
+    public boolean pivotAtGoal() {
+        return pid.atSetpoint();
+    }
+
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
         double voltOut = output + feedforward;
@@ -151,6 +155,8 @@ public class CoralIntake extends GenericSlapdown {
             hasResetPidController = true;
         }
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
+        Logger.recordOutput("CoralIntake/Goal", goal);
+        Logger.recordOutput("CoralIntake/Error", pid.getPositionError());
     }
 
     @Override

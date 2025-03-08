@@ -75,11 +75,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("L1", new ScoreCoral(Side.Left, Level.L1));
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
         NamedCommands.registerCommand("GroundIntake",
-            superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle)
-                .andThen(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("SourceIntake",
-            superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle)
-                .andThen(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsap(Presets.IntakeFromCPS).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("LockOntoReef", drive.switchToSingleTagWhenAvailable());
         NamedCommands.registerCommand("SwitchToGlobalPE",
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
@@ -136,10 +134,8 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
-        oi.binds.get(OI.Bind.IntakeFromGround)
-            .onTrue(superstructure.runToPositionCommand(Presets.GroundIntakeHeight, Presets.GroundIntakeAngle));
-        oi.binds.get(OI.Bind.IntakeFromHPS)
-            .onTrue(superstructure.runToPositionCommand(Presets.IntakeFromHPSHeight, Presets.IntakeFromHPSAngle));
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsap(Presets.IntakeFromCPS));
 
         DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
             () -> ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign), null);
@@ -177,12 +173,13 @@ public class RobotContainer {
         new Trigger(() -> {
             return endEffector.isOuttaking() && !endEffector.irSensorTrigger();
         }).onTrue(new WaitCommand(0.5)
-            .andThen(ledStrip.flash(UseableColor.Purple, Seconds.of(0.2), Seconds.of(0.2)).withTimeout(1)).andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
+            .andThen(ledStrip.flash(UseableColor.Purple, Seconds.of(0.2), Seconds.of(0.2)).withTimeout(1))
+            .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
 
         new Trigger(() -> {
             return endEffector.irSensorTrigger();
         }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingCoral));
-        
+
         new Trigger(() -> {
             return endEffector.cameraTrigger();
         }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE));

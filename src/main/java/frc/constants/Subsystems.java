@@ -96,15 +96,15 @@ public class Subsystems {
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final double kS = 0.025;
         public static final double kG = 0.11;
-        public static final double kV = 0.3;
-        public static final double kA = 0.02;
+        public static final double kV = 0.01;
+        public static final double kA = 0.0;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
         public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
-        public static final double BaseVelocityMax = 39.5d; // (2/18) copied from akit2024
-        public static final double BaseAccelerationMax = 79d; // (2/18) copied from akit2024
+        public static final double BaseVelocityMax = 39.5d;
+        public static final double BaseAccelerationMax = 79d;
         public static final double BaseGoalTolerance = .5d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
@@ -135,8 +135,8 @@ public class Subsystems {
         public static final double kP = 0.7;
         public static final double kD = 0.01;
 
-        public static final double VelocityMax = 240d; // (2/18) copied from akit2024
-        public static final double AccelerationMax = 120d; // (2/18) copied from akit2024
+        public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
+        public static final double BaseAccelerationMax = 360; // (2/18) copied from akit2024
         public static final Angle GoalTolerance = Degrees.of(0.5);
 
         public static final double ApproximateMassKg = 1.814;
@@ -171,21 +171,26 @@ public class Subsystems {
         public static final double RotorToArmRatio = 15;
         public static final Distance EffectiveLength = Inches.of(20);
 
-        public static final double kS = 0.0;
-        public static final double kG = 0.88;
+        // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2.3%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=70&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A15%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
+        public static final double kS = 0.01;
+        public static final double kG = 0.55;
         public static final double kV = 0.29;
-        public static final double kA = 0.03;
+        public static final double kA = 0.04;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 
-        public static final double BaseMaxVelocity = 180;
-        public static final double BaseMaxAcceleration = 360;
+        public static final double BaseGoalTolerance = 1;
+
+        public static final double BaseVelocityMax = 180;
+        public static final double BaseAccelerationMax = 360;
 
         public static final double IntakeSpeed = 0.6;
         public static final double OuttakeSpeed = -0.35;
 
         public static final Angle MaxAngle = Degrees.of(100);
-        public static final Angle StowAngle = Degrees.of(90);
+        public static final Angle StowAngle = Degrees.of(70);
         public static final Angle GroundAngle = Degrees.of(0);
+
+        public static final Mass Weight = Pounds.of(2.3);
     }
 }

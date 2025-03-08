@@ -17,19 +17,17 @@ import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
-import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
     private boolean coasting;
-    @Getter
-    @AutoLogOutput(key = "Elevator/Goal") private Distance goal = Inches.of(0.0);
+    @Getter private Distance goal = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
-    private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
         ElevatorConstants.kD,
         new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax),
         "ElevatorPID");
@@ -40,6 +38,7 @@ public class Elevator extends SubsystemBase {
 
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
+        pid.setTolerance(ElevatorConstants.BaseGoalTolerance);
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to 0", runOnce(() -> setGoal(ElevatorConstants.MinHeight)));
@@ -99,6 +98,7 @@ public class Elevator extends SubsystemBase {
         }
         useOutput(pid.calculate(measurementInches), pid.getSetpoint());
 
+        Logger.recordOutput("Elevator/Goal", goal);
         Logger.recordOutput("Elevator/Error", pid.getPositionError());
         Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());
         Logger.recordOutput("Elevator/ActualAcceleration", differentiableMeasurementInches.getSecondDerivative());

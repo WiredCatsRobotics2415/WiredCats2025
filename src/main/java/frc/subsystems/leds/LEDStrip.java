@@ -16,7 +16,7 @@ public class LEDStrip extends SubsystemBase {
     private static LEDStrip instance;
 
     @Getter private UseableColor currentUseable = UseableColor.BreathingGreen;
-    @Getter private Color currentColor =currentUseable.color;
+    @Getter private Color currentColor = currentUseable.color;
 
     private LEDStrip() {
         io = (LEDStripIO) Util.getIOImplementation(LEDStripIOBlinkin.class, LEDStripIOSim.class, new LEDStripIO() {});

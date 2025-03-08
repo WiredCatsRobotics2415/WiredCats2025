@@ -2,6 +2,7 @@ package frc.subsystems.slapdown;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Celsius;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -20,6 +21,8 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     private DutyCycleEncoder throughbore;
     private AnalogInput sensor;
 
+    private double appliedVolts;
+
     public GenericSlapdownIOReal() {}
 
     @Override
@@ -29,6 +32,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         inputs.pivotConnected = pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.pivotTemp = Celsius.of(pivotMotor.getMotorTemperature());
         inputs.pivotStatorCurrent = Amps.of(pivotMotor.getOutputCurrent());
+        inputs.appliedVoltage = Volts.of(appliedVolts);
 
         inputs.intakeConnected = intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.intakeTemp = Celsius.of(intakeMotor.getMotorTemperature());
@@ -62,6 +66,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
 
     @Override
     public void setPivotVoltage(double voltage) {
+        appliedVolts = voltage;
         pivotMotor.setVoltage(voltage);
     }
 }

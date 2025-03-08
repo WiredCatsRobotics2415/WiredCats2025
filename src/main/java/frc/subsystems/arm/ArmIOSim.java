@@ -8,6 +8,7 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.math.Algebra;
@@ -43,6 +44,11 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void setVoltage(double voltage) {
+        if (RobotState.isDisabled()) {
+            simArm.setInputVoltage(0);
+            appliedVoltage = 0;
+            return;
+        }
         appliedVoltage = voltage;
         simArm.setInputVoltage(voltage);
     }

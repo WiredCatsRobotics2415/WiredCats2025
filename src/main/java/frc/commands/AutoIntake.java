@@ -22,7 +22,6 @@ import frc.subsystems.vision.Vision;
 import frc.subsystems.vision.Vision.ObjectRecognized;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableNumber;
-import frc.utils.tuning.TuneableTime;
 
 public class AutoIntake extends Command {
     private Vision vision = Vision.getInstance();
@@ -139,5 +138,7 @@ public class AutoIntake extends Command {
     }
 
     @Override
-    public boolean isFinished() { return endEffector.hasCoral() || countSinceLastSeenCoral.hasElapsed(hasSeenCoralSeconds.get()); }
+    public boolean isFinished() {
+        return endEffector.hasCoral() || countSinceLastSeenCoral.hasElapsed(hasSeenCoralSeconds.get());
+    }
 }

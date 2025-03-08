@@ -13,10 +13,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Measurements.RobotMeasurements;
-import frc.subsystems.arm.Arm;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
-import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
+import frc.subsystems.superstructure.TuneableSuperStructureState;
+import frc.utils.tuning.TuneableDistance;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,6 +35,9 @@ public class Dealgae extends Command {
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
+
+    private TuneableSuperStructureState superStructureState;
+    private TuneableDistance goalDriveOffset;
 
     private Command driveCommand;
     private Command superStructureCommand;
@@ -59,10 +62,7 @@ public class Dealgae extends Command {
     }
 
     public Dealgae() {
-        // TODO: Note that if the robot is not driveable while the preset is going even though
-        // You are in the PresetOnly mode, consider moving this addRequirements line to
-        // initialize so it doesn't require drive too early
-        addRequirements(drive, Elevator.getInstance(), Arm.getInstance());
+        addRequirements(SuperStructure.getInstance());
     }
 
     @Override
@@ -70,15 +70,22 @@ public class Dealgae extends Command {
         Pose2d apriltagPose = findNearestReefSideApriltag();
         boolean algaeOnTop = algaeOnTopForPose(apriltagPose);
 
-        superStructureCommand = superStructure.runToPositionCommand(
-            algaeOnTop ? Presets.TopAlgaeDescoreHeight : Presets.BottomAlgaeDescoreHeight,
-            algaeOnTop ? Presets.TopAlgaeDescoreAngle : Presets.BottomAlgaeDescoreAngle);
+        superStructureCommand = superStructure.beThereAsap(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
         superStructureCommand.schedule();
 
         if (currentAutomationMode == DealgaeAutomationMode.PresetAndAlign) {
-            driveCommand = drive.driveTo(apriltagPose.plus(Offset), DriveToleranceMeters);
+            driveCommand = drive.driveTo(apriltagPose.plus(Offset)
+                .plus(new Transform2d(
+                    algaeOnTop ? Presets.TopDADriveOffset.distance() : Presets.BottomDADriveOffset.distance(),
+                    Inches.of(0), Rotation2d.kZero)),
+                DriveToleranceMeters);
             driveCommand.schedule();
         }
+    }
+
+    @Override
+    public void execute() {
+        if (driveCommand != null) System.out.println(driveCommand.isFinished());
     }
 
     @Override
