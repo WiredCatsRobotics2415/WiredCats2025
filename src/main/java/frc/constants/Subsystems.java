@@ -97,7 +97,7 @@ public class Subsystems {
         public static final double kS = 0.025;
         public static final double kG = 0.11;
         public static final double kV = 0.01;
-        public static final double kA = 0.0;
+        public static final double kA = 0.02;
         public static final double kP = 0.2;
         public static final double kD = 0.02;
 

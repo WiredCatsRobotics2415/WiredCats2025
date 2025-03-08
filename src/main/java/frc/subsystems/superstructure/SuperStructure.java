@@ -21,6 +21,7 @@ import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
 import frc.utils.math.Trig;
+import frc.utils.tuning.TuneableBoolean;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
@@ -33,13 +34,14 @@ public class SuperStructure extends SubsystemBase {
     private Elevator elevator = Elevator.getInstance();
     private CoralIntake coralIntake = CoralIntake.getInstance();
 
-    @Getter private boolean collisionPrevented = true;
+    @Getter private boolean collisionPrevented = false;
     private double lastElevatorTimePrediction;
     private double lastArmStartError;
 
-    private TuneableNumber percentageOfArmGoal = new TuneableNumber(0.75, "SuperStructure/percentageOfArmGoal");
+    private TuneableNumber percentageOfArmGoal = new TuneableNumber(0.0, "SuperStructure/percentageOfArmGoal"); //Note: Sim tests indicate this number should be at 0, otherwise we get wierd elevator freezing behavior - possibly add debounce so once arm has reached x% of goal, elevator can't be frozen again
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
     private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
+    private TuneableBoolean usePredictiveWillCollide = new TuneableBoolean(false, "SuperStructure/usePredictiveWillCollide");
 
     private static SuperStructure instance;
 
@@ -93,11 +95,11 @@ public class SuperStructure extends SubsystemBase {
 
             lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().in(Inches),
                 elevator.getMeasurement().in(Inches));
-            lastArmStartError = arm.getPid().getPositionError();
+            lastArmStartError = Math.abs(arm.getPid().getPositionError());
             timeTaken.start();
         }).andThen(run(() -> {
             if (!elevator.atGoal()) {
-                if (elevator.getPid().getPositionError() < 0) {
+                if (elevator.getPid().getPositionError() > 0) {
                     if (!willCollideInNextTimestep()) {
                         // If elevator wants to move down and it won't collide, then go
                         elevator.getPid().setConstraints(
@@ -108,7 +110,7 @@ public class SuperStructure extends SubsystemBase {
                     }
                 } else {
                     boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
-                    boolean armHasReachedMostOfGoal = (arm.getPid().getPositionError() /
+                    boolean armHasReachedMostOfGoal = (Math.abs(arm.getPid().getPositionError()) /
                         lastArmStartError) > percentageOfArmGoal.get();
                     if (elevatorCanMove && armHasReachedMostOfGoal) {
                         // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
@@ -128,7 +130,10 @@ public class SuperStructure extends SubsystemBase {
                         CoralIntakeConstants.BaseAccelerationMax));
                 }
             }
-        })).until(this::allAtGoal);
+        })).until(this::allAtGoal).andThen(runOnce(() -> {
+            timeTaken.stop();
+            timeTaken.reset();
+        }));
         command.addRequirements(elevator, arm, coralIntake);
         return command;
     }
@@ -142,11 +147,15 @@ public class SuperStructure extends SubsystemBase {
     }
 
     private boolean willCollideInNextTimestep() {
-        double elevatorFreezeTime = elevator.getPid().timeToStop();
+        if (usePredictiveWillCollide.get()) {
+            double elevatorFreezeTime = elevator.getPid().timeToStop();
         double armFreezeTime = arm.getPid().timeToStop();
         return positionsWillCollide(
-            Inches.of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(elevatorFreezeTime)),
-            Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)));
+        Inches.of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(elevatorFreezeTime)),
+        Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)));
+        } else {
+            return positionsWillCollide(elevator.getMeasurement(), arm.getMeasurement());
+        }
     }
 
     public boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle) {

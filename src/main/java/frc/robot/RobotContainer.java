@@ -155,7 +155,7 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new AutoIntake());
 
-        // oi.binds.get(OI.Bind.StowPreset).onTrue();
+        oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.beThereAsap(Presets.Stow));
     }
 
     private void configureTriggers() {
