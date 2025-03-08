@@ -27,10 +27,10 @@ public class Arm extends SubsystemBase {
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
 
-    private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA,
-        "ArmFF");
-    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
-        ArmConstants.kD,
+    private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS.get(), ArmConstants.kG.get(), ArmConstants.kV.get(),
+        ArmConstants.kA.get(), "ArmFF");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP.get(), 0.0d,
+        ArmConstants.kD.get(),
         new TrapezoidProfile.Constraints(ArmConstants.BaseVelocityMax, ArmConstants.BaseAccelerationMax), "ArmPID");
 
     @Getter private ArmIO io;

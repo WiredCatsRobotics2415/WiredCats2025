@@ -1,7 +1,6 @@
 package frc.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
@@ -25,10 +24,10 @@ public class Elevator extends SubsystemBase {
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
-    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
-        ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
-    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
-        ElevatorConstants.kD,
+    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS.get(), ElevatorConstants.kV.get(),
+        ElevatorConstants.kG.get(), ElevatorConstants.kA.get(), "ElevatorFF");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP.get(),
+        0.0d, ElevatorConstants.kD.get(),
         new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax),
         "ElevatorPID");
 
@@ -72,8 +71,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public Distance getMeasurement() {
-        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.in(Volts),
-            ElevatorConstants.PotentiometerMaxVolt.in(Volts), ElevatorConstants.MinHeight.in(Inches),
+        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.get(),
+            ElevatorConstants.PotentiometerMaxVolt.get(), ElevatorConstants.MinHeight.in(Inches),
             ElevatorConstants.MaxHeight.in(Inches)));
     }
 

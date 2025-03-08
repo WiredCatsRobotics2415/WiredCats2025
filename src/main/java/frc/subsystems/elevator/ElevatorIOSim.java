@@ -14,7 +14,7 @@ import frc.utils.math.Algebra;
 public class ElevatorIOSim implements ElevatorIO {
     private double appliedVoltage;
 
-    private final ElevatorSim simElevator = new ElevatorSim(ElevatorConstants.kV, ElevatorConstants.kA,
+    private final ElevatorSim simElevator = new ElevatorSim(ElevatorConstants.kV.get(), ElevatorConstants.kA.get(),
         DCMotor.getFalcon500(2), ElevatorConstants.MinHeight.in(Meters), ElevatorConstants.MaxHeight.in(Meters), true,
         ElevatorConstants.MinHeight.in(Meters));
 
@@ -37,7 +37,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
         inputs.wirePotentiometer = Algebra.linearMap(simElevator.getPositionMeters(),
             ElevatorConstants.MinHeight.in(Meters), ElevatorConstants.MaxHeight.in(Meters),
-            ElevatorConstants.PotentiometerMinVolt.in(Volts), ElevatorConstants.PotentiometerMaxVolt.in(Volts));
+            ElevatorConstants.PotentiometerMinVolt.get(), ElevatorConstants.PotentiometerMaxVolt.get());
     }
 
     @Override

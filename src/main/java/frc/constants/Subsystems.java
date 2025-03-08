@@ -88,20 +88,22 @@ public class Subsystems {
         public static final int LeftMotorPort = 9; // (2/14): this is Elevator1
         public static final int RightMotorPort = 10; // (2/14): this is Elevator2
 
-        public static final Voltage PotentiometerMinVolt = Volts.of(0.0d);
-        public static final Voltage PotentiometerMaxVolt = Volts.of(3.3d);
+        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0d,
+            "ElevatorFF/PotentiometerMinVolt");
+        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(3.3d,
+            "ElevatorFF/PotentiometerMaxVolt");
         public static final Distance MinHeight = Inches.of(0.0d);
         public static final Distance MaxHeight = Inches.of(79.0d);
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
-        public static final double kS = 0.025;
-        public static final double kG = 0.11;
-        public static final double kV = 0.01;
-        public static final double kA = 0.02;
-        public static final double kP = 0.2;
-        public static final double kD = 0.02;
+        public static final TuneableNumber kS = new TuneableNumber(0.025d, "ElevatorFF/kS");
+        public static final TuneableNumber kG = new TuneableNumber(0.11d, "ElevatorFF/kG");
+        public static final TuneableNumber kV = new TuneableNumber(0.01d, "ElevatorFF/kV");
+        public static final TuneableNumber kA = new TuneableNumber(0.02d, "ElevatorFF/kA");
+        public static final TuneableNumber kP = new TuneableNumber(0.2d, "ElevatorFF/kP");
+        public static final TuneableNumber kD = new TuneableNumber(0.02d, "ElevatorFF/kD");
 
-        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
+        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG.get(), "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
         public static final double BaseVelocityMax = 39.5d;
         public static final double BaseAccelerationMax = 79d;
@@ -128,12 +130,12 @@ public class Subsystems {
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kS = 0.025;
-        public static final double kG = 0.5;
-        public static final double kV = 0.1;
-        public static final double kA = 0.0;
-        public static final double kP = 0.7;
-        public static final double kD = 0.01;
+        public static final TuneableNumber kS = new TuneableNumber(0.025d, "ArmFF/kS");
+        public static final TuneableNumber kG = new TuneableNumber(0.5d, "ArmFF/kG");
+        public static final TuneableNumber kV = new TuneableNumber(0.1d, "ArmFF/kV");
+        public static final TuneableNumber kA = new TuneableNumber(0d, "ArmFF/kA");
+        public static final TuneableNumber kP = new TuneableNumber(0.7d, "ArmFF/kP");
+        public static final TuneableNumber kD = new TuneableNumber(0.01d, "ArmFF/kD");
 
         public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
         public static final double BaseAccelerationMax = 360; // (2/18) copied from akit2024
