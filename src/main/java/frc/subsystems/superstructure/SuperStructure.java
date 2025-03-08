@@ -19,14 +19,12 @@ import frc.constants.Subsystems.ElevatorConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
-import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableBoolean;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
-import frc.subsystems.superstructure.TuneableSuperStructureState;
 
 /**
  * Helper class to sit between commands and the arm and elevator, to ensure no internal collisions happen. All commands that use the arm or elevator should interact with this class instead of directly with arm or elevator.
@@ -41,10 +39,11 @@ public class SuperStructure extends SubsystemBase {
     private double lastElevatorTimePrediction;
     private double lastArmStartError;
 
-    private TuneableNumber percentageOfArmGoal = new TuneableNumber(0.0, "SuperStructure/percentageOfArmGoal"); //Note: Sim tests indicate this number should be at 0, otherwise we get wierd elevator freezing behavior - possibly add debounce so once arm has reached x% of goal, elevator can't be frozen again
+    private TuneableNumber percentageOfArmGoal = new TuneableNumber(0.0, "SuperStructure/percentageOfArmGoal"); // Note: Sim tests indicate this number should be at 0, otherwise we get wierd elevator freezing behavior - possibly add debounce so once arm has reached x% of goal, elevator can't be frozen again
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
     private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
-    private TuneableBoolean usePredictiveWillCollide = new TuneableBoolean(false, "SuperStructure/usePredictiveWillCollide");
+    private TuneableBoolean usePredictiveWillCollide = new TuneableBoolean(false,
+        "SuperStructure/usePredictiveWillCollide");
 
     private static SuperStructure instance;
 
@@ -75,13 +74,13 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public void setArmGoalSafely(Angle armGoal) {
-        if (!positionsWillCollide(elevator.getGoal(), armGoal, intake.getGoal())) {
+        if (!positionsWillCollide(elevator.getGoal(), armGoal, coralIntake.getGoal())) {
             arm.setGoal(armGoal);
         }
     }
 
     public void setElevatorGoalSafely(Distance elevatorGoal) {
-        if (!positionsWillCollide(elevatorGoal, arm.getGoal(), intake.getGoal())) {
+        if (!positionsWillCollide(elevatorGoal, arm.getGoal(), coralIntake.getGoal())) {
             elevator.setGoal(elevatorGoal);
         }
     }
@@ -152,16 +151,20 @@ public class SuperStructure extends SubsystemBase {
     private boolean willCollideInNextTimestep() {
         if (usePredictiveWillCollide.get()) {
             double elevatorFreezeTime = elevator.getPid().timeToStop();
-        double armFreezeTime = arm.getPid().timeToStop();
-        return positionsWillCollide(
-        Inches.of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(elevatorFreezeTime)),
-        Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)), Degrees.of(coralIntake.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(coralfree)));
+            double armFreezeTime = arm.getPid().timeToStop();
+            double coralFreezeTime = coralIntake.getPid().timeToStop();
+            return positionsWillCollide(
+                Inches
+                    .of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(elevatorFreezeTime)),
+                Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)),
+                Degrees.of(
+                    coralIntake.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(coralFreezeTime)));
         } else {
             return positionsWillCollide(elevator.getMeasurement(), arm.getMeasurement(), coralIntake.getPivotAngle());
         }
     }
 
-    private boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle, Angle cintakeAngle) {
+    public boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle, Angle cintakeAngle) {
         Distance ElevatorY = elevatorHeight.times(Trig.cosizzle(3.7)).plus(Inches.of(1.64));
         Distance Army = ElevatorY.plus(ArmConstants.EffectiveLength.times(Trig.cosizzle(-armAngle.in(Degrees) - 3.7)));
         Distance Tipy = Army.plus(elevatorHeight.times(Trig.sizzle(armAngle)));
