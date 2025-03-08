@@ -19,18 +19,21 @@ import frc.constants.Subsystems.ElevatorConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
+import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableBoolean;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
+import frc.subsystems.superstructure.TuneableSuperStructureState;
 
 /**
  * Helper class to sit between commands and the arm and elevator, to ensure no internal collisions happen. All commands that use the arm or elevator should interact with this class instead of directly with arm or elevator.
  */
 public class SuperStructure extends SubsystemBase {
     private Arm arm = Arm.getInstance();
+    private CoralIntake intake = CoralIntake.getInstance();
     private Elevator elevator = Elevator.getInstance();
     private CoralIntake coralIntake = CoralIntake.getInstance();
 
@@ -72,13 +75,13 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public void setArmGoalSafely(Angle armGoal) {
-        if (!positionsWillCollide(elevator.getGoal(), armGoal)) {
+        if (!positionsWillCollide(elevator.getGoal(), armGoal, intake.getGoal())) {
             arm.setGoal(armGoal);
         }
     }
 
     public void setElevatorGoalSafely(Distance elevatorGoal) {
-        if (!positionsWillCollide(elevatorGoal, arm.getGoal())) {
+        if (!positionsWillCollide(elevatorGoal, arm.getGoal(), intake.getGoal())) {
             elevator.setGoal(elevatorGoal);
         }
     }
@@ -152,17 +155,27 @@ public class SuperStructure extends SubsystemBase {
         double armFreezeTime = arm.getPid().timeToStop();
         return positionsWillCollide(
         Inches.of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(elevatorFreezeTime)),
-        Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)));
+        Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(armFreezeTime)), Degrees.of(coralIntake.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(coralfree)));
         } else {
-            return positionsWillCollide(elevator.getMeasurement(), arm.getMeasurement());
+            return positionsWillCollide(elevator.getMeasurement(), arm.getMeasurement(), coralIntake.getPivotAngle());
         }
     }
 
-    public boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle) {
-        boolean willCollide = (elevatorHeight.in(Inches) +
-            Trig.sizzle(armAngle) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches)) < 0);
-        this.collisionPrevented = willCollide;
-        return willCollide;
+    private boolean positionsWillCollide(Distance elevatorHeight, Angle armAngle, Angle cintakeAngle) {
+        Distance ElevatorY = elevatorHeight.times(Trig.cosizzle(3.7)).plus(Inches.of(1.64));
+        Distance Army = ElevatorY.plus(ArmConstants.EffectiveLength.times(Trig.cosizzle(-armAngle.in(Degrees) - 3.7)));
+        Distance Tipy = Army.plus(elevatorHeight.times(Trig.sizzle(armAngle)));
+        boolean willCollideCintake = false;
+
+        boolean willCollideElevator = ((elevatorHeight.in(Inches) +
+            Trig.cosizzle(armAngle) * (EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches))) < 0);
+        if (cintakeAngle.in(Degrees) > 0) {
+            willCollideCintake = (Tipy.minus(Inches.of(0.5)).in(Inches) < 0);
+        } else if (cintakeAngle.in(Degrees) < 0) {
+            willCollideCintake = ((Tipy.minus(Inches.of((0.5 * Trig.sizzle(cintakeAngle)))).in(Inches)) < 0);
+        }
+        this.collisionPrevented = willCollideElevator && willCollideCintake;
+        return willCollideElevator && willCollideCintake;
     }
 
     @Override
