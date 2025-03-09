@@ -7,6 +7,7 @@ import frc.constants.RuntimeConstants;
 
 public class TuneableProfiledPIDController extends ProfiledPIDController {
     private TuneableNumber kP, kI, kD, veloMax, accelMax, tolerance;
+    private double lastMeasure;
 
     public TuneableProfiledPIDController(double kP, double kI, double kD, Constraints baseConstraints,
         String controllerName) {
@@ -60,5 +61,18 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
     public double timeToStop() {
         Constraints constraints = this.getConstraints();
         return constraints.maxVelocity / constraints.maxAcceleration;
+    }
+
+    @Override
+    public double calculate(double measurement) {
+        lastMeasure = measurement;
+        return super.calculate(measurement);
+    }
+
+    /**
+     * @return Goal - measure
+     */
+    public double goalError() {
+        return this.getGoal().position - lastMeasure;
     }
 }

@@ -47,11 +47,12 @@ public class CoralIntake extends GenericSlapdown {
         io = (GenericSlapdownIO) Util.getIOImplementation(GenericSlapdownIOReal.class, GenericSlapdownIOSim.class,
             new GenericSlapdownIO() {});
         pid.setTolerance(CoralIntakeConstants.BaseGoalTolerance);
-        io.configureHardware(CoralIntakeConstants.PivotMotorId, CoralIntakeConstants.IntakeMotorId,
+        io.configureHardware(CoralIntakeConstants.PivotMotorID, CoralIntakeConstants.IntakeMotorID,
             CoralIntakeConstants.ThroughborePort, -1);
         io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
-            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle, CoralIntakeConstants.GroundAngle,
-            CoralIntakeConstants.ThroughboreMin, CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
+            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle.angle(),
+            CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin.get(),
+            CoralIntakeConstants.ThroughboreMax.get(), CoralIntakeConstants.Weight);
 
         new Trigger(EndEffector.getInstance()::hasCoral).onTrue(turnOffRollers());
 
@@ -81,7 +82,7 @@ public class CoralIntake extends GenericSlapdown {
     }
 
     public void setPivotGoal(Angle goal) {
-        if (goal.lte(CoralIntakeConstants.MaxAngle) && goal.gte(CoralIntakeConstants.GroundAngle)) {
+        if (goal.lte(CoralIntakeConstants.MaxAngle.angle()) && goal.gte(CoralIntakeConstants.GroundAngle.angle())) {
             this.goal = goal;
             pid.setGoal(goal.in(Degrees));
         }
@@ -89,16 +90,16 @@ public class CoralIntake extends GenericSlapdown {
 
     @Override
     public Angle getPivotAngle() {
-        return Degrees.of(Algebra.linearMap(inputs.throughborePosition + CoralIntakeConstants.ThroughboreZero,
-            CoralIntakeConstants.ThroughboreMin, CoralIntakeConstants.ThroughboreMax,
-            CoralIntakeConstants.MaxAngle.in(Degrees), CoralIntakeConstants.GroundAngle.in(Degrees)));
+        return Degrees.of(Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin.get(),
+            CoralIntakeConstants.ThroughboreMax.get(), CoralIntakeConstants.GroundAngle.in(Degrees),
+            CoralIntakeConstants.MaxAngle.in(Degrees)));
     }
 
     @Override
     public Command toggleIntake() {
         return runOnce(() -> {
             if (!intaking) {
-                io.setIntakePower(CoralIntakeConstants.IntakeSpeed);
+                io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
                 intaking = true;
             } else {
                 io.setIntakePower(0);
@@ -112,7 +113,7 @@ public class CoralIntake extends GenericSlapdown {
     public Command toggleOuttake() {
         return runOnce(() -> {
             if (!outtaking) {
-                io.setIntakePower(CoralIntakeConstants.OuttakeSpeed);
+                io.setIntakePower(CoralIntakeConstants.OuttakeSpeed.get());
                 outtaking = true;
             } else {
                 io.setIntakePower(0);

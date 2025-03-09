@@ -96,6 +96,6 @@ public class Controls {
             Degrees.of(192), "IntakeFromCPS");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(180), "GroundIntake");
+            Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");
     }
 }

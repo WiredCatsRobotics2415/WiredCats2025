@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.constants.Subsystems.ArmConstants;
 
 public class ArmIOReal implements ArmIO {
-    private TalonFX motor = new TalonFX(ArmConstants.MotorID);
+    private TalonFX motor;
     private double appliedVoltage;
 
     private StatusSignal<Current> motorStator = motor.getStatorCurrent();

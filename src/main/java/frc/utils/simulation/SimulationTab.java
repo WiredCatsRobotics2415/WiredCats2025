@@ -46,7 +46,6 @@ public class SimulationTab {
         thisTab = Shuffleboard.getTab("Simulation");
 
         // https://www.desmos.com/calculator/44o3ymgzv5
-        // TODO: just math.random * 3 ft at random angle
         thisTab.add("Drop Coral at Left HPS", new InstantCommand(() -> {
             Translation2d drop = getRandomPositionInSemicircle(
                 Meters.of(leftStationFarEnd.getDistance(leftStationCloseEnd)), Feet.of(4));

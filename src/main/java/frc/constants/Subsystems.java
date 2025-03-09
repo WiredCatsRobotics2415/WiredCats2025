@@ -11,6 +11,8 @@ import com.pathplanner.lib.path.PathConstraints;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.subsystems.leds.TuneableColor;
+import frc.utils.tuning.TuneableAngle;
+import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableNumber;
 
 public class Subsystems {
@@ -85,25 +87,23 @@ public class Subsystems {
 
     public class ElevatorConstants {
         public static final int AnalogPotentiometerPort = NavxMXPPorts.Analog0;
-        public static final int LeftMotorPort = 9; // (2/14): this is Elevator1
-        public static final int RightMotorPort = 10; // (2/14): this is Elevator2
+        public static final int LeftMotorID = 9; // (2/14): this is Elevator1
+        public static final int RightMotorID = 10; // (2/14): this is Elevator2
 
-        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0d,
-            "ElevatorFF/PotentiometerMinVolt");
-        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(3.3d,
-            "ElevatorFF/PotentiometerMaxVolt");
-        public static final Distance MinHeight = Inches.of(0.0d);
-        public static final Distance MaxHeight = Inches.of(79.0d);
+        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0.0d, "Elevator/PotMinVolt");
+        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(3.3d, "Elevator/PotMaxVolt");
+        public static final TuneableDistance MinHeight = new TuneableDistance(Inches.of(0.0d), "Elevator/MinHeight");
+        public static final TuneableDistance MaxHeight = new TuneableDistance(Inches.of(79.0d), "Elevator/MaxHeight");
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
-        public static final TuneableNumber kS = new TuneableNumber(0.025d, "ElevatorFF/kS");
-        public static final TuneableNumber kG = new TuneableNumber(0.11d, "ElevatorFF/kG");
-        public static final TuneableNumber kV = new TuneableNumber(0.01d, "ElevatorFF/kV");
-        public static final TuneableNumber kA = new TuneableNumber(0.02d, "ElevatorFF/kA");
-        public static final TuneableNumber kP = new TuneableNumber(0.2d, "ElevatorFF/kP");
-        public static final TuneableNumber kD = new TuneableNumber(0.02d, "ElevatorFF/kD");
+        public static final double kS = 0.025;
+        public static final double kG = 0.11;
+        public static final double kV = 0.01;
+        public static final double kA = 0.02;
+        public static final double kP = 0.2;
+        public static final double kD = 0.02;
 
-        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG.get(), "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
+        public static final TuneableNumber kGForArm = new TuneableNumber(0.11 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
         public static final double BaseVelocityMax = 39.5d;
         public static final double BaseAccelerationMax = 79d;
@@ -120,22 +120,22 @@ public class Subsystems {
         public static final int ThroughborePort = 19;
 
         // 0 degrees: the arm rail is parallel with the drivebase on the scoring side (front of robot)
-        // 180 degrees: the arm rail is with the drive base on the cintake side (back of robot)
-        public static final double ThroughboreMin = 0;
-        public static final double ThroughboreMax = 1;
-        public static final Angle MaxDegreesBack = Degrees.of(210);
-        public static final Angle MinDegreesFront = Degrees.of(-30);
+        // 180 degrees: the arm rail is parallel with the drive base on the cintake side (back of robot)
+        public static final TuneableNumber ThroughboreMin = new TuneableNumber(0, "Arm/ThroughBoreMin");
+        public static final TuneableNumber ThroughboreMax = new TuneableNumber(1, "Arm/ThroughBoreMax");
+        public static final TuneableAngle MaxDegreesBack = new TuneableAngle(Degrees.of(210), "Arm/MaxDegreesBack");
+        public static final TuneableAngle MinDegreesFront = new TuneableAngle(Degrees.of(-30), "Arm/MinDegreesBack");
 
         public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
             .withInverted(InvertedValue.CounterClockwise_Positive);
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final TuneableNumber kS = new TuneableNumber(0.025d, "ArmFF/kS");
-        public static final TuneableNumber kG = new TuneableNumber(0.5d, "ArmFF/kG");
-        public static final TuneableNumber kV = new TuneableNumber(0.1d, "ArmFF/kV");
-        public static final TuneableNumber kA = new TuneableNumber(0d, "ArmFF/kA");
-        public static final TuneableNumber kP = new TuneableNumber(0.7d, "ArmFF/kP");
-        public static final TuneableNumber kD = new TuneableNumber(0.01d, "ArmFF/kD");
+        public static final double kS = 0.025;
+        public static final double kG = 0.5;
+        public static final double kV = 0.1;
+        public static final double kA = 0.0;
+        public static final double kP = 0.7;
+        public static final double kD = 0.01;
 
         public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
         public static final double BaseAccelerationMax = 360; // (2/18) copied from akit2024
@@ -150,48 +150,50 @@ public class Subsystems {
         public static final int MotorID = 12;
         public static final int IRSensorPort = NavxMXPPorts.Analog1;
 
-        public static final double IntakeCoralSpeed = 0.6;
-        public static final double IntakeAlgaeSpeed = -0.8;
-        public static final double OuttakeCoralSpeed = -0.35;
-        public static final double OuttakeAlageSpeed = 0.35;
+        public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(0.6, "EndEffector/IntakeCoralSpeed");
+        public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(-0.8, "EndEffector/IntakeAlgaeSpeed");
+        public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(-0.35,
+            "EndEffector/OuttakeCoralSpeed");
+        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(0.35,
+            "EndEffector/OuttakeAlageSpeed");
 
-        public static final int IRThreshold = 100; // (2/14) copied from akit2024
-        public static final int AlgaeIntookCameraThreshold = 200;
+        public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
+        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(200,
+            "EndEffector/AlgaeIntookCameraThreshold");
 
-        public static final Distance EffectiveDistanceFromElevator = Inches.of(29);
+        public static final Distance EffectiveDistanceFromElevator = Inches.of(26);
     }
 
     public class CoralIntakeConstants {
-        public static final int PivotMotorId = 13;
-        public static final int IntakeMotorId = 14;
+        public static final int PivotMotorID = 13;
+        public static final int IntakeMotorID = 14;
 
         public static final int ThroughborePort = 18;
-        public static final double ThroughboreZero = 0;
-        public static final double ThroughboreMin = 0;
-        public static final double ThroughboreMax = 1;
+        public static final TuneableNumber ThroughboreMin = new TuneableNumber(0, "CoralIntake/ThroughboreMin");
+        public static final TuneableNumber ThroughboreMax = new TuneableNumber(1, "CoralIntake/ThroughboreMax");
 
         public static final double RotorToArmRatio = 15;
-        public static final Distance EffectiveLength = Inches.of(20);
+        public static final Distance EffectiveLength = Inches.of(23);
 
         // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2.3%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=70&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A15%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.01;
         public static final double kG = 0.55;
-        public static final double kV = 0.29;
+        public static final double kV = 0.01;
         public static final double kA = 0.04;
-        public static final double kP = 0.2;
-        public static final double kD = 0.02;
+        public static final double kP = 1.2;
+        public static final double kD = 0.12;
 
         public static final double BaseGoalTolerance = 1;
 
         public static final double BaseVelocityMax = 180;
         public static final double BaseAccelerationMax = 360;
 
-        public static final double IntakeSpeed = 0.6;
-        public static final double OuttakeSpeed = -0.35;
+        public static final TuneableNumber IntakeSpeed = new TuneableNumber(0.6, "CoralIntake/IntakeSpeed");
+        public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");
 
-        public static final Angle MaxAngle = Degrees.of(100);
+        public static final TuneableAngle MaxAngle = new TuneableAngle(100, "CoralIntake/MaxAngle");
         public static final Angle StowAngle = Degrees.of(70);
-        public static final Angle GroundAngle = Degrees.of(0);
+        public static final TuneableAngle GroundAngle = new TuneableAngle(0, "CoralIntake/GroundAngle");
 
         public static final Mass Weight = Pounds.of(2.3);
     }

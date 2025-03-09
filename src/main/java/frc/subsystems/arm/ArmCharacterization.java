@@ -20,7 +20,6 @@ import frc.utils.tuning.TuningModeTab;
 public class ArmCharacterization extends Characterizer {
     private static ArmCharacterization instance;
     private Arm arm;
-    private CoralIntake coralIntake = CoralIntake.getInstance();
     private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.5).div(Second.of(1));
     private final Angle TestSafetyThreshold = Degrees.of(7);
 
@@ -46,12 +45,12 @@ public class ArmCharacterization extends Characterizer {
 
     private boolean withinSafeThreshold() {
         Angle measurement = arm.getMeasurement();
-        Angle cintakeMeasurement = coralIntake.getPivotAngle();
+        Angle cintakeMeasurement = CoralIntake.getInstance().getPivotAngle();
         Distance elevatorHeight = Elevator.getInstance().getMeasurement();
-        return !SuperStructure.getInstance().positionsWillCollide(elevatorHeight, measurement.plus(TestSafetyThreshold),
+        return !SuperStructure.getInstance().stateIsValid(elevatorHeight, measurement.plus(TestSafetyThreshold),
             cintakeMeasurement.plus(TestSafetyThreshold))
-            && !SuperStructure.getInstance().positionsWillCollide(elevatorHeight,
-                measurement.minus(TestSafetyThreshold), cintakeMeasurement.plus(TestSafetyThreshold));
+            && !SuperStructure.getInstance().stateIsValid(elevatorHeight, measurement.minus(TestSafetyThreshold),
+                cintakeMeasurement.plus(TestSafetyThreshold));
     }
 
     public static void enable(Arm armSubsystem) {

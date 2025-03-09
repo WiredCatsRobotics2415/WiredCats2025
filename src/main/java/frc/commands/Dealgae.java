@@ -15,8 +15,6 @@ import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.superstructure.SuperStructure;
-import frc.subsystems.superstructure.TuneableSuperStructureState;
-import frc.utils.tuning.TuneableDistance;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,9 +33,6 @@ public class Dealgae extends Command {
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
-
-    private TuneableSuperStructureState superStructureState;
-    private TuneableDistance goalDriveOffset;
 
     private Command driveCommand;
     private Command superStructureCommand;

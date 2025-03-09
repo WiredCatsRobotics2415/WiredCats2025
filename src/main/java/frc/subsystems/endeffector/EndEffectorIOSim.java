@@ -27,7 +27,8 @@ public class EndEffectorIOSim implements EndEffectorIO {
 
     @Override
     public void updateInputs(EndEffectorIOInputs inputs) {
-        inputs.sensorValue = intakeSimulation.getGamePiecesAmount() != 0 ? EndEffectorConstants.IRThreshold : 0;
+        inputs.sensorValue = intakeSimulation.getGamePiecesAmount() != 0 ? (int) EndEffectorConstants.IRThreshold.get()
+            : 0;
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = Amps.of(motor.getCurrentDrawAmps());

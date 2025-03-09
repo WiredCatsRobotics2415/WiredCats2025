@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
+import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
@@ -24,10 +25,10 @@ public class Elevator extends SubsystemBase {
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
-    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS.get(), ElevatorConstants.kV.get(),
-        ElevatorConstants.kG.get(), ElevatorConstants.kA.get(), "ElevatorFF");
-    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP.get(),
-        0.0d, ElevatorConstants.kD.get(),
+    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
+        ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
+        ElevatorConstants.kD,
         new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax),
         "ElevatorPID");
 
@@ -40,8 +41,10 @@ public class Elevator extends SubsystemBase {
         pid.setTolerance(ElevatorConstants.BaseGoalTolerance);
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Run to 0", runOnce(() -> setGoal(ElevatorConstants.MinHeight)));
-            TuningModeTab.getInstance().addCommand("Run to max", runOnce(() -> setGoal(ElevatorConstants.MaxHeight)));
+            TuningModeTab.getInstance().addCommand("Run to 0", runOnce(
+                () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MinHeight.distance())));
+            TuningModeTab.getInstance().addCommand("Run to max", runOnce(
+                () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MaxHeight.distance())));
             TuningModeTab.getInstance().addCommand("Toggle coast", runOnce(() -> {
                 if (coasting) {
                     io.setCoast(false);
@@ -61,7 +64,8 @@ public class Elevator extends SubsystemBase {
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
     public void setGoal(Distance setGoal) {
-        if (setGoal.gt(ElevatorConstants.MaxHeight) || setGoal.lt(ElevatorConstants.MinHeight)) return;
+        if (setGoal.gt(ElevatorConstants.MaxHeight.distance()) || setGoal.lt(ElevatorConstants.MinHeight.distance()))
+            return;
         this.goal = setGoal;
         pid.setGoal(setGoal.in(Inches));
     }

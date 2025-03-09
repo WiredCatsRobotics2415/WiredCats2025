@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
@@ -22,15 +23,15 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
-    @Getter private Angle goal = Degrees.of(0.0);
+    @Getter private Angle goal = Degrees.mutable(0.0d);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
 
-    private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS.get(), ArmConstants.kG.get(), ArmConstants.kV.get(),
-        ArmConstants.kA.get(), "ArmFF");
-    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP.get(), 0.0d,
-        ArmConstants.kD.get(),
+    private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA,
+        "ArmFF");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
+        ArmConstants.kD,
         new TrapezoidProfile.Constraints(ArmConstants.BaseVelocityMax, ArmConstants.BaseAccelerationMax), "ArmPID");
 
     @Getter private ArmIO io;
@@ -46,10 +47,11 @@ public class Arm extends SubsystemBase {
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to cintake side",
-                runOnce(() -> setGoal(ArmConstants.MaxDegreesBack)));
-            TuningModeTab.getInstance().addCommand("Run to stow", runOnce(() -> setGoal(Degrees.of(90))));
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MaxDegreesBack.angle())));
+            TuningModeTab.getInstance().addCommand("Run to stow",
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(Degrees.of(90))));
             TuningModeTab.getInstance().addCommand("Run to scoring side",
-                runOnce(() -> setGoal(ArmConstants.MinDegreesFront)));
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MinDegreesFront.angle())));
             TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", runOnce(() -> {
                 if (isCoasting)
                     brake();
@@ -66,7 +68,7 @@ public class Arm extends SubsystemBase {
 
     /** Sets the goal height. If goal is out of the physical range, it is not set. */
     public void setGoal(Angle goal) {
-        if (goal.gt(ArmConstants.MaxDegreesBack) || goal.lt(ArmConstants.MinDegreesFront)) return;
+        if (goal.gt(ArmConstants.MaxDegreesBack.angle()) || goal.lt(ArmConstants.MinDegreesFront.angle())) return;
         this.goal = goal;
         pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
     }
@@ -76,8 +78,8 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return runOnce(() -> {
-            if (goal.gt(ArmConstants.MaxDegreesBack)) {
-                goal = ArmConstants.MaxDegreesBack;
+            if (goal.gt(ArmConstants.MaxDegreesBack.angle())) {
+                goal = ArmConstants.MaxDegreesBack.angle();
                 return;
             }
             goal = goal.plus(Degrees.of(0.5));
@@ -90,8 +92,8 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return runOnce(() -> {
-            if (goal.lt(ArmConstants.MinDegreesFront)) {
-                goal = ArmConstants.MinDegreesFront;
+            if (goal.lt(ArmConstants.MinDegreesFront.angle())) {
+                goal = ArmConstants.MinDegreesFront.angle();
                 return;
             }
             goal = goal.minus(Degrees.of(0.5));
@@ -114,9 +116,9 @@ public class Arm extends SubsystemBase {
     }
 
     public Angle getMeasurement() {
-        return Degrees
-            .of(Algebra.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax,
-                ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees)));
+        return Degrees.of(Algebra.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin.get(),
+            ArmConstants.ThroughboreMax.get(), ArmConstants.MinDegreesFront.in(Degrees),
+            ArmConstants.MaxDegreesBack.in(Degrees)));
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint, double measurementDegrees) {

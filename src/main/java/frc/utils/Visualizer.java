@@ -47,19 +47,20 @@ public class Visualizer {
         Pose3d elevatorBase = Pose3d.kZero;
 
         double offsetOfStage2 = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) *
-            height.div(ElevatorConstants.MaxHeight).times(ElevatorConstants.Stage2Height).in(Meters);
+            height.div(ElevatorConstants.MaxHeight.distance()).times(ElevatorConstants.Stage2Height).in(Meters);
         Pose3d elevatorStage2 = new Pose3d(offsetOfStage2, 0,
-            height.div(ElevatorConstants.MaxHeight).times(ElevatorConstants.Stage2Height).in(Meters), Rotation3d.kZero);
+            height.div(ElevatorConstants.MaxHeight.distance()).times(ElevatorConstants.Stage2Height).in(Meters),
+            Rotation3d.kZero);
 
         double offsetOfStage3 = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) *
-            height.div(ElevatorConstants.MaxHeight).times(ElevatorConstants.Stage3Height).in(Meters);
+            height.div(ElevatorConstants.MaxHeight.distance()).times(ElevatorConstants.Stage3Height).in(Meters);
         Pose3d elevatorStage3 = new Pose3d(offsetOfStage2 + offsetOfStage3, 0,
-            height.div(ElevatorConstants.MaxHeight)
+            height.div(ElevatorConstants.MaxHeight.distance())
                 .times(ElevatorConstants.Stage2Height.plus(ElevatorConstants.Stage3Height)).in(Meters),
             Rotation3d.kZero);
 
         double carriageOffset = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) *
-            height.div(ElevatorConstants.MaxHeight).times(ElevatorConstants.Stage2Height).in(Meters);
+            height.div(ElevatorConstants.MaxHeight.distance()).times(ElevatorConstants.Stage2Height).in(Meters);
         Pose3d carriage = new Pose3d(offsetOfStage2 + offsetOfStage3 + carriageOffset, 0, height.in(Meters),
             Rotation3d.kZero);
 

@@ -43,8 +43,8 @@ public class ElevatorCharacterization extends Characterizer {
 
     private boolean withinSafeThreshold() {
         Distance measurement = elevator.getMeasurement();
-        return measurement.minus(TestSafetyThreshold).gte(ElevatorConstants.MinHeight)
-            || measurement.plus(TestSafetyThreshold).lte(ElevatorConstants.MaxHeight);
+        return measurement.minus(TestSafetyThreshold).gte(ElevatorConstants.MinHeight.distance())
+            || measurement.plus(TestSafetyThreshold).lte(ElevatorConstants.MaxHeight.distance());
     }
 
     public static void enable(Elevator elevatorSubsystem) {

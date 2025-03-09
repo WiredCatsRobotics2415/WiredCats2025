@@ -39,7 +39,7 @@ public class ArmIOSim implements ArmIO {
 
         inputs.throughborePosition = Algebra.linearMap(Units.radiansToDegrees(simArm.getAngleRads()),
             ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees),
-            ArmConstants.ThroughboreMin, ArmConstants.ThroughboreMax);
+            ArmConstants.ThroughboreMin.get(), ArmConstants.ThroughboreMax.get());
     }
 
     @Override

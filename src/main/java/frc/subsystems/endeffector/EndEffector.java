@@ -34,7 +34,7 @@ public class EndEffector extends SubsystemBase {
     public Command toggleIntakeCoral() {
         return runOnce(() -> {
             if (!intakingCoral) {
-                io.setPower(EndEffectorConstants.IntakeCoralSpeed);
+                io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
                 intakingCoral = true;
             } else {
                 io.setPower(0);
@@ -47,7 +47,7 @@ public class EndEffector extends SubsystemBase {
 
     public Command intakeAndWaitForCoral() {
         return run(() -> {
-            io.setPower(EndEffectorConstants.IntakeCoralSpeed);
+            io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
             intakingCoral = true;
             intakingAlgae = false;
             outtaking = false;
@@ -57,7 +57,7 @@ public class EndEffector extends SubsystemBase {
     public Command toggleIntakeAlgae() {
         return runOnce(() -> {
             if (!intakingAlgae) {
-                io.setPower(EndEffectorConstants.IntakeAlgaeSpeed);
+                io.setPower(EndEffectorConstants.IntakeAlgaeSpeed.get());
                 intakingAlgae = true;
             } else {
                 io.setPower(0);
@@ -79,12 +79,12 @@ public class EndEffector extends SubsystemBase {
                 return;
             }
             if (irSensorTrigger()) {
-                io.setPower(EndEffectorConstants.OuttakeCoralSpeed);
+                io.setPower(EndEffectorConstants.OuttakeCoralSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
                 outtaking = true;
             } else if (cameraTrigger()) {
-                io.setPower(EndEffectorConstants.OuttakeAlageSpeed);
+                io.setPower(EndEffectorConstants.OuttakeAlageSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
                 outtaking = true;
@@ -102,12 +102,12 @@ public class EndEffector extends SubsystemBase {
     }
 
     public boolean irSensorTrigger() {
-        return inputs.sensorValue >= EndEffectorConstants.IRThreshold;
+        return inputs.sensorValue >= EndEffectorConstants.IRThreshold.get();
     }
 
     public boolean cameraTrigger() {
         return Vision.getInstance()
-            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold;
+            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold.get();
     }
 
     public boolean hasCoral() {

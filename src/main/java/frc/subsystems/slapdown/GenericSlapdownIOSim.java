@@ -40,6 +40,7 @@ public class GenericSlapdownIOSim implements GenericSlapdownIO {
     @Override
     public void updateInputs(GenericSlapdownIOInputsAutoLogged inputs) {
         if (pivotSim == null || intakeMotor == null) return;
+        pivotSim.update(0.02);
 
         inputs.pivotConnected = true;
         inputs.appliedVoltage = Volts.of(appliedVolts);
@@ -71,7 +72,7 @@ public class GenericSlapdownIOSim implements GenericSlapdownIO {
 
         pivotSim = new SingleJointedArmSim(DCMotor.getNeo550(1), rotorToGearRatio,
             SingleJointedArmSim.estimateMOI(effectiveLength.in(Meters), mass.in(Kilograms)), effectiveLength.in(Meters),
-            min.in(Radians), max.in(Radians), true, 0.0d);
+            min.in(Radians), max.in(Radians), true, Math.PI / 2);
     }
 
     @Override

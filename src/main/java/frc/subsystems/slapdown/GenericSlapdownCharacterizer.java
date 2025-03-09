@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.utils.tuning.Characterizer;
+import frc.utils.tuning.TuneableAngle;
 import frc.utils.tuning.TuningModeTab;
 import org.littletonrobotics.junction.Logger;
 
@@ -18,10 +19,10 @@ public class GenericSlapdownCharacterizer extends Characterizer {
     private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.5).div(Second.of(1));
 
     private final Angle TestSafetyThreshold = Degrees.of(7);
-    private Angle testMaxAngle;
-    private Angle testMinAngle;
+    private TuneableAngle testMaxAngle;
+    private TuneableAngle testMinAngle;
 
-    private GenericSlapdownCharacterizer(GenericSlapdown slapdown, String name, Angle min, Angle max) {
+    private GenericSlapdownCharacterizer(GenericSlapdown slapdown, String name, TuneableAngle min, TuneableAngle max) {
         this.slapdown = slapdown;
         testMaxAngle = max;
         testMinAngle = min;
@@ -45,12 +46,12 @@ public class GenericSlapdownCharacterizer extends Characterizer {
 
     private boolean withinSafeThreshold() {
         Angle measurement = slapdown.getPivotAngle();
-        return measurement.minus(TestSafetyThreshold).gte(testMinAngle)
-            || measurement.plus(TestSafetyThreshold).lte(testMaxAngle);
+        return measurement.minus(TestSafetyThreshold).gte(testMinAngle.angle())
+            || measurement.plus(TestSafetyThreshold).lte(testMaxAngle.angle());
     }
 
-    public static GenericSlapdownCharacterizer createInstance(GenericSlapdown slapdown, String name, Angle min,
-        Angle max) {
+    public static GenericSlapdownCharacterizer createInstance(GenericSlapdown slapdown, String name, TuneableAngle min,
+        TuneableAngle max) {
         return new GenericSlapdownCharacterizer(slapdown, name, min, max);
     }
 }

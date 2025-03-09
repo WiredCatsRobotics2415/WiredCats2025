@@ -15,8 +15,8 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import frc.constants.Subsystems.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
-    private TalonFX leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
-    private TalonFX rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
+    private TalonFX leftMotor;
+    private TalonFX rightMotor;
     private double appliedVoltage;
 
     private StatusSignal<Current> leftStator = leftMotor.getStatorCurrent();
@@ -35,11 +35,11 @@ public class ElevatorIOReal implements ElevatorIO {
     }
 
     private void configureMotors() {
-        leftMotor = new TalonFX(ElevatorConstants.LeftMotorPort);
+        leftMotor = new TalonFX(ElevatorConstants.LeftMotorID);
         leftMotor.getConfigurator()
             .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
-        rightMotor = new TalonFX(ElevatorConstants.RightMotorPort);
+        rightMotor = new TalonFX(ElevatorConstants.RightMotorID);
         leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
