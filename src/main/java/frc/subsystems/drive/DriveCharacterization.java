@@ -231,6 +231,10 @@ public class DriveCharacterization extends Characterizer {
         public void end(boolean interrupted) {
             System.out.println("Current Characterization ended, current limit: " + currentCounter);
             System.out.println("Please restart robot code to apply correct current limit to swerve");
+            System.out.println("kT: " + (4.69 / 257));
+            System.out.println("Normal force: " + RobotMeasurements.RobotWeight.in(Kilograms) * 9.81);
+            System.out.println("Wheel COF: " + (currentCounter * (4.69 / 257)) /
+                ((RobotMeasurements.RobotWeight.in(Kilograms) * 9.81) * TunerConstants.kWheelRadius.in(Meters)));
             timer.stop();
             timer.reset();
         }

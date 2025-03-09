@@ -18,10 +18,10 @@ public class RobotStatus {
 
     public enum RobotState {
         Disabled(leds.set(UseableColor.BreathingGreen)), Enabled(leds.set(UseableColor.ChasingGreen)),
-        AligningToCPS(leds.set(UseableColor.Gray)), AutoGroundIntaking(leds.set(UseableColor.Yellow)),
+        AligningToHPS(leds.set(UseableColor.Gray)), AutoGroundIntaking(leds.set(UseableColor.Yellow)),
         AligningToDeAlgae(leds.set(UseableColor.SkyBlue)), ContainingCoral(flashingGreen),
         ContainingAlgaeInEE(flashingGreen), AligningToScoreCoral(leds.set(UseableColor.White)),
-        AligningToBarge(leds.set(UseableColor.White)), WaitingForCoralAtCPS(leds.set(UseableColor.Red)),
+        AligningToBarge(leds.set(UseableColor.White)), WaitingForCoralAtHPS(leds.set(UseableColor.Red)),
         WaitingToDeAlgae(leds.set(UseableColor.Orange)), WaitingToScoreCoral(leds.set(UseableColor.Gray)),
         WaitingToBargeAlgae(leds.set(UseableColor.SkyBlue));
 

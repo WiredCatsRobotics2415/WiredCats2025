@@ -4,9 +4,12 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.VisionConstants;
+import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
+import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Util;
-import java.util.Arrays;
+import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -21,6 +24,9 @@ public class Vision extends SubsystemBase {
     public enum ObjectRecognized {
         Coral, Algae
     }
+
+    @Getter
+    @Setter private LimelightsForElements currentFocusedElement = LimelightsForElements.Reef;
 
     private Vision() {
         io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, new VisionIO() {});
@@ -59,18 +65,18 @@ public class Vision extends SubsystemBase {
             }
         }
         if (usedPoses == 0) return null;
-        return new Pose2d(averageX / usedPoses, averageY / usedPoses, new Rotation2d());
+        return new Pose2d(averageX / usedPoses, averageY / usedPoses, Rotation2d.kZero);
     }
 
-    public PoseEstimate getReefSingleTagPoseEstimate() {
+    public PoseEstimate getSingleTagPoseEstimate(LimelightsForElements limelights, int tag) {
         PoseEstimate pe = new PoseEstimate();
 
         double xSum = 0;
         double ySum = 0;
         double smallestTimestamp = Double.MAX_VALUE;
         int numCamerasUsed = 0;
-        for (int index : VisionConstants.ReefFacingLLs) {
-            if (inputs.poseTagCounts[index] > 0) {
+        for (int index : limelights.indexInPEList) {
+            if (inputs.poseTagCounts[index] > 0 && inputs.nearestTags[index] == tag) {
                 xSum += inputs.poseEstimates[index].getX();
                 ySum += inputs.poseEstimates[index].getY();
                 numCamerasUsed += 1;
@@ -86,18 +92,46 @@ public class Vision extends SubsystemBase {
         return pe;
     }
 
-    public boolean isReefSingleTagPoseEstimateAvailable() {
-        int[] tagIdsSeen = new int[VisionConstants.ReefFacingLLs.length];
+    /**
+     * Finds the nearest apriltag id to each limelight. Returns -1 if both limelights do not see the same tag.
+     */
+    public int nearestTagToLimelights(LimelightsForElements limelights) {
+        int[] nearestTagToEach = new int[limelights.indexInPEList.length];
         int llCounter = 0;
-        for (int i = 0; i < inputs.nearestTags.length; i++) {
-            for (int llIdx : VisionConstants.ReefFacingLLs) {
-                if (llIdx == i) {
-                    tagIdsSeen[llCounter] = inputs.nearestTags[i];
-                    llCounter++;
-                }
+        for (int indexInPE : limelights.indexInPEList) {
+            nearestTagToEach[llCounter] = inputs.nearestTags[indexInPE];
+            llCounter += 1;
+        }
+
+        boolean allEqual = true;
+        int lastTag = -1;
+        for (int tagId : nearestTagToEach) {
+            if (lastTag == -1) {
+                lastTag = tagId;
+                continue;
+            }
+            if (tagId != lastTag) {
+                allEqual = false;
+                break;
             }
         }
-        return Arrays.stream(tagIdsSeen).distinct().count() == 1;
+        return allEqual ? nearestTagToEach[0] : -1;
+    }
+
+    public boolean limelightsCanSeeOneOf(LimelightsForElements limelights, int[] tagSet) {
+        int nearestTagToEach = nearestTagToLimelights(limelights);
+        for (int tagId : tagSet) {
+            if (nearestTagToEach == tagId) return true;
+        }
+        return false;
+    }
+
+    public boolean limelightsCanSeeOneOf(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
+        int nearestTagToEach = nearestTagToLimelights(limelights);
+        for (int tagId : tagSet.get()) {
+            if (nearestTagToEach == tagId) return true;
+        }
+        return false;
     }
 
     /**

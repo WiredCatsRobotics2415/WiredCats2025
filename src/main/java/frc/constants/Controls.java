@@ -91,8 +91,8 @@ public class Controls {
         public static final TuneableDistance TopDADriveOffset = new TuneableDistance(Inches.of(-6),
             "Presets/TopDADriveOffset");
 
-        public static final TuneableSuperStructureState IntakeFromCPS = new TuneableSuperStructureState(Inches.of(26),
-            Degrees.of(192), "IntakeFromCPS");
+        public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(26),
+            Degrees.of(192), "IntakeFromHPS");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");

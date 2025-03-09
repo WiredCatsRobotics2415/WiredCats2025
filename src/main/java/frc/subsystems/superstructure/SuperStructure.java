@@ -131,6 +131,8 @@ public class SuperStructure extends SubsystemBase {
                 elevator.getMeasurement().in(Inches));
             isFreezingArm = false;
             timeTaken.start();
+            System.out.println("Superstructure beThereIn - front switch: " + armSwitchingToFrontSide + ", back switch: "
+                + armSwitchingToBackSide + ", elevator time prediction: " + lastElevatorTimePrediction);
         }).andThen(run(() -> {
             if (!elevator.atGoal()) {
                 if (elevator.getPid().goalError() < 0) {

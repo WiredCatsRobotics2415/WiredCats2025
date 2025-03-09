@@ -7,15 +7,18 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Measurements.RobotMeasurements;
+import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
+import frc.robot.RobotStatus;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.superstructure.TuneableSuperStructureState;
+import frc.subsystems.vision.Vision;
+import frc.utils.AllianceDependent;
 import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
@@ -42,7 +45,8 @@ public class ScoreCoral extends Command {
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
-    private static final TuneableNumber LeftRightOffset = new TuneableNumber(6, "ScoreCoral/LROffsetInches");
+    private static final TuneableDistance LeftOffset = new TuneableDistance(6, "ScoreCoral/LeftOffset");
+    private static final TuneableDistance RightOffset = new TuneableDistance(6, "ScoreCoral/RightOffset");
     private static final double DriveToleranceMeters = Units.inchesToMeters(5);
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
@@ -51,21 +55,41 @@ public class ScoreCoral extends Command {
     private TuneableSuperStructureState superStructureState;
     private TuneableDistance goalDriveOffset;
     private Side side;
+    private int tagToFocusOn = -1;
 
     private Command driveCommand;
+    private Command focusCommand;
     private Command superStructureCommand;
 
-    private Pose2d findNearestReefSideApriltag() {
-        Pose2d currentPosition = CommandSwerveDrivetrain.getInstance().getState().Pose;
-        if (DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Blue) {
-            return currentPosition.nearest(ReefMeasurements.reefBlueApriltags);
-        } else {
-            return currentPosition.nearest(ReefMeasurements.reefRedApriltags);
+    public Pose2d findNearestReefSideApriltag() {
+        int tagSeenByBoth = Vision.getInstance().nearestTagToLimelights(LimelightsForElements.Reef);
+        if (tagSeenByBoth > 0) {
+            // If there is a tag seen by both limelights, use its corresponding pose2d by finding the index of the tag id in the reefIds array
+            int[] reefIds = ReefMeasurements.reefIds.get();
+            int i = 0;
+            for (int tagId : reefIds) {
+                if (tagId == tagSeenByBoth) break;
+                i++;
+            }
+            if (i < reefIds.length) {
+                tagToFocusOn = tagSeenByBoth;
+                return ReefMeasurements.reefApriltagsAlphabetic.get().get(i);
+            }
         }
+        Pose2d currentPosition = CommandSwerveDrivetrain.getInstance().getState().Pose;
+        Pose2d apriltagPose;
+        if (AllianceDependent.isCurrentlyBlue()) {
+            apriltagPose = currentPosition.nearest(ReefMeasurements.reefBlueApriltags);
+            tagToFocusOn = ReefMeasurements.reefBlueIds[ReefMeasurements.reefBlueApriltags.indexOf(apriltagPose)];
+        } else {
+            apriltagPose = currentPosition.nearest(ReefMeasurements.reefRedApriltags);
+            tagToFocusOn = ReefMeasurements.reefRedIds[ReefMeasurements.reefRedApriltags.indexOf(apriltagPose)];
+        }
+        return apriltagPose;
     }
 
     public ScoreCoral(Side reefSide, Level reefLevel) {
-        addRequirements(SuperStructure.getInstance());
+        // addRequirements(SuperStructure.getInstance());
         side = reefSide;
 
         switch (reefLevel) {
@@ -94,31 +118,43 @@ public class ScoreCoral extends Command {
 
     @Override
     public void initialize() {
-        superStructureCommand = superStructure.beThereAsap(superStructureState);
-        superStructureCommand.schedule();
-
         if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) {
             Transform2d leftOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset.distance()),
-                Inches.of(LeftRightOffset.get()), new Rotation2d());
+                LeftOffset.distance(), Rotation2d.kZero);
             Transform2d rightOffset = new Transform2d(CenterToBumper.plus(goalDriveOffset.distance()),
-                Inches.of(-LeftRightOffset.get()), new Rotation2d());
+                RightOffset.distance().times(-1), Rotation2d.kZero);
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
             driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
             driveCommand.schedule();
-        }
-    }
 
-    @Override
-    public void execute() {
-        if (driveCommand != null) System.out.println(driveCommand.isFinished());
+            double timeTo = drive.maxTimeToGetToPose(driveTo);
+            superStructureCommand = superStructure.beThereIn(timeTo, superStructureState);
+            System.out.println("Score coral time to: " + timeTo);
+
+            focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, tagToFocusOn);
+            focusCommand.schedule();
+        } else {
+            superStructureCommand = superStructure.beThereAsap(superStructureState);
+        }
+        superStructureCommand.schedule();
+
+        RobotStatus.setRobotState(RobotState.AligningToScoreCoral);
     }
 
     @Override
     public boolean isFinished() {
         if (currentAutomationMode == CoralAutomationMode.PresetOnly) {
-            return superStructureCommand.isFinished();
+            return SuperStructure.getInstance().allAtGoal();
         }
-        return driveCommand.isFinished() && superStructureCommand.isFinished();
+        System.out
+            .println("finished? " + driveCommand.isFinished() + " && " + SuperStructure.getInstance().allAtGoal());
+        return driveCommand.isFinished() && SuperStructure.getInstance().allAtGoal();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        if (currentAutomationMode == CoralAutomationMode.PresetAndAlign) focusCommand.cancel();
+        RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
 }

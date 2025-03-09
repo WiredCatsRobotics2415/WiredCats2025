@@ -115,7 +115,9 @@ public class Visualizer {
 
         if (Robot.isSimulation()) {
             Pose3d[] coralPoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Coral");
+            Pose3d[] algaePoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Algae");
             Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
+            Logger.recordOutput("FieldSimulation/AlagePositions", algaePoses);
         }
 
         visualizePECameraTargets();

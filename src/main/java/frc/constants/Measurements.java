@@ -21,6 +21,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.constants.Subsystems.DriveConstants;
+import frc.utils.AllianceDependent;
 import java.util.List;
 
 public class Measurements {
@@ -68,11 +69,11 @@ public class Measurements {
         }
 
         public static final Transform3d FrontLeftCamera = new Transform3d(Inches.of(2.644), Inches.of(-11.784437),
-            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 17.5), Degrees.of(-20)));
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 16.5), Degrees.of(-20)));
         public static final Transform3d FrontRightCamera = new Transform3d(Inches.of(2.644), Inches.of(11.784437),
-            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 17.5), Degrees.of(20)));
-        public static final Transform3d BackCamera = new Transform3d(Inches.of(-2.644), Inches.of(11.784437),
-            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7), Degrees.of(-200)));
+            Inches.of(26.531608), new Rotation3d(Degrees.of(0), Degrees.of(3.7 + 16.5), Degrees.of(20)));
+        public static final Transform3d BackCamera = new Transform3d(Inches.of(-7.578), Inches.of(10.052),
+            Inches.of(27.982014), new Rotation3d(Degrees.of(0), Degrees.of(3.7 - 32), Degrees.of(-190)));
         public static final Transform3d[] PECameraTransforms = new Transform3d[] { FrontLeftCamera, FrontRightCamera,
             BackCamera };
 
@@ -117,7 +118,19 @@ public class Measurements {
         public static final Pose2d redReefKLApriltag = new Pose2d(new Translation2d(13.474446, 3.306318),
             Rotation2d.fromDegrees(300)); // ID 6
 
-        public static final int[] allReefApriltagIds = new int[] { 6, 7, 8, 9, 10, 11, 17, 18, 19, 20, 21, 22 };
+        public static final int blueReefABId = 18;
+        public static final int blueReefCDId = 17;
+        public static final int blueReefEFId = 22;
+        public static final int blueReefGHId = 21;
+        public static final int blueReefIJId = 20;
+        public static final int blueReefKLId = 19;
+
+        public static final int redReefABId = 7;
+        public static final int redReefCDId = 8;
+        public static final int redReefEFId = 9;
+        public static final int redReefGHId = 10;
+        public static final int redReefIJId = 11;
+        public static final int redReefKLId = 6;
 
         public static final List<Pose2d> reefBlueApriltags;
         static {
@@ -130,6 +143,17 @@ public class Measurements {
             reefRedApriltags = List.of(redReefABApriltag, redReefCDApriltag, redReefEFApriltag, redReefGHApriltag,
                 redReefIJApriltag, redReefKLApriltag);
         }
+
+        public static final AllianceDependent<List<Pose2d>> reefApriltagsAlphabetic = new AllianceDependent<List<Pose2d>>(
+            reefBlueApriltags, reefRedApriltags);
+
+        public static final int[] reefBlueIds = new int[] { blueReefABId, blueReefCDId, blueReefEFId, blueReefGHId,
+            blueReefIJId, blueReefKLId };
+
+        public static final int[] reefRedIds = new int[] { redReefABId, redReefCDId, redReefEFId, redReefGHId,
+            redReefIJId, redReefKLId };
+
+        public static final AllianceDependent<int[]> reefIds = new AllianceDependent<int[]>(reefBlueIds, reefRedIds);
 
         public static final List<Boolean> ReefAlgaeOnTopAlphabeticOrder;
         static {

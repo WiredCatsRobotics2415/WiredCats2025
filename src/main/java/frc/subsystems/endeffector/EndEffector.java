@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
+import frc.robot.RobotStatus;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.vision.Vision;
 import frc.utils.Util;
 import lombok.Getter;
@@ -22,8 +24,8 @@ public class EndEffector extends SubsystemBase {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             new EndEffectorIO() {});
 
-        new Trigger(this::hasCoral).onTrue(turnOff());
-        new Trigger(this::hasAlgae).onTrue(turnOff());
+        new Trigger(this::hasCoral).onTrue(turnOff().andThen(RobotStatus.setRobotStateOnce(RobotState.ContainingCoral))).onFalse(RobotStatus.setRobotStateOnce(RobotState.Enabled));
+        new Trigger(this::hasAlgae).onTrue(turnOff().andThen(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE))).onFalse(RobotStatus.setRobotStateOnce(RobotState.Enabled));
     }
 
     public static EndEffector getInstance() {

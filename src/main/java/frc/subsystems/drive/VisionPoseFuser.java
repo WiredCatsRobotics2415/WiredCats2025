@@ -20,20 +20,22 @@ import frc.subsystems.vision.Vision;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionPoseFuser {
-    private final double BaseDistrustConstant = 0.7;
-    private final double DistanceFromTagScalar = 0;
-    private final double DistanceFromCurrentPoseScalar = 0;
-    private final double LinearVelocityOfRobot = 0;
-    private final double LinearAccelerationOfRobot = 0;
-    private final double AngularVelocityOfRobot = 0;
-    private final double AngularAccelerationOfRobot = 0;
-    private final double PoseLatencyScalar = 0;
+    private final TuneableNumber BaseDistrustConstant = new TuneableNumber(0.7, "VPF/BaseDistrustConstant");
+    private final TuneableNumber DistanceFromTagScalar = new TuneableNumber(1, "VPF/DistanceFromTagScalar");
+    private final TuneableNumber DistanceFromCurrentPoseScalar = new TuneableNumber(1,
+        "VPF/DistanceFromCurrentPoseScalar");
+    private final TuneableNumber LinearVelocityOfRobot = new TuneableNumber(2, "VPF/LinearVelocityOfRobot");
+    private final TuneableNumber LinearAccelerationOfRobot = new TuneableNumber(4, "VPF/LinearAccelerationOfRobot");
+    private final TuneableNumber AngularVelocityOfRobot = new TuneableNumber(3, "VPF/AngularVelocityOfRobot");
+    private final TuneableNumber AngularAccelerationOfRobot = new TuneableNumber(6, "VPF/AngularAccelerationOfRobot");
+    private final TuneableNumber PoseLatencyScalar = new TuneableNumber(0.075, "VPF/PoseLatencyScalar");
     // To disable vision pose fusing: set this to 0
     private final Distance DistanceFromCurrentPoseCutoffThreshold = RobotMeasurements.CenterToFrameRadius;
 
@@ -93,16 +95,18 @@ public class VisionPoseFuser {
 
             if (distanceFromCurrent > DistanceFromCurrentPoseCutoffThreshold.in(Meters)) continue;
 
-            double baseStdDev = BaseDistrustConstant + DistanceFromTagScalar * estimate.avgTagDist +
-                DistanceFromCurrentPoseScalar * distanceFromCurrent + AngularVelocityOfRobot * robotAngularVelocityDS +
-                AngularAccelerationOfRobot * robotAngularAccelerationDSS + PoseLatencyScalar * estimate.latency;
+            double baseStdDev = BaseDistrustConstant.get() + DistanceFromTagScalar.get() * estimate.avgTagDist +
+                DistanceFromCurrentPoseScalar.get() * distanceFromCurrent +
+                AngularVelocityOfRobot.get() * robotAngularVelocityDS +
+                AngularAccelerationOfRobot.get() * robotAngularAccelerationDSS +
+                PoseLatencyScalar.get() * estimate.latency;
 
-            double xSTDEV = baseStdDev + LinearVelocityOfRobot * state.Speeds.vxMetersPerSecond +
-                LinearAccelerationOfRobot * pigeonLinearAccelX.getValueAsDouble();
+            double xSTDEV = baseStdDev + LinearVelocityOfRobot.get() * state.Speeds.vxMetersPerSecond +
+                LinearAccelerationOfRobot.get() * pigeonLinearAccelX.getValueAsDouble();
             finalXSTDEVs[i] = xSTDEV;
 
-            double ySTDEV = baseStdDev + LinearVelocityOfRobot * state.Speeds.vyMetersPerSecond +
-                LinearAccelerationOfRobot * pigeonLinearAccelY.getValueAsDouble();
+            double ySTDEV = baseStdDev + LinearVelocityOfRobot.get() * state.Speeds.vyMetersPerSecond +
+                LinearAccelerationOfRobot.get() * pigeonLinearAccelY.getValueAsDouble();
             finalYSTDEVs[i] = ySTDEV;
 
             drivetrain.addVisionMeasurement(estimate.pose, Utils.fpgaToCurrentTime(estimate.timestampSeconds),

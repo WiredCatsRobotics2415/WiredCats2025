@@ -31,16 +31,20 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.constants.Controls;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.DriveConstants;
+import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
+import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.driver.DashboardManager;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuneableNumber;
@@ -64,10 +68,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private final SwerveRequest.ApplyRobotSpeeds autoRequest = new SwerveRequest.ApplyRobotSpeeds()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
-    public final SwerveRequest.FieldCentric driveOpenLoopRequest = new SwerveRequest.FieldCentric()
+    public final SwerveRequest.FieldCentric driveOpenLoopFieldCentricRequest = new SwerveRequest.FieldCentric()
         .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05)
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo)
         .withForwardPerspective(ForwardPerspectiveValue.OperatorPerspective);
+    public final SwerveRequest.RobotCentric driveOpenLoopRobotCentricRequest = new SwerveRequest.RobotCentric()
+        .withDeadband(Controls.MaxDriveMeterS * 0.05).withRotationalDeadband(Controls.MaxAngularRadS * 0.05)
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo);
     public final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
@@ -82,14 +89,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
+    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.7, "Drive/singleTagBaseDistrust");
+    private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
+    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1.3, "Drive/singleTagDistanceFromTag");
+
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
 
     public enum PoseEstimationType {
-        SingleTagReef, Global
+        SingleTag, Global
     }
 
-    private static PoseEstimationType currentPoseEstimationType = PoseEstimationType.Global;
+    private PoseEstimationType currentPoseEstimationType = PoseEstimationType.Global;
+    private LimelightsForElements currentSingleTagLLs;
+    private int currentSingleTagId;
 
     private static CommandSwerveDrivetrain instance;
 
@@ -133,6 +146,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
              * @Override public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) { for (SwerveModule<?, ?, ?> m : modulesToApply) { if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getDriveMotor()).set(0); if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getSteerMotor()).set(0); } sentMotorConfigs = true; return StatusCode.OK; } }; String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" }; int i = 0; for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) { TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive")); TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer")); i++; }
              */
         }
+
+        DashboardManager.getInstance().addBoolSupplier(true, "Single tag?",
+            () -> currentPoseEstimationType == PoseEstimationType.SingleTag, null);
     }
 
     public static CommandSwerveDrivetrain getInstance() {
@@ -187,10 +203,16 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         SwerveDriveState currentState = getState();
-        if (currentPoseEstimationType == PoseEstimationType.SingleTagReef) {
-            PoseEstimate singleTag = vision.getReefSingleTagPoseEstimate();
-            if (singleTag != null)
-                addVisionMeasurement(singleTag.pose, singleTag.timestampSeconds, VecBuilder.fill(0.7, 0.7, 999999));
+        if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
+            PoseEstimate singleTag = vision.getSingleTagPoseEstimate(currentSingleTagLLs, currentSingleTagId);
+            if (singleTag != null) {
+                double distrust = singleTagBaseDistrust.get() +
+                    singleTagDistanceFromCurrent.get() *
+                        currentState.Pose.getTranslation().getDistance(singleTag.pose.getTranslation()) +
+                    singleTagDistanceFromTag.get() * singleTag.avgTagDist;
+                addVisionMeasurement(singleTag.pose, singleTag.timestampSeconds,
+                    VecBuilder.fill(distrust, distrust, 999999));
+            }
         } else {
             poseFuser.update(currentState);
         }
@@ -200,6 +222,43 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
         Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
+    }
+
+    /**
+     * Sets the pose estimator to fuse only this tag seen by this limelights until you interrupt this command. You MUST interrupt this command, otherwise the pose estimator will stay this way until you the switchPoseEstimator command is run.
+     */
+    public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int tag) {
+        return new WaitUntilCommand(() -> vision.nearestTagToLimelights(limelights) == tag).andThen(Commands.run(() -> {
+            currentPoseEstimationType = PoseEstimationType.SingleTag;
+            currentSingleTagLLs = limelights;
+            currentSingleTagId = tag;
+        })).finallyDo(() -> {
+            currentPoseEstimationType = PoseEstimationType.Global;
+        });
+    }
+
+    public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int[] tagSet) {
+        return new WaitUntilCommand(() -> vision.limelightsCanSeeOneOf(limelights, tagSet)).andThen(Commands.run(() -> {
+            currentPoseEstimationType = PoseEstimationType.SingleTag;
+            currentSingleTagLLs = limelights;
+            currentSingleTagId = vision.nearestTagToLimelights(limelights);
+        })).finallyDo(() -> {
+            currentPoseEstimationType = PoseEstimationType.Global;
+        });
+    }
+
+    public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
+        return new WaitUntilCommand(() -> vision.limelightsCanSeeOneOf(limelights, tagSet)).andThen(Commands.run(() -> {
+            currentPoseEstimationType = PoseEstimationType.SingleTag;
+            currentSingleTagLLs = limelights;
+            currentSingleTagId = vision.nearestTagToLimelights(limelights);
+        })).finallyDo(() -> {
+            currentPoseEstimationType = PoseEstimationType.Global;
+        });
+    }
+
+    public Command switchPoseEstimator(PoseEstimationType poseEstimationType) {
+        return Commands.runOnce(() -> this.currentPoseEstimationType = poseEstimationType);
     }
 
     /**
@@ -234,7 +293,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         driveToPositionYController.setTolerance(translationToleranceMeters);
 
         double maxSpeedMS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
-        return applyRequest(() -> {
+        return runOnce(() -> {
+            SwerveDriveState currentState = getState();
+            Pose2d currentPose = currentState.Pose;
+            ChassisSpeeds speeds = currentState.Speeds;
+            driveToPositionXController.reset(new State(currentPose.getX(), speeds.vxMetersPerSecond));
+            driveToPositionYController.reset(new State(currentPose.getY(), speeds.vyMetersPerSecond));
+            driveToPositionHeadingController.reset();
+        }).andThen(applyRequest(() -> {
             Pose2d currentPose = getState().Pose;
             double velocityX = MathUtil.clamp(driveToPositionXController.calculate(currentPose.getX(), goalPose.getX()),
                 -maxSpeedMS, maxSpeedMS);
@@ -243,17 +309,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
             return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
                 .withVelocityX(velocityX).withVelocityY(velocityY);
-        }).until(() -> {
+        })).until(() -> {
             return driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
                 && driveToPositionHeadingController.atSetpoint();
-        }).beforeStarting(() -> {
-            SwerveDriveState currentState = getState();
-            Pose2d currentPose = currentState.Pose;
-            ChassisSpeeds speeds = currentState.Speeds;
-            driveToPositionXController.reset(new State(currentPose.getX(), speeds.vxMetersPerSecond));
-            driveToPositionYController.reset(new State(currentPose.getY(), speeds.vyMetersPerSecond));
-            driveToPositionHeadingController.reset();
-        }, this);
+        });
+    }
+
+    public double maxTimeToGetToPose(Pose2d goal) {
+        SwerveDriveState currentState = getState();
+        Pose2d currentPose = currentState.Pose;
+
+        double xTime = driveToPositionXController.timeToGetTo(currentPose.getX(), goal.getX());
+        double yTime = driveToPositionYController.timeToGetTo(currentPose.getY(), goal.getY());
+        return Math.max(xTime, yTime);
     }
 
     public Command resetPoseFromLimelight() {
@@ -273,12 +341,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }));
     }
 
-    public Command switchPoseEstimator(PoseEstimationType estimatorType) {
-        return runOnce(() -> {
-            currentPoseEstimationType = estimatorType;
-        });
-    }
-
     public Command resetRotationFromLimelightMT1() {
         ArrayList<Rotation2d> rotations = new ArrayList<Rotation2d>();
 
@@ -288,12 +350,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }).until(() -> rotations.size() == (int) resetPoseSamples.get()).andThen(runOnce(() -> {
             resetRotation(Statistics.circularMeanRemoveOutliers(rotations, rotations.size()));
             rotations.clear();
-        }));
-    }
-
-    public Command switchToSingleTagWhenAvailable() {
-        return new WaitUntilCommand(vision::isReefSingleTagPoseEstimateAvailable).andThen(runOnce(() -> {
-            switchPoseEstimator(PoseEstimationType.SingleTagReef);
         }));
     }
 

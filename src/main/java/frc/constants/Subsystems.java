@@ -32,15 +32,14 @@ public class Subsystems {
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
             BackCenterName };
-        public static final int[] ReefFacingLLs = new int[] { 0, 1 };
 
-        public enum LimelightIndex {
-            Reef(new int[] { 0, 1 }), Processor(new int[] { 2 }), CoralStation(new int[] { 0, 1 });
+        public enum LimelightsForElements {
+            Reef(new int[] { 0, 1 }), Processor(new int[] { 0, 1 }), HumanPlayerStation(new int[] { 2 });
 
-            public int[] index;
+            public int[] indexInPEList;
 
-            private LimelightIndex(int[] index) {
-                this.index = index;
+            private LimelightsForElements(int[] indexes) {
+                this.indexInPEList = indexes;
             }
         }
     }

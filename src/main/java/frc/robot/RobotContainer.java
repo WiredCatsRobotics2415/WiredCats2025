@@ -24,8 +24,10 @@ import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
+import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
+import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
@@ -92,8 +94,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("GroundIntake",
             superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("SourceIntake",
-            superstructure.beThereAsap(Presets.IntakeFromCPS).alongWith(endEffector.intakeAndWaitForCoral()));
-        NamedCommands.registerCommand("LockOntoReef", drive.switchToSingleTagWhenAvailable());
+            superstructure.beThereAsap(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("FocusPEOnReef",
+            drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, ReefMeasurements.reefIds));
         NamedCommands.registerCommand("SwitchToGlobalPE",
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
@@ -122,8 +125,13 @@ public class RobotContainer {
                 rotation = 0;
                 x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
                 y = Math.abs(y) > minorAdjXPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
+                return drive.driveOpenLoopRobotCentricRequest
+                    .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
+                    .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                    .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
             }
-            return drive.driveOpenLoopRequest.withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
+            return drive.driveOpenLoopFieldCentricRequest
+                .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
                 .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
                 .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
         }).withName("Teleop Default"));
@@ -155,7 +163,7 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsap(Presets.IntakeFromCPS));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsap(Presets.IntakeFromHPS));
 
         DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
             () -> ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign), null);
