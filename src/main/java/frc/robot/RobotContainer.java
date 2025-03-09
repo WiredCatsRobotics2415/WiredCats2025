@@ -9,6 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -115,11 +116,15 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.MinorDriveLeft).whileTrue(new MinorDriveAdjuster(Direction.Left));
         oi.binds.get(OI.Bind.MinorDriveRight).whileTrue(new MinorDriveAdjuster(Direction.Right));
 
-        oi.binds.get(OI.Bind.ManualElevatorUp).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(1.0)));
-        oi.binds.get(OI.Bind.ManualElevatorDown).whileTrue(superstructure.changeElevatorGoalBy(Inches.of(-1.0)));
+        oi.binds.get(OI.Bind.ManualElevatorUp)
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(1.0))));
+        oi.binds.get(OI.Bind.ManualElevatorDown)
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(-1.0))));
 
-        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(superstructure.changeArmGoalBy(Degrees.of(1)));
-        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(superstructure.changeArmGoalBy(Degrees.of(-1)));
+        oi.binds.get(OI.Bind.ManualArmForward)
+            .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(-1.0))));
+        oi.binds.get(OI.Bind.ManualArmBack)
+            .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(1.0))));
 
         oi.binds.get(OI.Bind.ToggleDealgae).onTrue(endEffector.toggleIntakeAlgae());
         oi.binds.get(OI.Bind.ToggleIntake).onTrue(endEffector.toggleIntakeCoral());

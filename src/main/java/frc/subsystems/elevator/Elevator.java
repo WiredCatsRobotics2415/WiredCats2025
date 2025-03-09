@@ -71,7 +71,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atGoal() {
-        return pid.atSetpoint();
+        return pid.atGoal();
     }
 
     public Distance getMeasurement() {

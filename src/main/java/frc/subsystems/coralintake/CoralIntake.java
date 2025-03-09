@@ -133,7 +133,7 @@ public class CoralIntake extends GenericSlapdown {
     }
 
     public boolean pivotAtGoal() {
-        return pid.atSetpoint();
+        return pid.atGoal();
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {

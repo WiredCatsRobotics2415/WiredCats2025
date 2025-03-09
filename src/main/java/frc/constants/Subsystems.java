@@ -34,15 +34,14 @@ public class Subsystems {
             BackCenterName };
         public static final int[] ReefFacingLLs = new int[] { 0, 1 };
 
-       public enum LimelightIndex {
-        Reef(new int[] {0, 1}), Processor(new int[] {2}), CoralStation(new int[] {0, 1});
+        public enum LimelightIndex {
+            Reef(new int[] { 0, 1 }), Processor(new int[] { 2 }), CoralStation(new int[] { 0, 1 });
 
-        public int[] index;
-        private LimelightIndex(int[] index) {
-            this.index = index;
-        }
-       }
+            public int[] index;
 
+            private LimelightIndex(int[] index) {
+                this.index = index;
+            }
         }
     }
 

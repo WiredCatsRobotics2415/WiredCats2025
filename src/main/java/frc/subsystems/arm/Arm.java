@@ -112,7 +112,7 @@ public class Arm extends SubsystemBase {
     }
 
     public boolean atGoal() {
-        return pid.atSetpoint();
+        return pid.atGoal();
     }
 
     public Angle getMeasurement() {

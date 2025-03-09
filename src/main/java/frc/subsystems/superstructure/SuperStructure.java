@@ -10,7 +10,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.RobotMeasurements;
@@ -37,8 +36,9 @@ public class SuperStructure extends SubsystemBase {
     private Elevator elevator = Elevator.getInstance();
 
     private double lastElevatorTimePrediction;
-    private double lastArmStartError;
     private boolean isFreezingArm = false;
+    private boolean armSwitchingToFrontSide = false;
+    private boolean armSwitchingToBackSide = false;
 
     private boolean armWillCollideWithDrivebase = false;
     private boolean armWillCollideWithCoralIntake = false;
@@ -47,7 +47,8 @@ public class SuperStructure extends SubsystemBase {
     private double eeLength = EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
-    private TuneableNumber percentageOfArmGoal = new TuneableNumber(0.0, "SuperStructure/percentageOfArmGoal"); // Note: Sim tests indicate this number should be at 0, otherwise we get wierd elevator freezing behavior - possibly add debounce so once arm has reached x% of goal, elevator can't be frozen again. 3-8: the elevator completely freezes if you use this, so just don't. the arm moves fast enough here, it probably will IRL.
+    private Angle ninetyDeg = Degrees.of(90); // Cache to avoid making more objects
+
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
     private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
     private TuneableBoolean usePredictiveWillCollide = new TuneableBoolean(false,
@@ -59,6 +60,8 @@ public class SuperStructure extends SubsystemBase {
         if (RuntimeConstants.TuningMode) {
             TuningModeTab.getInstance().addBoolSupplier("Arm & Drivebase", () -> armWillCollideWithDrivebase);
             TuningModeTab.getInstance().addBoolSupplier("Arm & cIntake", () -> armWillCollideWithCoralIntake);
+            TuningModeTab.getInstance().addBoolSupplier("Front Switch", () -> armSwitchingToFrontSide);
+            TuningModeTab.getInstance().addBoolSupplier("Back Switch", () -> armSwitchingToBackSide);
             TuningModeTab.getInstance().addBoolSupplier("freezing arm", () -> isFreezingArm);
         }
 
@@ -70,34 +73,34 @@ public class SuperStructure extends SubsystemBase {
         return instance;
     }
 
-    /** Change arm goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
-    public Command changeArmGoalBy(Angle changeBy) {
-        return run(() -> {
-            this.setArmGoalSafely((arm.getGoal().plus(changeBy)));
-        }).finallyDo(() -> Commands.idle(this).schedule());
-    }
-
-    /** Change elevator goal by changeBy. Negatives work, bounds are checked. Intended for manual control. */
-    public Command changeElevatorGoalBy(Distance changeBy) {
-        return run(() -> {
-            this.setElevatorGoalSafely((elevator.getGoal().plus(changeBy)));
-        }).finallyDo(() -> Commands.idle(this).schedule());
-    }
-
-    public void setArmGoalSafely(Angle armGoal) {
-        if (stateIsValid(elevator.getGoal(), armGoal, coralIntake.getGoal())) {
-            arm.setGoal(armGoal);
+    public void setArmGoalSafely(Angle newGoal) {
+        if (stateIsValid(elevator.getGoal(), newGoal, coralIntake.getGoal())) {
+            arm.setGoal(newGoal);
         }
     }
 
-    public void setElevatorGoalSafely(Distance elevatorGoal) {
-        if (stateIsValid(elevatorGoal, arm.getGoal(), coralIntake.getGoal())) {
-            elevator.setGoal(elevatorGoal);
+    public void setElevatorGoalSafely(Distance newGoal) {
+        if (stateIsValid(newGoal, arm.getGoal(), coralIntake.getGoal())) {
+            elevator.setGoal(newGoal);
         }
     }
 
     /**
-     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here
+     * Changes arm goal by changeBy. Accounts for collision detection. Do NOT require the arm or superstructure if you use this in an instantcommand.
+     */
+    public void changeArmGoalSafely(Angle changeBy) {
+        setArmGoalSafely(arm.getGoal().plus(changeBy));
+    }
+
+    /**
+     * Changes elevator goal by changeBy. Accounts for collision detection. Do NOT require the arm or superstructure if you use this in an instantcommand.
+     */
+    public void changeElevatorGoalSafely(Distance changeBy) {
+        setElevatorGoalSafely(elevator.getGoal().plus(changeBy));
+    }
+
+    /**
+     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one.
      */
     public Command beThereIn(double secondsToBeThereIn, TuneableSuperStructureState goal) {
         Timer timeTaken = new Timer();
@@ -109,27 +112,34 @@ public class SuperStructure extends SubsystemBase {
             arm.setGoal(goal.getArm().angle());
             coralIntake.setPivotGoal(goal.getCoralIntake().angle());
 
+            armSwitchingToFrontSide = arm.getMeasurement().gte(ninetyDeg) && arm.getGoal().lt(ninetyDeg);
+            armSwitchingToBackSide = arm.getMeasurement().lte(ninetyDeg) && arm.getGoal().gt(ninetyDeg);
+
             lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().in(Inches),
                 elevator.getMeasurement().in(Inches));
-            lastArmStartError = Math.abs(arm.getPid().goalError());
             isFreezingArm = false;
             timeTaken.start();
         }).andThen(run(() -> {
             if (!elevator.atGoal()) {
                 if (elevator.getPid().goalError() < 0) {
                     if (!armWillCollideWithDrivebase) {
-                        // If elevator wants to move down and it won't collide, then go
+                        // If elevator wants to move down and it won't collide the arm with the drivebase, then move
                         elevator.getPid().setConstraints(
                             new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
+                        System.out.println("elevator wants to move down and can");
                     } else {
-                        // If elevator wants to move down and will collide, stop it so the arm can get out of the way
+                        // Stop elevator so the arm can get out of the way
                         elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
+                        System.out.println("elevator wants to move down and CAN'T");
                     }
                 } else {
                     boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
-                    boolean armHasReachedMostOfGoal = (Math.abs(arm.getPid().goalError()) /
-                        lastArmStartError) > percentageOfArmGoal.get();
-                    if (elevatorCanMove && armHasReachedMostOfGoal) {
+                    boolean armOnTargetSide = true;
+                    if (armSwitchingToFrontSide || armSwitchingToBackSide) {
+                        armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
+                            || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
+                    }
+                    if (elevatorCanMove && armOnTargetSide) {
                         // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
                         elevator.getPid().setConstraints(
                             new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
@@ -144,19 +154,15 @@ public class SuperStructure extends SubsystemBase {
                     if (armWillCollideWithCoralIntake) {
                         coralIntake.getPid()
                             .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax));
-                        System.out.println("cintake up frozen");
                     } else {
                         coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax,
                             CoralIntakeConstants.BaseAccelerationMax));
-                        System.out.println("cintake up moving");
                     }
                 } else { // if it wants to go down, we need to make sure the arm wont hit it
                     if (armWillCollideWithCoralIntake) {
                         isFreezingArm = true;
-                        System.out.println("cintake down");
                     } else {
                         isFreezingArm = false;
-                        System.out.println("cintake down");
                     }
                 }
             } else {
@@ -180,9 +186,9 @@ public class SuperStructure extends SubsystemBase {
         Angle armAngle;
         Angle cIntakeAngle;
         if (usePredictiveWillCollide.get()) {
-            double elevatorFreezeTime = elevator.getPid().timeToStop();
-            double armFreezeTime = arm.getPid().timeToStop();
-            double coralFreezeTime = coralIntake.getPid().timeToStop();
+            // double elevatorFreezeTime = elevator.getPid().timeToStop();
+            // double armFreezeTime = arm.getPid().timeToStop();
+            // double coralFreezeTime = coralIntake.getPid().timeToStop();
             elevatorHeight = Inches.of(elevator.getDifferentiableMeasurementInches().firstDerivativeLinearApprox(0.04));
             armAngle = Degrees.of(arm.getDifferentiableMeasurementDegrees().firstDerivativeLinearApprox(0.04));
             cIntakeAngle = Degrees
@@ -209,7 +215,7 @@ public class SuperStructure extends SubsystemBase {
             carriagePoint.getY() + Trig.cosizzle(armAngle) * eeLength);
         // System.out.println(" endEffector: " + endEffector);
 
-        if (arm.in(Degrees) > 90) { // Test for cintake
+        if (arm.gt(ninetyDeg)) { // Test for coral intake
             Point2d eeBottomTip = new Point2d(endEffector.getX() + Trig.cosizzle(armAngle) * 3,
                 endEffector.getY() + Trig.sizzle(armAngle) * 3);
             collisions[0] = eeBottomTip.getX() < 18 && eeBottomTip.getY() < 0;
@@ -237,7 +243,7 @@ public class SuperStructure extends SubsystemBase {
 
     public boolean stateIsValid(Distance elevator, Angle arm, Angle cIntake) {
         boolean[] collisions = collisionTest(elevator, arm, cIntake);
-        return collisions[0] && collisions[1];
+        return !collisions[0] && !collisions[1];
     }
 
     @Override
