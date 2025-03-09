@@ -17,7 +17,7 @@ public class RobotStatus {
     @Getter private static RobotState robotState;
 
     public enum RobotState {
-        Disabled(leds.set(UseableColor.BreathingGreen)), Enabled(leds.set(UseableColor.FlashingGreen)),
+        Disabled(leds.set(UseableColor.BreathingGreen)), Enabled(leds.set(UseableColor.ChasingGreen)),
         AligningToCPS(leds.set(UseableColor.Gray)), AutoGroundIntaking(leds.set(UseableColor.Yellow)),
         AligningToDeAlgae(leds.set(UseableColor.SkyBlue)), ContainingCoral(flashingGreen),
         ContainingAlgaeInEE(flashingGreen), AligningToScoreCoral(leds.set(UseableColor.White)),

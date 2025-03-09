@@ -1,7 +1,6 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandJoystick;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,14 +21,10 @@ public class OI {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
         ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
         AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
-        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, MinorDriveForward, MinorDriveBackward,
-        MinorDriveLeft, MinorDriveRight, AutoIntakeFromGround
+        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
-    private SlewRateLimiter xLimiter = new SlewRateLimiter(Controls.SlewRate);
-    private SlewRateLimiter yLimiter = new SlewRateLimiter(Controls.SlewRate);
-    private SlewRateLimiter rotationLimiter = new SlewRateLimiter(Controls.SlewRate);
 
     private static OI instance;
 
@@ -46,6 +41,8 @@ public class OI {
 
         binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
 
+        binds.put(Bind.ChangeTeleopMode, controller.button(GulikitButtons.RightPaddle));
+
         binds.put(Bind.ManualElevatorUp, controller.leftBumper());
         binds.put(Bind.ManualElevatorDown, controller.leftTrigger());
         binds.put(Bind.ManualArmForward, controller.rightBumper());
@@ -55,11 +52,6 @@ public class OI {
         binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
         binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.Y));
-
-        binds.put(Bind.MinorDriveForward, controller.povUp());
-        binds.put(Bind.MinorDriveBackward, controller.povDown());
-        binds.put(Bind.MinorDriveLeft, controller.povLeft());
-        binds.put(Bind.MinorDriveRight, controller.povRight());
 
         binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
@@ -100,9 +92,7 @@ public class OI {
         }
         if (Double.isNaN(newX)) newX = 0.0d;
         if (Double.isNaN(newY)) newY = 0.0d;
-        double rateLimitedX = xLimiter.calculate(x);
-        double rateLimitedY = yLimiter.calculate(y);
-        return new double[] { rateLimitedX, rateLimitedY };
+        return new double[] { newX, newY };
     }
 
     public double getRotation() {
@@ -113,7 +103,7 @@ public class OI {
         } else {
             deadbanded = minimumPowerCompensation(deadbanded);
         }
-        return rotationLimiter.calculate(deadbanded);
+        return deadbanded;
     }
 
     public XboxController getHIDOfController() { return controller.getHID(); }

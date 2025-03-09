@@ -7,7 +7,9 @@ import static edu.wpi.first.units.Units.Seconds;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -16,14 +18,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
 import frc.commands.Dealgae.DealgaeAutomationMode;
-import frc.commands.MinorDriveAdjuster;
-import frc.commands.MinorDriveAdjuster.Direction;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
+import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
@@ -36,6 +37,8 @@ import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
 import frc.utils.driver.DashboardManager;
+import frc.utils.math.AdjustableSLR;
+import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -54,9 +57,20 @@ public class RobotContainer {
 
     private LoggedDashboardChooser<Command> autoChooser;
 
+    public enum TeleopDriveMode {
+        Normal, MinorAdjustment
+    }
+
+    @Getter private TeleopDriveMode currentTeleopDriveMode = TeleopDriveMode.Normal;
+
+    private AdjustableSLR driveXLimiter = new AdjustableSLR(DriveConstants.BaseXAccelerationMax.get());
+    private AdjustableSLR driveYLimiter = new AdjustableSLR(DriveConstants.BaseYAccelerationMax.get());
+    private AdjustableSLR driveRotationLimiter = new AdjustableSLR(DriveConstants.BaseRotationAccelMax.get());
+    private TuneableNumber minorAdjXPct = new TuneableNumber(0.2, "Drive/minorAdjXPct");
+    private TuneableNumber minorAdjYPct = new TuneableNumber(0.2, "Drive/minorAdjYPct");
+
     private RobotContainer() {
         setupAuto();
-        neutralizeSubsystems();
         configureControls();
         configureTriggers();
     }
@@ -97,24 +111,25 @@ public class RobotContainer {
         });
     }
 
-    public void neutralizeSubsystems() {
-        // TODO: should be stow cmd or something like that
-    }
-
     private void configureControls() {
         oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
-            double[] input = oi.getXY();
-            return drive.driveOpenLoopRequest.withVelocityX(-input[1] * Controls.MaxDriveMeterS)
-                .withVelocityY(-input[0] * Controls.MaxDriveMeterS)
-                .withRotationalRate(-oi.getRotation() * Controls.MaxAngularRadS);
+            double[] linearInput = oi.getXY();
+            double x = linearInput[1], y = linearInput[0];
+            double rotation = oi.getRotation();
+            if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
+                rotation = 0;
+                x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
+                y = Math.abs(y) > minorAdjXPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
+            }
+            return drive.driveOpenLoopRequest.withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
+                .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
         }).withName("Teleop Default"));
-
-        oi.binds.get(OI.Bind.MinorDriveForward).whileTrue(new MinorDriveAdjuster(Direction.Forward));
-        oi.binds.get(OI.Bind.MinorDriveBackward).whileTrue(new MinorDriveAdjuster(Direction.Backward));
-        oi.binds.get(OI.Bind.MinorDriveLeft).whileTrue(new MinorDriveAdjuster(Direction.Left));
-        oi.binds.get(OI.Bind.MinorDriveRight).whileTrue(new MinorDriveAdjuster(Direction.Right));
+        oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.5, DebounceType.kRising)
+            .onTrue(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.MinorAdjustment))
+            .onFalse(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.Normal));
 
         oi.binds.get(OI.Bind.ManualElevatorUp)
             .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(1.0))));
@@ -188,6 +203,18 @@ public class RobotContainer {
         new Trigger(() -> {
             return endEffector.cameraTrigger();
         }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE));
+    }
+
+    public void periodic() {
+        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        driveXLimiter.setRateLimit(ssLimits[0]);
+        driveYLimiter.setRateLimit(ssLimits[1]);
+        driveRotationLimiter.setRateLimit(ssLimits[2]);
+
+        drive.getDriveToPositionXController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        drive.getDriveToPositionYController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

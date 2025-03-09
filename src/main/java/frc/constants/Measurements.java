@@ -20,7 +20,7 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
-import frc.constants.Subsystems.DriveAutoConstants;
+import frc.constants.Subsystems.DriveConstants;
 import java.util.List;
 
 public class Measurements {
@@ -41,7 +41,7 @@ public class Measurements {
 
         public static final Mass RobotWeight = Pounds.of(90); // TODO: update with real value
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
-            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveAutoConstants.HeadingKA / TunerConstants.driveGains.kA));
+            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
             TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with slip current characerization
             DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);

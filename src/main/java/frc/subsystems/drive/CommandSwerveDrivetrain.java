@@ -36,7 +36,7 @@ import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.constants.Controls;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
-import frc.constants.Subsystems.DriveAutoConstants;
+import frc.constants.Subsystems.DriveConstants;
 import frc.constants.TunerConstants;
 import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
@@ -71,12 +71,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     public final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
-    TuneableProfiledPIDController driveToPositionXController = new TuneableProfiledPIDController(
-        DriveAutoConstants.DTTranslationPID, new Constraints(0, 0), "DriveToX");
-    TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
-        DriveAutoConstants.DTTranslationPID, new Constraints(0, 0), "DriveToY");
-    PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveAutoConstants.HeadingkP,
-        DriveAutoConstants.HeadingkI, DriveAutoConstants.HeadingkD);
+    @Getter private TuneableProfiledPIDController driveToPositionXController = new TuneableProfiledPIDController(
+        DriveConstants.DTTranslationPID,
+        new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseXAccelerationMax.get()), "DriveToX");
+    @Getter private TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
+        DriveConstants.DTTranslationPID,
+        new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseYAccelerationMax.get()), "DriveToY");
+    private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveConstants.HeadingkP,
+        DriveConstants.HeadingkI, DriveConstants.HeadingkD);
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
@@ -101,7 +103,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configureAutoBuilder();
 
-        driveToPositionHeadingController.setTolerance(DriveAutoConstants.HeadingTolerance);
+        driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance);
         driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
 
         if (RuntimeConstants.TuningMode) {
@@ -111,15 +113,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
                 resetRotationFromLimelightMT1().ignoringDisable(true));
 
-            DriveAutoConstants.PPTranslationP.addListener(newP -> {
-                DriveAutoConstants.PPTranslationPID = new PIDConstants(newP);
-                DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
-                    DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
+            DriveConstants.PPTranslationP.addListener(newP -> {
+                DriveConstants.PPTranslationPID = new PIDConstants(newP);
+                DriveConstants.PathFollowingController = new PPHolonomicDriveController(DriveConstants.PPTranslationPID,
+                    DriveConstants.RotationPID);
             });
-            DriveAutoConstants.RotationP.addListener(newP -> {
-                DriveAutoConstants.RotationPID = new PIDConstants(newP);
-                DriveAutoConstants.PathFollowingController = new PPHolonomicDriveController(
-                    DriveAutoConstants.PPTranslationPID, DriveAutoConstants.RotationPID);
+            DriveConstants.RotationP.addListener(newP -> {
+                DriveConstants.RotationPID = new PIDConstants(newP);
+                DriveConstants.PathFollowingController = new PPHolonomicDriveController(DriveConstants.PPTranslationPID,
+                    DriveConstants.RotationPID);
             });
 
             // Add torque safety to all motors
@@ -150,7 +152,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveAutoConstants.PathFollowingController, RobotConfig.fromGUISettings(),
+                DriveConstants.PathFollowingController, RobotConfig.fromGUISettings(),
                 // Assume the path needs to be flipped for Red vs Blue, this is normally the case
                 () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red, this // Subsystem for requirements
             );
@@ -183,8 +185,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 hasAppliedOperatorPerspective = true;
             });
         }
-        SwerveDriveState currentState = getState();
 
+        SwerveDriveState currentState = getState();
         if (currentPoseEstimationType == PoseEstimationType.SingleTagReef) {
             PoseEstimate singleTag = vision.getReefSingleTagPoseEstimate();
             if (singleTag != null)
@@ -207,13 +209,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command pathfindTo(Pose2d goalPose) {
         try {
-            return new PathfindingCommand(goalPose, DriveAutoConstants.DefaultPathConstraints, () -> getState().Pose,
+            return new PathfindingCommand(goalPose, DriveConstants.DefaultPathConstraints, () -> getState().Pose,
                 () -> getState().Speeds,
                 (speeds,
                     feedforwards) -> setControl(autoRequest.withSpeeds(speeds)
                         .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
                         .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
-                DriveAutoConstants.PathFollowingController, RobotMeasurements.PPRobotConfig, this);
+                DriveConstants.PathFollowingController, RobotMeasurements.PPRobotConfig, this);
         } catch (Exception ex) {
             DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
                 ex.getStackTrace());
@@ -242,7 +244,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
                 .withVelocityX(velocityX).withVelocityY(velocityY);
         }).until(() -> {
-            return driveToPositionXController.atSetpoint() && driveToPositionYController.atSetpoint()
+            return driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
                 && driveToPositionHeadingController.atSetpoint();
         }).beforeStarting(() -> {
             SwerveDriveState currentState = getState();

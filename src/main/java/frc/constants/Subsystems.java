@@ -54,7 +54,7 @@ public class Subsystems {
         public static final TuneableColor WestminsterGreen = new TuneableColor(30, 72, 47, "WestminsterGreen");
 
         public enum UseableColor {
-            BreathingGreen(new Color(30, 72, 47), 0.11), FlashingGreen(new Color(30, 72, 47), 0.01),
+            BreathingGreen(new Color(30, 72, 47), 0.11), ChasingGreen(new Color(30, 72, 47), 0.01),
             Green(new Color(30, 72, 47), 0.75), Orange(Color.kOrange, 0.65), Purple(Color.kPurple, 0.91),
             Red(Color.kRed, 0.61), Blue(Color.kBlue, 0.87), SkyBlue(Color.kSkyBlue, 0.83), Yellow(Color.kYellow, 0.69),
             White(Color.kWhite, 0.93), Gray(Color.kGray, 0.97), Black(Color.kBlack, 0.99),
@@ -70,23 +70,29 @@ public class Subsystems {
         }
     }
 
-    public class DriveAutoConstants {
-        public static final TuneableNumber PPTranslationP = new TuneableNumber(20.0d, "DriveAuto/PPTranslationP");
-        public static final TuneableNumber RotationP = new TuneableNumber(15.0d, "DriveAuto/RotationP");
+    public class DriveConstants {
+        public static final TuneableNumber PPTranslationP = new TuneableNumber(20.0d, "Drive/PPTranslationP");
+        public static final TuneableNumber RotationP = new TuneableNumber(15.0d, "Drive/RotationP");
 
-        public static final double BaseVelocityMax = Controls.MaxDriveMeterS;
-        public static final double BaseAccelerationMax = 2 * Controls.MaxDriveMeterS;
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(Controls.MaxDriveMeterS,
+            "Drive/BaseVelocityMax");
+        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(
+            (1 / 0.25) * Controls.MaxDriveMeterS, "Drive/BaseXAccelerationMax");
+        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(
+            (1 / 0.125) * Controls.MaxDriveMeterS, "Drive/BaseYAccelerationMax");
+        public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(
+            (1 / 0.125) * Controls.MaxDriveMeterS, "Drive/BaseRotationAccelMax");
 
         public static PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
         public static PIDConstants RotationPID = new PIDConstants(RotationP.get(), 0, 0);
         public static PathFollowingController PathFollowingController = new PPHolonomicDriveController(PPTranslationPID,
             RotationPID);
-        public static final PathConstraints DefaultPathConstraints = new PathConstraints(
-            MetersPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 2),
-            MetersPerSecondPerSecond.of(TunerConstants.kSpeedAt12Volts.baseUnitMagnitude() / 4),
-            RadiansPerSecond.of(Math.PI), RadiansPerSecondPerSecond.of(Math.PI / 2));
+        public static final PathConstraints DefaultPathConstraints = new PathConstraints(TunerConstants.kSpeedAt12Volts,
+            TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
+            RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants DTTranslationPID = new PIDConstants(0.5, 0, 0);
+        public static final PIDConstants DTTranslationPID = new PIDConstants(2, 0, 0.1);
+
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
         public static final double HeadingkP = 3;

@@ -16,6 +16,7 @@ import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
+import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
@@ -43,6 +44,11 @@ public class SuperStructure extends SubsystemBase {
     private boolean armWillCollideWithDrivebase = false;
     private boolean armWillCollideWithCoralIntake = false;
 
+    private double lastEEHeight = 0.0d;
+    private double maxEEHeight = ElevatorConstants.MaxHeight.in(Inches) +
+        EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
+    private double lastEEDistanceFromElevator = 0.0d;
+
     private double elevatorTilt = RobotMeasurements.ElevatorTilt.in(Radians);
     private double eeLength = EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
@@ -54,6 +60,10 @@ public class SuperStructure extends SubsystemBase {
     private TuneableBoolean usePredictiveWillCollide = new TuneableBoolean(false,
         "SuperStructure/usePredictiveWillCollide"); // Note: Sim tests indicate that this can cause jumpiness - worth testing IRL but not 100% necessary
 
+    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelX");
+    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
+    private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
+
     private static SuperStructure instance;
 
     private SuperStructure() {
@@ -63,6 +73,8 @@ public class SuperStructure extends SubsystemBase {
             TuningModeTab.getInstance().addBoolSupplier("Front Switch", () -> armSwitchingToFrontSide);
             TuningModeTab.getInstance().addBoolSupplier("Back Switch", () -> armSwitchingToBackSide);
             TuningModeTab.getInstance().addBoolSupplier("freezing arm", () -> isFreezingArm);
+            TuningModeTab.getInstance().addDoubleSupplier("last EE height", () -> lastEEHeight);
+            TuningModeTab.getInstance().addDoubleSupplier("last EE distance", () -> lastEEDistanceFromElevator);
         }
 
         setDefaultCommand(beThereAsap(Presets.Stow));
@@ -199,51 +211,65 @@ public class SuperStructure extends SubsystemBase {
             cIntakeAngle = coralIntake.getPivotAngle();
         }
 
-        boolean[] currentCollisions = collisionTest(elevatorHeight, armAngle, cIntakeAngle);
+        boolean[] currentCollisions = collisionTest(elevatorHeight, armAngle, cIntakeAngle, true);
         armWillCollideWithDrivebase = currentCollisions[0];
         armWillCollideWithCoralIntake = currentCollisions[1];
     }
 
-    private boolean[] collisionTest(Distance elevator, Angle arm, Angle cIntake) {
+    private boolean[] collisionTest(Distance elevator, Angle arm, Angle cIntake, boolean updateCurrentMeasures) {
         boolean[] collisions = new boolean[2];
 
         double height = elevator.in(Inches);
         Point2d carriagePoint = new Point2d(4.5 - height * Trig.sizzle(elevatorTilt),
             height * Trig.cosizzle(elevatorTilt) + 1.64);
         double armAngle = -arm.in(Radians) + Units.degreesToRadians(90) - elevatorTilt;
-        Point2d endEffector = new Point2d(carriagePoint.getX() - Trig.sizzle(armAngle) * eeLength,
-            carriagePoint.getY() + Trig.cosizzle(armAngle) * eeLength);
+        Point2d endEffector = new Point2d(carriagePoint.x() - Trig.sizzle(armAngle) * eeLength,
+            carriagePoint.y() + Trig.cosizzle(armAngle) * eeLength);
         // System.out.println(" endEffector: " + endEffector);
 
         if (arm.gt(ninetyDeg)) { // Test for coral intake
-            Point2d eeBottomTip = new Point2d(endEffector.getX() + Trig.cosizzle(armAngle) * 3,
-                endEffector.getY() + Trig.sizzle(armAngle) * 3);
-            collisions[0] = eeBottomTip.getX() < 18 && eeBottomTip.getY() < 0;
+            Point2d eeBottomTip = new Point2d(endEffector.x() + Trig.cosizzle(armAngle) * 3,
+                endEffector.y() + Trig.sizzle(armAngle) * 3);
+            collisions[0] = eeBottomTip.x() < 18 && eeBottomTip.y() < 0;
 
             Point2d cIntakeEnd = new Point2d(10.4 + Trig.cosizzle(cIntake) * cIntakeLength,
                 0.5 + Trig.sizzle(cIntake) * cIntakeLength);
 
-            double lineResult = ((eeBottomTip.getY() - carriagePoint.getY()) /
-                (eeBottomTip.getX() - carriagePoint.getX())) * (cIntakeEnd.getX() - carriagePoint.getX()) +
-                carriagePoint.getY();
-            // System.out.println(lineResult + " is less than " + cIntakeEnd.getY());
+            double lineResult = ((eeBottomTip.y() - carriagePoint.y()) / (eeBottomTip.x() - carriagePoint.x())) *
+                (cIntakeEnd.x() - carriagePoint.x()) + carriagePoint.y();
+            // System.out.println(lineResult + " is less than " + cIntakeEnd.y());
             // System.out.println(" eeBottomTip: " + eeBottomTip);
             // System.out.println(" carriagePoint: " + carriagePoint);
-            collisions[1] = lineResult < cIntakeEnd.getY();
+            collisions[1] = lineResult < cIntakeEnd.y();
         } else {
             Point2d eeTopTip = new Point2d(
-                carriagePoint.getX() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
-                carriagePoint.getY() + Trig.cosizzle(armAngle) * 13 - 15.5 * Trig.sizzle(armAngle + elevatorTilt));
-            collisions[0] = eeTopTip.getX() > -18 && eeTopTip.getY() < 0;
+                carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
+                carriagePoint.y() + Trig.cosizzle(armAngle) * 13 - 15.5 * Trig.sizzle(armAngle + elevatorTilt));
+            collisions[0] = eeTopTip.x() > -18 && eeTopTip.y() < 0;
 
             collisions[1] = false;
+        }
+        if (updateCurrentMeasures) {
+            lastEEHeight = endEffector.y();
+            lastEEDistanceFromElevator = Math.abs(endEffector.x());
         }
         return collisions;
     }
 
     public boolean stateIsValid(Distance elevator, Angle arm, Angle cIntake) {
-        boolean[] collisions = collisionTest(elevator, arm, cIntake);
+        boolean[] collisions = collisionTest(elevator, arm, cIntake, false);
         return !collisions[0] && !collisions[1];
+    }
+
+    public double[] recommendedDriveAccelLimits() {
+        double[] limits = new double[3];
+        limits[0] = DriveConstants.BaseXAccelerationMax.get() -
+            (lastEEHeight / maxEEHeight) * (1 - pctOfDriveAccelX.get()) * DriveConstants.BaseXAccelerationMax.get();
+        limits[1] = DriveConstants.BaseYAccelerationMax.get() -
+            (lastEEHeight / maxEEHeight) * (1 - pctOfDriveAccelY.get()) * DriveConstants.BaseYAccelerationMax.get();
+        limits[2] = DriveConstants.BaseRotationAccelMax.get() - (lastEEDistanceFromElevator / eeLength) *
+            (1 - pctOfDriveAccelR.get()) * DriveConstants.BaseRotationAccelMax.get();
+        return limits;
     }
 
     @Override

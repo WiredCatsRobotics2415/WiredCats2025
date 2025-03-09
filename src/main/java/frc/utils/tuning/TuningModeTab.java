@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.constants.RuntimeConstants;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class TuningModeTab {
     private static TuningModeTab instance;
@@ -44,6 +45,10 @@ public class TuningModeTab {
 
     public void addBoolSupplier(String title, BooleanSupplier supplier) {
         thisTab.addBoolean(title, supplier).withWidget("Boolean Box");
+    }
+
+    public void addDoubleSupplier(String title, DoubleSupplier supplier) {
+        thisTab.addDouble(title, supplier).withWidget("Number");
     }
 
     public void addCommand(String title, Command command) {

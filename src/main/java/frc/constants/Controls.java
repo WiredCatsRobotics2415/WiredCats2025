@@ -10,14 +10,13 @@ import frc.utils.tuning.TuneableDistance;
 public class Controls {
     public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
     public static final double MaxAngularRadS = 1.2 * Math.PI;
+    public static final double Deadband = 0.05d;
     public static final double MinimumDrivePower = 0.05d;
-    public static final double RumbleSoftValue = 0.2d;
-    public static final double RumbleHardValue = 0.6d;
     public static final boolean UseCurve = true;
     public static final double CurveExponent = 3;
-    public static final double SlewRate = 8; // ie. 8 units/sec, so 0.125 acceleration limit
-    public static final double Deadband = 0.05d;
-    public static final double MinorAdjustmentSpeedMeterS = 0.25;
+
+    public static final double RumbleSoftValue = 0.2d;
+    public static final double RumbleHardValue = 0.6d;
 
     public class GulikitButtons {
         public static final int X = 4;

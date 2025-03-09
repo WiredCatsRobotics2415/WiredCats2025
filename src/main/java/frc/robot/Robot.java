@@ -97,6 +97,7 @@ public class Robot extends LoggedRobot {
             TuneableBoolean.periodic();
         }
         TorqueSafety.getInstance().periodic();
+        RobotContainer.getInstance().periodic();
         CommandScheduler.getInstance().run();
         if (RuntimeConstants.VisualizationEnabled) Visualizer.update();
     }
