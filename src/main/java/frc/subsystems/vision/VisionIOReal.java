@@ -46,7 +46,9 @@ public class VisionIOReal implements VisionIO {
         for (int i = 0; i < VisionConstants.PoseEstimationLLNames.length; i++) {
             PoseEstimate estimate = LimelightHelpers
                 .getBotPoseEstimate_wpiBlue_MegaTag2(VisionConstants.PoseEstimationLLNames[i]);
-            if (estimate == null) estimate = PoseEstimate.zero;
+            if (estimate == null) {
+                estimate = PoseEstimate.zero;
+            }
             inputs.poseEstimates[i] = estimate.pose;
             inputs.poseLatencies[i] = estimate.latency;
             inputs.poseTimestampsSeconds[i] = estimate.timestampSeconds;
@@ -65,8 +67,8 @@ public class VisionIOReal implements VisionIO {
         }
 
         if (currentPipeline == EndEffectorPipeline.DriverView) {
-            inputs.endEffectorCameraAveragePixelValue = (int) LimelightHelpers
-                .getPythonScriptData(VisionConstants.EndEffectorName)[0];
+            double[] endEffectorData = LimelightHelpers.getPythonScriptData(VisionConstants.EndEffectorName);
+            if (endEffectorData.length > 0) inputs.endEffectorCameraAveragePixelValue = (int) endEffectorData[0];
         } else {
             RawDetection[] objectsDetected = LimelightHelpers.getRawDetections(VisionConstants.EndEffectorName);
             if (objectsDetected.length == 0) {
