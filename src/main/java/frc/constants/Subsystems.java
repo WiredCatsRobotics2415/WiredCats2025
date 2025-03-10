@@ -57,7 +57,7 @@ public class Subsystems {
             Green(new Color(30, 72, 47), 0.75), Orange(Color.kOrange, 0.65), Purple(Color.kPurple, 0.91),
             Red(Color.kRed, 0.61), Blue(Color.kBlue, 0.87), SkyBlue(Color.kSkyBlue, 0.83), Yellow(Color.kYellow, 0.69),
             White(Color.kWhite, 0.93), Gray(Color.kGray, 0.97), Black(Color.kBlack, 0.99),
-            Rainbow(new Color(255, 255, 255), -0.45);
+            Rainbow(new Color(255, 255, 255), -0.45), Pink(new Color(255, 105, 180), 0.57);
 
             public Color color;
             public double sparkPWMLevel;
@@ -177,11 +177,11 @@ public class Subsystems {
             "EndEffector/AlgaeIntookCameraThreshold");
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(26);
-        //end of end effector to carriage
+        // end of end effector to carriage
         public static final Distance DistanceFromCarriage = Inches.of(22);
-        //Constant difference betweeen angle of arm and angle of end of end effector to the carriage
+        // Constant difference betweeen angle of arm and angle of end of end effector to the carriage
         public static final Angle AngleFromArmWrtCarraige = Degrees.of(-3.05);
-        //Difference between angle of arm and angle of end effector with respect to the ground
+        // Difference between angle of arm and angle of end effector with respect to the ground
         public static final Angle AngleFromArmWrtGround = Degrees.of(14);
     }
 

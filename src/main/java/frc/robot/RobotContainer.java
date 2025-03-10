@@ -12,14 +12,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
-import frc.commands.IntakeFromHPS;
 import frc.commands.Dealgae.DealgaeAutomationMode;
+import frc.commands.IntakeFromHPS;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.commands.ScoreCoral.Level;
@@ -154,8 +153,12 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake());
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
-        oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.beThereAsap(Presets.Stow));
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal)).andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
+        oi.binds.get(OI.Bind.StowPreset)
+            .onTrue(superstructure.beThereAsap(Presets.Stow).andThen(Commands.waitUntil(superstructure::allAtGoal))
+                .andThen(RobotStatus.setRobotStateOnce(RobotState.Stow)));
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(
+            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
+                .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
@@ -199,18 +202,16 @@ public class RobotContainer {
 
         // Flash the leds when a coral is scored
         new Trigger(() -> {
-            return endEffector.isOuttaking() && !endEffector.irSensorTrigger();
+            return (endEffector.isOuttakingAlgae() && !endEffector.cameraTrigger())
+                || (endEffector.isOuttakingCoral() && !endEffector.irSensorTrigger());
         }).onTrue(new WaitCommand(0.5)
-            .andThen(ledStrip.flash(UseableColor.Purple, Seconds.of(0.2), Seconds.of(0.2)).withTimeout(1))
+            .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1))
             .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
 
-        new Trigger(() -> {
-            return endEffector.irSensorTrigger();
-        }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingCoral));
-
-        new Trigger(() -> {
-            return endEffector.cameraTrigger();
-        }).onTrue(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE));
+        new Trigger(endEffector::hasAlgae)
+            .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
+        new Trigger(endEffector::hasCoral)
+            .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
     }
 
     public void periodic() {

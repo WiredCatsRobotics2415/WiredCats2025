@@ -6,11 +6,8 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.commands.Dealgae.DealgaeAutomationMode;
-import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.HumanPlayerStation;
 import frc.constants.Measurements.RobotMeasurements;
@@ -36,12 +33,13 @@ public class IntakeFromHPS extends Command {
 
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
-        private static final Transform2d Offset = new Transform2d(CenterToBumper, Inches.of(0), Rotation2d.kZero);
-    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3, "IntakeFromHPS/DriveTolerance");
+    private static final Transform2d Offset = new Transform2d(CenterToBumper, Inches.of(0), Rotation2d.kZero);
+    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3,
+        "IntakeFromHPS/DriveTolerance");
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
-    
+
     private int tagToFocusOn = -1;
 
     private Command driveCommand;

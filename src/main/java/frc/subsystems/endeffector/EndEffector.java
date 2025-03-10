@@ -2,10 +2,7 @@ package frc.subsystems.endeffector;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
-import frc.robot.RobotStatus;
-import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.vision.Vision;
 import frc.utils.Util;
 import lombok.Getter;
@@ -18,14 +15,12 @@ public class EndEffector extends SubsystemBase {
 
     @Getter private boolean intakingCoral = false;
     @Getter private boolean intakingAlgae = false;
-    @Getter private boolean outtaking = false;
+    @Getter private boolean outtakingCoral = false;
+    @Getter private boolean outtakingAlgae = false;
 
     private EndEffector() {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             new EndEffectorIO() {});
-
-        new Trigger(this::hasCoral).onTrue(turnOff().andThen(RobotStatus.setRobotStateOnce(RobotState.ContainingCoral))).onFalse(RobotStatus.setRobotStateOnce(RobotState.Enabled));
-        new Trigger(this::hasAlgae).onTrue(turnOff().andThen(RobotStatus.setRobotStateOnce(RobotState.ContainingAlgaeInEE))).onFalse(RobotStatus.setRobotStateOnce(RobotState.Enabled));
     }
 
     public static EndEffector getInstance() {
@@ -43,7 +38,8 @@ public class EndEffector extends SubsystemBase {
                 intakingCoral = false;
             }
             intakingAlgae = false;
-            outtaking = false;
+            outtakingCoral = false;
+            outtakingAlgae = false;
         });
     }
 
@@ -52,7 +48,8 @@ public class EndEffector extends SubsystemBase {
             io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
             intakingCoral = true;
             intakingAlgae = false;
-            outtaking = false;
+            outtakingAlgae = false;
+            outtakingCoral = false;
         }).until(this::hasCoral).andThen(turnOff());
     }
 
@@ -66,7 +63,8 @@ public class EndEffector extends SubsystemBase {
                 intakingAlgae = false;
             }
             intakingCoral = false;
-            outtaking = false;
+            outtakingAlgae = false;
+            outtakingCoral = false;
         });
     }
 
@@ -75,21 +73,22 @@ public class EndEffector extends SubsystemBase {
      */
     public Command toggleOuttake() {
         return runOnce(() -> {
-            if (outtaking) {
+            if (outtakingAlgae || outtakingCoral) {
                 io.setPower(0);
-                outtaking = false;
+                outtakingAlgae = false;
+                outtakingCoral = false;
                 return;
             }
             if (irSensorTrigger()) {
                 io.setPower(EndEffectorConstants.OuttakeCoralSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
-                outtaking = true;
+                outtakingCoral = true;
             } else if (cameraTrigger()) {
                 io.setPower(EndEffectorConstants.OuttakeAlageSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
-                outtaking = true;
+                outtakingAlgae = true;
             }
         });
     }
@@ -97,7 +96,8 @@ public class EndEffector extends SubsystemBase {
     public Command turnOff() {
         return runOnce(() -> {
             io.setPower(0);
-            outtaking = false;
+            outtakingAlgae = false;
+            outtakingCoral = false;
             intakingCoral = false;
             intakingAlgae = false;
         });

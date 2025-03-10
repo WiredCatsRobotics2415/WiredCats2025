@@ -96,7 +96,7 @@ public class Controls {
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");
-        
+
         public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
             "Presets/TopDADriveOffset");
     }

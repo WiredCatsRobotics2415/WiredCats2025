@@ -18,9 +18,10 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
-        AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
-        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
+        AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
+        AutoScoreRightL3, AutoScoreRightL4, DealgaePreset, SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive,
+        AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();

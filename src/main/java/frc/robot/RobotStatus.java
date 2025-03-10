@@ -12,18 +12,17 @@ import lombok.Getter;
 public class RobotStatus {
     private static LEDStrip leds = LEDStrip.getInstance();
 
-    private static Command flashingGreen = leds.flash(UseableColor.Green, Seconds.of(0.25), Seconds.of(0.25));
+    public static final Command flashingGreen = leds.flash(UseableColor.Green, Seconds.of(0.25), Seconds.of(0.25));
 
     @Getter private static RobotState robotState;
 
     public enum RobotState {
         Disabled(leds.set(UseableColor.BreathingGreen)), Enabled(leds.set(UseableColor.ChasingGreen)),
-        AligningToHPS(leds.set(UseableColor.Gray)), AutoGroundIntaking(leds.set(UseableColor.Yellow)),
-        AligningToDeAlgae(leds.set(UseableColor.SkyBlue)), ContainingCoral(flashingGreen),
-        ContainingAlgaeInEE(flashingGreen), AligningToScoreCoral(leds.set(UseableColor.White)),
-        AligningToBarge(leds.set(UseableColor.White)), WaitingForCoralAtHPS(leds.set(UseableColor.Red)),
-        WaitingToDeAlgae(leds.set(UseableColor.Orange)), WaitingToScoreCoral(leds.set(UseableColor.Gray)),
-        WaitingToBargeAlgae(leds.set(UseableColor.SkyBlue));
+        AligningToHPS(leds.set(UseableColor.Pink)), AutoGroundIntaking(leds.set(UseableColor.Pink)),
+        AligningToDeAlgae(leds.set(UseableColor.Pink)), Stow(leds.set(UseableColor.White)),
+        AligningToScoreCoral(leds.set(UseableColor.Pink)), AligningToBarge(leds.set(UseableColor.Pink)),
+        WaitingForCoralAtHPS(leds.set(UseableColor.Red)), WaitingToDeAlgae(leds.set(UseableColor.Red)),
+        WaitingToScoreCoral(leds.set(UseableColor.Red)), WaitingToBargeAlgae(leds.set(UseableColor.Red));
 
         public Command ledStripCommand;
 

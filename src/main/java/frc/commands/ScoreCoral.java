@@ -1,12 +1,10 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
@@ -21,7 +19,6 @@ import frc.subsystems.superstructure.TuneableSuperStructureState;
 import frc.subsystems.vision.Vision;
 import frc.utils.AllianceDependent;
 import frc.utils.tuning.TuneableDistance;
-import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import lombok.Setter;
 
