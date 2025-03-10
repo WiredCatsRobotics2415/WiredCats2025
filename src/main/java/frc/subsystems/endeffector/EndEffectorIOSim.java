@@ -85,8 +85,10 @@ public class EndEffectorIOSim implements EndEffectorIO {
             intakeSimulation.stopIntake();
         }
         if (power < 0) {
-            intakeSimulation.obtainGamePieceFromIntake();
-            outtakeNote();
+            if (intakeSimulation.getGamePiecesAmount() > 0) {
+                intakeSimulation.obtainGamePieceFromIntake();
+                outtakeNote();
+            }
         }
     }
 }
