@@ -129,4 +129,11 @@ public class Visualizer {
     public static void setLEDStripColor(Color8Bit color) {
         ledStripLine.setColor(color);
     }
+    
+    public static Pose3d getActualCarriagePose() {
+        Distance elevatorActual = elevatorSubsystem.getMeasurement();
+        Pose3d carraigeActual = visualizeElevator(elevatorActual, "Actual");
+        return carraigeActual;
+    }
+
 }

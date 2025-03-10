@@ -177,6 +177,12 @@ public class Subsystems {
             "EndEffector/AlgaeIntookCameraThreshold");
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(26);
+        //end of end effector to carriage
+        public static final Distance DistanceFromCarriage = Inches.of(22);
+        //Constant difference betweeen angle of arm and angle of end of end effector to the carriage
+        public static final Angle AngleFromArmWrtCarraige = Degrees.of(-3.05);
+        //Difference between angle of arm and angle of end effector with respect to the ground
+        public static final Angle AngleFromArmWrtGround = Degrees.of(14);
     }
 
     public class CoralIntakeConstants {
