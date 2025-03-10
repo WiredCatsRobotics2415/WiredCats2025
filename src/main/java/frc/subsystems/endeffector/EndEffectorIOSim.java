@@ -37,7 +37,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
             CommandSwerveDrivetrain.getInstance().getMapleSimSwerveDrivetrain().mapleSimDrive, Inches.of(9.5),
             Inches.of(11.3), IntakeSide.BACK, 1);
 
-        Pose3d carriagePose = Visualizer.getActualCarriagePose();
+        Pose3d carriagePose = Visualizer.getLastCarriagePoint();
         Angle armAngle = armSubsystem.getMeasurement();
         Angle endEffectorAngle = armAngle.plus(EndEffectorConstants.AngleFromArmWrtCarraige);
 

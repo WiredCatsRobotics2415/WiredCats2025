@@ -22,6 +22,8 @@ import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.vision.Vision;
 import frc.utils.math.Trig;
 import frc.utils.tuning.*;
+import lombok.Getter;
+
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
@@ -42,6 +44,8 @@ public class Visualizer {
     private static LoggedMechanismRoot2d ledStripRoot = ledStrip.getRoot("LEDStrip", 0.5, 0.2);
     private static LoggedMechanismLigament2d ledStripLine = ledStripRoot
         .append(new LoggedMechanismLigament2d("LEDStripLine", .35, 90, 6, new Color8Bit(Color.kBlack)));
+    
+    @Getter private static Pose3d lastCarriagePoint;
 
     private static Pose3d visualizeElevator(Distance height, String key) {
         Pose3d elevatorBase = Pose3d.kZero;
@@ -129,11 +133,4 @@ public class Visualizer {
     public static void setLEDStripColor(Color8Bit color) {
         ledStripLine.setColor(color);
     }
-    
-    public static Pose3d getActualCarriagePose() {
-        Distance elevatorActual = elevatorSubsystem.getMeasurement();
-        Pose3d carraigeActual = visualizeElevator(elevatorActual, "Actual");
-        return carraigeActual;
-    }
-
 }
