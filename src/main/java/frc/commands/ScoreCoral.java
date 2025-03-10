@@ -1,6 +1,7 @@
 package frc.commands;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -47,7 +48,7 @@ public class ScoreCoral extends Command {
         .plus(RobotMeasurements.BumperLength).times(-1);
     private static final TuneableDistance LeftOffset = new TuneableDistance(6, "ScoreCoral/LeftOffset");
     private static final TuneableDistance RightOffset = new TuneableDistance(6, "ScoreCoral/RightOffset");
-    private static final double DriveToleranceMeters = Units.inchesToMeters(5);
+    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3, "ScoreCoral/DriveTolerance");
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
@@ -125,7 +126,7 @@ public class ScoreCoral extends Command {
                 RightOffset.distance().times(-1), Rotation2d.kZero);
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
             Pose2d driveTo = findNearestReefSideApriltag().plus(offset);
-            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters);
+            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters.in(Meters));
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveTo);

@@ -1,6 +1,7 @@
 package frc.commands;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -18,6 +19,7 @@ import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
 import frc.utils.AllianceDependent;
+import frc.utils.tuning.TuneableDistance;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,7 +34,7 @@ public class Dealgae extends Command {
     private static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
         .plus(RobotMeasurements.BumperLength).times(-1);
     private static final Transform2d Offset = new Transform2d(CenterToBumper, Inches.of(0), Rotation2d.kZero);
-    private static final double DriveToleranceMeters = Units.inchesToMeters(2);
+    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3, "DeAlgae/DriveTolerance");
 
     private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     private SuperStructure superStructure = SuperStructure.getInstance();
@@ -81,7 +83,7 @@ public class Dealgae extends Command {
     }
 
     public Dealgae() {
-        addRequirements(SuperStructure.getInstance());
+        // addRequirements(SuperStructure.getInstance());
     }
 
     @Override
@@ -94,7 +96,7 @@ public class Dealgae extends Command {
                 .plus(new Transform2d(
                     algaeOnTop ? Presets.TopDADriveOffset.distance() : Presets.BottomDADriveOffset.distance(),
                     Inches.of(0), Rotation2d.kZero));
-            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters);
+            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.in(Meters));
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveToPose);

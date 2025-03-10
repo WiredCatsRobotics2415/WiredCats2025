@@ -161,6 +161,37 @@ public class Measurements {
         }
     }
 
+    public class HumanPlayerStation {
+        public static final Pose2d blueLeftHPS = new Pose2d(ApriltagFieldLayout.getTagPose(13).get().toPose2d().getTranslation(), Rotation2d.fromDegrees(-36));
+        public static final Pose2d blueRightHPS = new Pose2d(ApriltagFieldLayout.getTagPose(12).get().toPose2d().getTranslation(), Rotation2d.fromDegrees(36));
+        public static final Pose2d redLeftHPS = new Pose2d(ApriltagFieldLayout.getTagPose(1).get().toPose2d().getTranslation(), Rotation2d.fromDegrees(-36));
+        public static final Pose2d redRightHPS = new Pose2d(ApriltagFieldLayout.getTagPose(2).get().toPose2d().getTranslation(), Rotation2d.fromDegrees(36));
+
+        public static final int blueLeftId = 13;
+        public static final int blueRightId = 12;
+        public static final int redLeftId = 1;
+        public static final int redRightId = 2;
+
+        public static final List<Pose2d> hpsBlueApriltags;
+        static {
+            hpsBlueApriltags = List.of(blueLeftHPS, blueRightHPS);
+        }
+
+        public static final List<Pose2d> hpsRedApriltags;
+        static {
+            hpsRedApriltags = List.of(redLeftHPS, redRightHPS);
+        }
+
+        public static final AllianceDependent<List<Pose2d>> hpsApriltags = new AllianceDependent<List<Pose2d>>(
+            hpsBlueApriltags, hpsRedApriltags);
+        
+        public static final int[] hpsBlueIds = new int[] { blueLeftId, blueRightId };
+    
+        public static final int[] hpsRedIds = new int[] { redLeftId, redRightId };
+    
+        public static final AllianceDependent<int[]> hpsIds = new AllianceDependent<int[]>(hpsBlueIds, hpsRedIds);
+    }
+
     public class BalanceConstants {
         public static final double rollThreshold = 0;
         public static final double pitchThreshold = 0;

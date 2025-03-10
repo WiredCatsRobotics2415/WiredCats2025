@@ -12,11 +12,13 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
+import frc.commands.IntakeFromHPS;
 import frc.commands.Dealgae.DealgaeAutomationMode;
 import frc.commands.ScoreCoral;
 import frc.commands.ScoreCoral.CoralAutomationMode;
@@ -149,10 +151,13 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ManualArmBack)
             .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(1.0))));
 
-        oi.binds.get(OI.Bind.ToggleDealgae).onTrue(endEffector.toggleIntakeAlgae());
-        oi.binds.get(OI.Bind.ToggleIntake).onTrue(endEffector.toggleIntakeCoral());
-        oi.binds.get(OI.Bind.ToggleOuttake).onTrue(endEffector.toggleOuttake());
+        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake());
+        oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
+        oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.beThereAsap(Presets.Stow));
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal)).andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
+        oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
         oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));
         oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3));
@@ -161,9 +166,6 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2));
         oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
-        oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsap(Presets.IntakeFromHPS));
 
         DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
             () -> ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign), null);
@@ -182,8 +184,6 @@ public class RobotContainer {
         }));
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new AutoIntake());
-
-        oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.beThereAsap(Presets.Stow));
     }
 
     private void configureTriggers() {

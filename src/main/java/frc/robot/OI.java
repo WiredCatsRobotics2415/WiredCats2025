@@ -18,10 +18,9 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, ToggleDealgae, ToggleOuttake,
-        ToggleIntake, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround, AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3,
         AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2, AutoScoreRightL3, AutoScoreRightL4, DealgaePreset,
-        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode
+        SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -48,11 +47,12 @@ public class OI {
         binds.put(Bind.ManualArmForward, controller.rightBumper());
         binds.put(Bind.ManualArmBack, controller.rightTrigger());
 
-        binds.put(Bind.ToggleDealgae, controller.button(GulikitButtons.X));
-        binds.put(Bind.ToggleIntake, controller.button(GulikitButtons.B));
-        binds.put(Bind.ToggleOuttake, controller.button(GulikitButtons.A));
+        binds.put(Bind.Shoot, controller.button(GulikitButtons.B));
+        binds.put(Bind.DeAlgae, controller.button(GulikitButtons.A));
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.Y));
 
+        binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
+        binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
         binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
         binds.put(Bind.DealgaePreset, numpad.button(NumpadButtons.NumberSeven));
@@ -64,9 +64,8 @@ public class OI {
         binds.put(Bind.AutoScoreRightL2, numpad.button(NumpadButtons.NumberSix));
         binds.put(Bind.AutoScoreRightL3, numpad.button(NumpadButtons.NumberNine));
         binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
-        binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
-
-        binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
+        binds.put(Bind.ProcessorPreset, numpad.button(NumpadButtons.NumberNine));
+        binds.put(Bind.BargePreset, numpad.button(NumpadButtons.Asterisk));
     }
 
     private double deadbandCompensation(double r) {
