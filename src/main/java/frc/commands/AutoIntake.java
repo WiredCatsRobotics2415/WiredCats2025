@@ -49,58 +49,6 @@ public class AutoIntake extends Command {
         RobotStatus.setRobotStateOnce(RobotState.AutoGroundIntaking);
         vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
-        if (DriverStation.isAutonomous()) {
-            PPHolonomicDriveController.overrideXYFeedback(() -> {
-                if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
-                    double ty = vision.getObjectDetectedTy();
-                    double tx = vision.getObjectDetectedTx();
-
-                    double distance = (CoralMeasurements.HeightFromCenterOffGround
-                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
-                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
-                    Rotation2d pose = drive.getState().Pose.getRotation();
-
-                    double objectAngle = pose.getRadians() - Units.degreesToRadians(tx);
-                    double minTimeToObject = distance / Controls.MaxDriveMeterS;
-                    double xFeedback = distance * Trig.cosizzle(objectAngle) / minTimeToObject;
-                    return xFeedback;
-                } else {
-                    return 0.0;
-                }
-            }, () -> {
-                if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
-                    double ty = vision.getObjectDetectedTy();
-
-                    double distance = (CoralMeasurements.HeightFromCenterOffGround
-                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
-                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
-                    Rotation2d pose = drive.getState().Pose.getRotation();
-
-                    double objectAngle = pose.getRadians() - Units.degreesToRadians(ty);
-                    double minTimeToObject = distance / Controls.MaxDriveMeterS;
-                    double yFeedback = distance * Trig.sizzle(objectAngle) / minTimeToObject;
-                    return yFeedback;
-                } else {
-                    return 0.0;
-                }
-            });
-            PPHolonomicDriveController.overrideRotationFeedback(() -> {
-                if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
-                    double ty = vision.getObjectDetectedTy();
-                    double tx = vision.getObjectDetectedTx();
-
-                    double distance = (CoralMeasurements.HeightFromCenterOffGround
-                        .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
-                        Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
-
-                    double minTimeToObject = distance / 0.4;
-                    return Units.degreesToRadians(tx) / minTimeToObject;
-                } else {
-                    // no override if object not detected
-                    return 0.0;
-                }
-            });
-        }
     }
 
     @Override
