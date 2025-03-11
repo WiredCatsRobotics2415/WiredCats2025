@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.constants.RuntimeConstants;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -15,10 +17,22 @@ public class TuningModeTab {
     private static TuningModeTab instance;
     private ShuffleboardTab thisTab;
 
+    private int currentLogRun = 1;
+
     private TuningModeTab() {
         thisTab = Shuffleboard.getTab("Tuning");
 
-        addCommand("Stop SL", new InstantCommand(() -> SignalLogger.stop()));
+        addCommand("Stop Signal Logger", new InstantCommand(() -> {
+            System.out.println("Saving log as log #" + currentLogRun);
+            SignalLogger.stop();
+        }));
+        addCommand("Start Signal Logger", new InstantCommand(() -> {
+            currentLogRun += 1;
+            System.out.println("Starting signal logger with run #" + currentLogRun);
+            LocalDate date = LocalDate.now();
+            LocalTime time = LocalTime.now();
+            SignalLogger.start();
+        }));
     }
 
     /**

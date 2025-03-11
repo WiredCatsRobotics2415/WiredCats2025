@@ -17,10 +17,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
-import frc.commands.Dealgae.DealgaeAutomationMode;
+import frc.commands.GenericAutomation;
+import frc.commands.GenericAutomation.AutomationMode;
 import frc.commands.IntakeFromHPS;
 import frc.commands.ScoreCoral;
-import frc.commands.ScoreCoral.CoralAutomationMode;
 import frc.commands.ScoreCoral.Level;
 import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
@@ -171,18 +171,12 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
 
         DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
-            () -> ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign), null);
+            () -> ScoreCoral.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign), null);
         oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
-            if (ScoreCoral.getCurrentAutomationMode().equals(CoralAutomationMode.PresetAndAlign)) {
-                ScoreCoral.setCurrentAutomationMode(CoralAutomationMode.PresetOnly);
+            if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
             } else {
-                ScoreCoral.setCurrentAutomationMode(CoralAutomationMode.PresetAndAlign);
-            }
-
-            if (Dealgae.getCurrentAutomationMode().equals(DealgaeAutomationMode.PresetAndAlign)) {
-                Dealgae.setCurrentAutomationMode(DealgaeAutomationMode.PresetOnly);
-            } else {
-                Dealgae.setCurrentAutomationMode(DealgaeAutomationMode.PresetAndAlign);
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
             }
         }));
 
