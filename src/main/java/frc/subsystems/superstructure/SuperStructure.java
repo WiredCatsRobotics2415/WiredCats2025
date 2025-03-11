@@ -22,9 +22,11 @@ import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.endeffector.EndEffector;
 import frc.utils.math.Point2d;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableBoolean;
+import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 
@@ -63,6 +65,9 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelX");
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
+
+    private TuneableDistance algaeArmPivotElevatorHeight = new TuneableDistance(30,
+        "SuperStructure/Min height that arm can pivot at");
 
     private static SuperStructure instance;
 
@@ -134,6 +139,8 @@ public class SuperStructure extends SubsystemBase {
             System.out.println("Superstructure beThereIn - front switch: " + armSwitchingToFrontSide + ", back switch: "
                 + armSwitchingToBackSide + ", elevator time prediction: " + lastElevatorTimePrediction);
         }).andThen(run(() -> {
+            boolean freezeArmFromAlgaeContainmentElevation = false;
+
             if (!elevator.atGoal()) {
                 if (elevator.getPid().goalError() < 0) {
                     if (!armWillCollideWithDrivebase) {
@@ -160,6 +167,14 @@ public class SuperStructure extends SubsystemBase {
                     } else {
                         elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
                     }
+
+                    // if we have an algae, we have to switch sides AND the elevator is too low
+                    if (EndEffector.getInstance().hasAlgae() && !armOnTargetSide
+                        && elevator.getMeasurement().gt(algaeArmPivotElevatorHeight.distance())) {
+                        freezeArmFromAlgaeContainmentElevation = true;
+                    } else {
+                        freezeArmFromAlgaeContainmentElevation = false;
+                    }
                 }
             }
 
@@ -182,6 +197,7 @@ public class SuperStructure extends SubsystemBase {
             } else {
                 isFreezingArm = false;
             }
+            if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
         }));
         command.addRequirements(elevator, arm, coralIntake);
         return command;
