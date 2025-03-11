@@ -24,25 +24,29 @@ import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableNumber;
 
 public class AutoIntake extends Command {
-    private Vision vision = Vision.getInstance();
-    private EndEffector endEffector = EndEffector.getInstance();
-    private CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
+    private Vision vision;
+    private EndEffector endEffector;
+    private CommandSwerveDrivetrain drive;
 
-    private TuneableNumber hasSeenCoralSeconds = new TuneableNumber(0.5, "AutoIntaking/hasSeenCoralSeconds");
+    private TuneableNumber hasSeenCoralSeconds;
 
-    private final SwerveRequest.RobotCentric driveBackward = new SwerveRequest.RobotCentric()
-        .withVelocityX(-0.5 * Controls.MaxDriveMeterS); // back of robot = intaking side
+    private SwerveRequest.RobotCentric driveBackward;
 
-    private boolean hasSeenCoral = true;
-    private Timer countSinceLastSeenCoral = new Timer();
-
-    public AutoIntake() {
-        addRequirements(drive);
-    }
+    private boolean hasSeenCoral;
+    public Timer countSinceLastSeenCoral;
 
     @Override
     public void initialize() {
-        this.deadlineFor(RobotStatus.keepStateUntilInterrupted(RobotState.AutoGroundIntaking));
+        hasSeenCoral = false;
+        countSinceLastSeenCoral = new Timer();
+        hasSeenCoralSeconds = new TuneableNumber(0.5, "AutoIntaking/hasSeenCoralSeconds");
+        vision = Vision.getInstance();
+        endEffector = EndEffector.getInstance();
+        drive = CommandSwerveDrivetrain.getInstance();
+        addRequirements(drive);
+        driveBackward = new SwerveRequest.RobotCentric().withVelocityX(-0.4 * Controls.MaxDriveMeterS); // back of robot = intaking side
+
+        RobotStatus.setRobotStateOnce(RobotState.AutoGroundIntaking);
         vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
         if (DriverStation.isAutonomous()) {
@@ -89,7 +93,7 @@ public class AutoIntake extends Command {
                         .minus(RobotMeasurements.EECamHeightOffGround).in(Meters)) /
                         Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
 
-                    double minTimeToObject = distance / Controls.MaxDriveMeterS;
+                    double minTimeToObject = distance / 0.4;
                     return Units.degreesToRadians(tx) / minTimeToObject;
                 } else {
                     // no override if object not detected
@@ -112,15 +116,27 @@ public class AutoIntake extends Command {
             double ty = vision.getObjectDetectedTy();
             double tx = vision.getObjectDetectedTx();
 
-            double distance = (CoralMeasurements.HeightFromCenterOffGround.minus(RobotMeasurements.EECamHeightOffGround)
-                .in(Meters)) / Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
+            double distanceV = (RobotMeasurements.EECamHeightOffGround
+                .minus(CoralMeasurements.HeightFromCenterOffGround).in(Meters)) /
+                Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
+            double distanceH = Math.tan(Units.degreesToRadians(tx)) * distanceV;
+            System.out.println("horizontal" + distanceH);
+            double distance = Math.sqrt((distanceV * distanceV) + (distanceH * distanceH));
+            System.out.println(distance);
 
             double minTimeToObject = distance / Controls.MaxDriveMeterS;
             // kp used to control rotational rate of robot
-            double kp = 1 / minTimeToObject;
-            drive.setControl(driveBackward.withRotationalRate(Units.degreesToRadians(tx) * kp));
+            // drive.setControl(driveBackward.withRotationalRate(Units.degreesToRadians(tx) / minTimeToObject));
+            drive.setControl(driveBackward.withVelocityY(-distanceH / minTimeToObject)
+                .withRotationalRate(Units.degreesToRadians(tx)));
+            System.out.println(Units.degreesToRadians(tx));
         } else {
             if (hasSeenCoral) {
+                vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
+                if (DriverStation.isAutonomous()) {
+                    PPHolonomicDriveController.clearXYFeedbackOverride();
+                    PPHolonomicDriveController.clearRotationFeedbackOverride();
+                }
                 System.out.println("lost sight of coral");
                 countSinceLastSeenCoral.start();
                 hasSeenCoral = false;
@@ -130,11 +146,9 @@ public class AutoIntake extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        PPHolonomicDriveController.clearXYFeedbackOverride();
-        PPHolonomicDriveController.clearRotationFeedbackOverride();
-        vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
-        countSinceLastSeenCoral.stop();
         countSinceLastSeenCoral.reset();
+        countSinceLastSeenCoral.stop();
+        System.out.println("ended" + interrupted);
     }
 
     @Override

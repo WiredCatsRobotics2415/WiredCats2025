@@ -180,7 +180,11 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new AutoIntake());
+        oi.binds.get(OI.Bind.AutoIntakeFromGround)
+            .onTrue(new AutoIntake().withTimeout(5).andThen(new InstantCommand(() ->
+            {
+                System.out.println("done with auto intake!!!!");
+            })));
     }
 
     private void configureTriggers() {
