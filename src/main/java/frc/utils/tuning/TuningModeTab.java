@@ -25,14 +25,14 @@ public class TuningModeTab {
         addCommand("Stop Signal Logger", new InstantCommand(() -> {
             System.out.println("Saving log as log #" + currentLogRun);
             SignalLogger.stop();
-        }));
+        }).ignoringDisable(true));
         addCommand("Start Signal Logger", new InstantCommand(() -> {
             currentLogRun += 1;
             System.out.println("Starting signal logger with run #" + currentLogRun);
             LocalDate date = LocalDate.now();
             LocalTime time = LocalTime.now();
             SignalLogger.start();
-        }));
+        }).ignoringDisable(true));
     }
 
     /**
