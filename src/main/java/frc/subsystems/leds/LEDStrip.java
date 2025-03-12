@@ -33,8 +33,8 @@ public class LEDStrip extends SubsystemBase {
     }
 
     public void setColor(UseableColor color) {
-        if (!color.equals(currentUseable)) {
-            currentColor = color.color;
+        if (!color.equals(this.currentUseable)) {
+            this.currentColor = color.color;
             io.setColor(color);
         }
     }

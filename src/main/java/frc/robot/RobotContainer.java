@@ -12,8 +12,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
@@ -26,10 +26,10 @@ import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
+import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
-import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
@@ -93,9 +93,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("L1", new ScoreCoral(Side.Left, Level.L1));
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
         NamedCommands.registerCommand("GroundIntake",
-            superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsapAndEnd(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("SourceIntake",
-            superstructure.beThereAsap(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsapAndEnd(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("FocusPEOnReef",
             drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, ReefMeasurements.reefIds));
         NamedCommands.registerCommand("SwitchToGlobalPE",
@@ -154,11 +154,10 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
         oi.binds.get(OI.Bind.StowPreset)
-            .onTrue(superstructure.beThereAsap(Presets.Stow).andThen(Commands.waitUntil(superstructure::allAtGoal))
-                .andThen(RobotStatus.setRobotStateOnce(RobotState.Stow)));
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(
-            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
-                .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
+            .onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(), CommonCommands.stowNormally(),
+                () -> coralIntake.getPivotAngle().lte(CoralIntakeConstants.GroundAngle.angle().plus(Degrees.of(7)))));
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsapAndEnd(Presets.GroundIntake)
+            .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
@@ -180,7 +179,8 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new AutoIntake());
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(superstructure.beThereAsapAndEnd(Presets.GroundIntake)
+            .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
     }
 
     private void configureTriggers() {
@@ -195,12 +195,12 @@ public class RobotContainer {
         }));
 
         // Flash the leds when a coral is scored
-        new Trigger(() -> {
-            return (endEffector.isOuttakingAlgae() && !endEffector.cameraTrigger())
-                || (endEffector.isOuttakingCoral() && !endEffector.irSensorTrigger());
-        }).onTrue(new WaitCommand(0.5)
-            .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1))
-            .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
+        // new Trigger(() -> {
+        // return (endEffector.isOuttakingAlgae() && !endEffector.cameraTrigger())
+        // || (endEffector.isOuttakingCoral() && !endEffector.irSensorTrigger());
+        // }).onTrue(new WaitCommand(0.5)
+        // .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1.2))
+        // .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
 
         new Trigger(endEffector::hasAlgae)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));

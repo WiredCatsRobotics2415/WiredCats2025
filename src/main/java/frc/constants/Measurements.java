@@ -234,7 +234,7 @@ public class Measurements {
     }
 
     public static class LimelightSpecs {
-        public static final Angle ThreeGHorizontalFOV = Degrees.of(82);
+        public static final Angle ThreeGFOV = Degrees.of(82);
         public static final Angle ThreeGVerticalFOV = Degrees.of(56.2);
         public static final double ThreeGDiagnolFOV = 91.144;
 
