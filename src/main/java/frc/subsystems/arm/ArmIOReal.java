@@ -15,9 +15,9 @@ public class ArmIOReal implements ArmIO {
     private TalonFX motor;
     private double appliedVoltage;
 
-    private StatusSignal<Current> motorStator = motor.getStatorCurrent();
-    private StatusSignal<Current> motorSupply = motor.getSupplyCurrent();
-    private StatusSignal<Temperature> motorTemp = motor.getDeviceTemp();
+    private StatusSignal<Current> motorStator;
+    private StatusSignal<Current> motorSupply;
+    private StatusSignal<Temperature> motorTemp;
 
     private DutyCycleEncoder throughbore;
 
@@ -31,6 +31,10 @@ public class ArmIOReal implements ArmIO {
         motor = new TalonFX(ArmConstants.MotorID);
         motor.getConfigurator().apply(ArmConstants.MotorOutput);
         motor.setNeutralMode(NeutralModeValue.Brake);
+
+        motorStator = motor.getStatorCurrent();
+        motorSupply = motor.getSupplyCurrent();
+        motorTemp = motor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, motorStator, motorSupply, motorTemp);
     }

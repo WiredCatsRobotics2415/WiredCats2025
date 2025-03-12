@@ -3,6 +3,7 @@ package frc.robot;
 import com.ctre.phoenix6.HootReplay;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Notifier;
+import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
 import frc.robot.RobotStatus.RobotState;
@@ -27,6 +28,9 @@ import org.littletonrobotics.urcl.URCL;
  */
 public class Robot extends LoggedRobot {
     public Robot() {
+        PowerDistribution pdh = new PowerDistribution();
+        pdh.setSwitchableChannel(true);
+
         // Record metadata
         Logger.recordMetadata("ProjectName", BuildConstants.MAVEN_NAME);
         Logger.recordMetadata("BuildDate", BuildConstants.BUILD_DATE);
