@@ -39,6 +39,7 @@ public class CoralIntake extends GenericSlapdown {
 
     @Getter private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
+    private Angle lastMeasurement;
     @Getter private boolean intaking = false;
     @Getter private boolean outtaking = false;
     private boolean hasResetPidController = false;
@@ -89,11 +90,7 @@ public class CoralIntake extends GenericSlapdown {
     }
 
     @Override
-    public Angle getPivotAngle() {
-        return Degrees.of(Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin.get(),
-            CoralIntakeConstants.ThroughboreMax.get(), CoralIntakeConstants.GroundAngle.in(Degrees),
-            CoralIntakeConstants.MaxAngle.in(Degrees)));
-    }
+    public Angle getPivotAngle() { return lastMeasurement; }
 
     @Override
     public Command toggleIntake() {
@@ -148,8 +145,11 @@ public class CoralIntake extends GenericSlapdown {
         io.updateInputs(inputs);
         Logger.processInputs("CoralIntake", inputs);
 
-        double measurementDegrees = getPivotAngle().in(Degrees);
+        double measurementDegrees = Algebra.linearMap(inputs.throughborePosition,
+            CoralIntakeConstants.ThroughboreMin.get(), CoralIntakeConstants.ThroughboreMax.get(),
+            CoralIntakeConstants.GroundAngle.in(Degrees), CoralIntakeConstants.MaxAngle.in(Degrees));
         differentiableMeasurementDegrees.update(measurementDegrees);
+        lastMeasurement = Degrees.of(measurementDegrees);
 
         if (!hasResetPidController) {
             pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));

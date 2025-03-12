@@ -13,12 +13,12 @@ public class CommonCommands {
 
     public static SequentialCommandGroup stowFromGroundIntake() {
         return new SequentialCommandGroup(superstructure.beThereAsap(Presets.BumpStow),
-            Commands.waitUntil(elevator::atGoal), superstructure.beThereAsapAndEnd(Presets.Stow),
-            RobotStatus.setRobotStateOnce(RobotState.Stow));
+            Commands.waitUntil(elevator::atGoal), superstructure.beThereAsap(Presets.Stow),
+            Commands.waitUntil(superstructure::allAtGoal), RobotStatus.setRobotStateOnce(RobotState.Stow));
     }
 
     public static SequentialCommandGroup stowNormally() {
-        return new SequentialCommandGroup(superstructure.beThereAsapAndEnd(Presets.Stow),
-            RobotStatus.setRobotStateOnce(RobotState.Stow));
+        return new SequentialCommandGroup(superstructure.beThereAsap(Presets.Stow),
+            Commands.waitUntil(superstructure::allAtGoal), RobotStatus.setRobotStateOnce(RobotState.Stow));
     }
 }

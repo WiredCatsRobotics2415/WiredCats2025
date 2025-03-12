@@ -93,9 +93,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("L1", new ScoreCoral(Side.Left, Level.L1));
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
         NamedCommands.registerCommand("GroundIntake",
-            superstructure.beThereAsapAndEnd(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("SourceIntake",
-            superstructure.beThereAsapAndEnd(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
+            superstructure.beThereAsap(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("FocusPEOnReef",
             drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, ReefMeasurements.reefIds));
         NamedCommands.registerCommand("SwitchToGlobalPE",
@@ -156,7 +156,7 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.StowPreset)
             .onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(), CommonCommands.stowNormally(),
                 () -> coralIntake.getPivotAngle().lte(CoralIntakeConstants.GroundAngle.angle().plus(Degrees.of(7)))));
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsapAndEnd(Presets.GroundIntake)
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
             .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
@@ -179,7 +179,7 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(superstructure.beThereAsapAndEnd(Presets.GroundIntake)
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(superstructure.beThereAsap(Presets.GroundIntake)
             .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
     }
 

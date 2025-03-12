@@ -58,7 +58,7 @@ public class Controls {
 
     public class Presets {
         public static final TuneableSuperStructureState BumpStow = new TuneableSuperStructureState(Inches.of(4),
-            Degrees.of(90), CoralIntakeConstants.StowAngle, "Stow");
+            Degrees.of(90), CoralIntakeConstants.StowAngle, "BumpStow");
         public static final TuneableSuperStructureState Stow = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(90), CoralIntakeConstants.StowAngle, "Stow");
 

@@ -22,6 +22,7 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator extends SubsystemBase {
     private boolean coasting;
     @Getter private Distance goal = Inches.of(0.0);
+    private Distance lastMeasurement = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
@@ -74,11 +75,7 @@ public class Elevator extends SubsystemBase {
         return pid.atGoal();
     }
 
-    public Distance getMeasurement() {
-        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.get(),
-            ElevatorConstants.PotentiometerMaxVolt.get(), ElevatorConstants.MinHeight.in(Inches),
-            ElevatorConstants.MaxHeight.in(Inches)));
-    }
+    public Distance getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.velocity);
@@ -92,8 +89,11 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
-        double measurementInches = getMeasurement().in(Inches);
+        double measurementInches = Algebra.linearMap(inputs.wirePotentiometer,
+            ElevatorConstants.PotentiometerMinVolt.get(), ElevatorConstants.PotentiometerMaxVolt.get(),
+            ElevatorConstants.MinHeight.in(Inches), ElevatorConstants.MaxHeight.in(Inches));
         differentiableMeasurementInches.update(measurementInches);
+        lastMeasurement = Inches.of(measurementInches);
 
         if (!hasResetPidController) {
             pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));

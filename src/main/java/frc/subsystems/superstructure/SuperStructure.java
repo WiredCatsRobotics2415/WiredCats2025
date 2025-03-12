@@ -70,7 +70,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableDistance algaeArmPivotElevatorHeight = new TuneableDistance(30,
         "SuperStructure/Min height arm can pivot at w/ algae");
     private TuneableDistance coralArmPivotElevatorHeight = new TuneableDistance(4,
-        "SuperStructure/Min height that arm can leave cIntake"); //should be same as bump stow preset elevator height
+        "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
 
     private boolean freezingArmFromCoralContainmentDebounce = false;
 
@@ -122,7 +122,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /**
-     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one.
+     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one. If you are using this in a composition and want to see when it finishes, use ::allAtGoal.
      */
     public Command beThereIn(double secondsToBeThereIn, TuneableSuperStructureState goal) {
         Timer timeTaken = new Timer();
@@ -223,14 +223,6 @@ public class SuperStructure extends SubsystemBase {
 
     public Command beThereAsap(TuneableSuperStructureState goal) {
         return beThereIn(0, goal);
-    }
-
-    public Command beThereAndEnd(double timeTo, TuneableSuperStructureState goal) {
-        return beThereIn(timeTo, goal).onlyWhile(() -> !this.allAtGoal());
-    }
-
-    public Command beThereAsapAndEnd(TuneableSuperStructureState goal) {
-        return beThereIn(0, goal).onlyWhile(() -> !this.allAtGoal());
     }
 
     public boolean allAtGoal() {

@@ -6,12 +6,16 @@ import edu.wpi.first.units.AngleUnit;
 import edu.wpi.first.units.measure.Angle;
 
 public class TuneableAngle extends TuneableNumber {
+    private Angle lastMeasure;
+
     public TuneableAngle(double defaultDegrees, String key) {
         super(defaultDegrees, key);
+        lastMeasure = Degrees.of(defaultDegrees);
+        this.addListener((newValue) -> lastMeasure = Degrees.of(newValue));
     }
 
     public TuneableAngle(Angle initial, String key) {
-        super(initial.in(Degrees), key);
+        this(initial.in(Degrees), key);
     }
 
     public double in(AngleUnit unit) {
@@ -19,6 +23,6 @@ public class TuneableAngle extends TuneableNumber {
     }
 
     public Angle angle() {
-        return Degrees.of(get());
+        return lastMeasure;
     }
 }
