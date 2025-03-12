@@ -78,25 +78,18 @@ public class ScoreCoral extends GenericAutomation {
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveTo);
-            superStructureCommand = superStructure.beThereIn(timeTo, superStructureState);
+            superStructureCommand = superStructure.beThereAndEnd(timeTo, superStructureState);
             System.out.println("Score coral time to: " + timeTo);
 
             focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
                 apriltagPoseAndId.getSecond());
             focusCommand.schedule();
         } else {
-            superStructureCommand = superStructure.beThereAsap(superStructureState);
+            superStructureCommand = superStructure.beThereAsapAndEnd(superStructureState);
         }
         superStructureCommand.schedule();
 
         RobotStatus.setRobotState(RobotState.AligningToScoreCoral);
-    }
-
-    @Override
-    public boolean isFinished() {
-        boolean result = super.isFinished();
-        System.out.println("SC: " + result);
-        return result;
     }
 
     @Override

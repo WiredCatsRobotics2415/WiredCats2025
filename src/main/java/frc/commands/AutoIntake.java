@@ -6,7 +6,6 @@ import static edu.wpi.first.units.Units.Radians;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -19,8 +18,8 @@ import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
+import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.subsystems.vision.Vision.ObjectRecognized;
-import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableNumber;
 
 public class AutoIntake extends Command {
@@ -96,6 +95,7 @@ public class AutoIntake extends Command {
     public void end(boolean interrupted) {
         countSinceLastSeenCoral.reset();
         countSinceLastSeenCoral.stop();
+        vision.setEndEffectorPipeline(EndEffectorPipeline.DriverView);
         System.out.println("ended" + interrupted);
     }
 

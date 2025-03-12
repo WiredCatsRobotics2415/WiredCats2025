@@ -66,9 +66,9 @@ public class GenericAutomation extends Command {
     @Override
     public boolean isFinished() {
         if (currentAutomationMode == AutomationMode.PresetOnly) {
-            return SuperStructure.getInstance().allAtGoal();
+            return superStructureCommand.isFinished();
         }
-        return driveCommand.isFinished() && SuperStructure.getInstance().allAtGoal();
+        return driveCommand.isFinished() && superStructureCommand.isFinished();
     }
 
     @Override
