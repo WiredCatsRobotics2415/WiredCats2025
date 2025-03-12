@@ -95,11 +95,13 @@ public class Controls {
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(26),
             Degrees.of(192), "IntakeFromHPS");
+        public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
+            "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");
 
-        public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
-            "Presets/TopDADriveOffset");
+        public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(10),
+            Degrees.of(0), "Processor");
     }
 }

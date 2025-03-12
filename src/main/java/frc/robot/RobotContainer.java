@@ -183,6 +183,9 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
             superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
                 .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
+
+        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(
+            superstructure.beThereAsap(Presets.ProcessorScore).andThen(Commands.waitUntil(superstructure::allAtGoal)));
     }
 
     private void configureTriggers() {

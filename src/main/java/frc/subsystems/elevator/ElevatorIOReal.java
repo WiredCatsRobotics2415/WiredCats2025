@@ -40,7 +40,7 @@ public class ElevatorIOReal implements ElevatorIO {
             .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
         rightMotor = new TalonFX(ElevatorConstants.RightMotorID);
-        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        rightMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
         leftMotor.setNeutralMode(NeutralModeValue.Brake);

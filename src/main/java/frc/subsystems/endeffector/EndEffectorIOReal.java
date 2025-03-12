@@ -22,8 +22,8 @@ public class EndEffectorIOReal implements EndEffectorIO {
 
     private void configureMotor() {
         SparkMaxConfig config = new SparkMaxConfig();
-        motor.configure(config.smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake), ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters);
+        motor.configure(config.smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake).inverted(true),
+            ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     @Override

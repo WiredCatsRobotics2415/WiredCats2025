@@ -2,8 +2,6 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.signals.InvertedValue;
 import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
@@ -140,9 +138,6 @@ public class Subsystems {
         public static final TuneableNumber ThroughboreMax = new TuneableNumber(1, "Arm/ThroughBoreMax");
         public static final TuneableAngle MaxDegreesBack = new TuneableAngle(Degrees.of(210), "Arm/MaxDegreesBack");
         public static final TuneableAngle MinDegreesFront = new TuneableAngle(Degrees.of(-30), "Arm/MinDegreesBack");
-
-        public static final MotorOutputConfigs MotorOutput = new MotorOutputConfigs()
-            .withInverted(InvertedValue.CounterClockwise_Positive);
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.025;

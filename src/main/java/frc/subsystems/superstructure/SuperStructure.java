@@ -71,6 +71,8 @@ public class SuperStructure extends SubsystemBase {
         "SuperStructure/Min height arm can pivot at w/ algae");
     private TuneableDistance coralArmPivotElevatorHeight = new TuneableDistance(4,
         "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
+    
+    private TuneableBoolean stowCommandIsDefault = new TuneableBoolean(!RuntimeConstants.TuningMode, "SuperStructure/EnableStowAsDefault");
 
     private boolean freezingArmFromCoralContainmentDebounce = false;
 
@@ -85,9 +87,16 @@ public class SuperStructure extends SubsystemBase {
             TuningModeTab.getInstance().addBoolSupplier("freezing arm", () -> isFreezingArm);
             TuningModeTab.getInstance().addDoubleSupplier("last EE height", () -> lastEEHeight);
             TuningModeTab.getInstance().addDoubleSupplier("last EE distance", () -> lastEEDistanceFromElevator);
+            if (stowCommandIsDefault.get()) {
+                setDefaultCommand(beThereAsap(Presets.Stow));
+            }
+            stowCommandIsDefault.addListener((Boolean enable) -> {
+                if (enable) setDefaultCommand(beThereAsap(Presets.Stow));
+                else this.removeDefaultCommand();
+            });
+        } else {
+            setDefaultCommand(beThereAsap(Presets.Stow));
         }
-
-        setDefaultCommand(beThereAsap(Presets.Stow));
     }
 
     public static SuperStructure getInstance() {
