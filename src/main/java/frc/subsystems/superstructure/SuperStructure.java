@@ -167,7 +167,8 @@ public class SuperStructure extends SubsystemBase {
                             || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
                     }
                     freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
-                        && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance());
+                        && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
+                        && EndEffector.getInstance().hasCoral();
                     if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
                     if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
                         // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move

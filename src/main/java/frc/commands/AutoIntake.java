@@ -79,7 +79,6 @@ public class AutoIntake extends Command {
             System.out.println(Units.degreesToRadians(tx));
         } else {
             if (hasSeenCoral) {
-                vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
                 if (DriverStation.isAutonomous()) {
                     PPHolonomicDriveController.clearXYFeedbackOverride();
                     PPHolonomicDriveController.clearRotationFeedbackOverride();

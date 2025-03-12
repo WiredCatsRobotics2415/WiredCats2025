@@ -26,7 +26,6 @@ import frc.commands.ScoreCoral.Side;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
-import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
@@ -124,19 +123,22 @@ public class RobotContainer {
             double rotation = oi.getRotation();
             if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
                 rotation = 0;
-                x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
-                y = Math.abs(y) > minorAdjXPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
+                // this mode disables rotation, and sets the maximum speed of the robot to the minorAdjPct speed.
+                x = x / (1 / minorAdjXPct.get());
+                y = y / (1 / minorAdjYPct.get());
+                // x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
+                // y = Math.abs(y) > minorAdjYPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
                 return drive.driveOpenLoopRobotCentricRequest
-                    .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
-                    .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                    .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
+                    .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
                     .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
             }
             return drive.driveOpenLoopFieldCentricRequest
-                .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
-                .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
+                .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
                 .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
         }).withName("Teleop Default"));
-        oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.5, DebounceType.kRising)
+        oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.25, DebounceType.kRising)
             .onTrue(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.MinorAdjustment))
             .onFalse(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.Normal));
 
@@ -153,9 +155,8 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake());
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
-        oi.binds.get(OI.Bind.StowPreset)
-            .onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(), CommonCommands.stowNormally(),
-                () -> coralIntake.getPivotAngle().lte(CoralIntakeConstants.GroundAngle.angle().plus(Degrees.of(7)))));
+        oi.binds.get(OI.Bind.StowPreset).onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
+            CommonCommands.stowNormally(), () -> endEffector.hasCoral()));
         oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
             .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
@@ -179,8 +180,9 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(superstructure.beThereAsap(Presets.GroundIntake)
-            .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
+            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
+                .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
     }
 
     private void configureTriggers() {
