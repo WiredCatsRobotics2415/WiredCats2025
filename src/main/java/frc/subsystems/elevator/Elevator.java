@@ -13,6 +13,7 @@ import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
+import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
@@ -36,6 +37,7 @@ public class Elevator extends SubsystemBase {
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private static Elevator instance;
+    private TuneableDistance deadbandNoVoltageHeight = new TuneableDistance(1.5, "Elevator/NoVoltageBelow");
 
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
@@ -81,7 +83,7 @@ public class Elevator extends SubsystemBase {
         double feedforward = ff.calculate(setpoint.velocity);
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
-        io.setVoltage(voltOut);
+        if (getMeasurement().gte(deadbandNoVoltageHeight.distance())) io.setVoltage(voltOut);
     }
 
     @Override

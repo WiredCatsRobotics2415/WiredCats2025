@@ -28,14 +28,10 @@ public class ArmCharacterization extends Characterizer {
                 state -> SignalLogger.writeString("SysIDArmState", state.toString())),
             new SysIdRoutine.Mechanism(output -> arm.getIo().setVoltage(output.in(Volts)), null, arm));
 
-        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).onlyWhile(this::willNotHitFront)
-            .withName("Arm: Dynamic Forward"));
-        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).onlyWhile(this::willNotHitBack)
-            .withName("Arm: Dynamic Backward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).onlyWhile(this::willNotHitFront)
-            .withName("Arm: Quasi Forward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).onlyWhile(this::willNotHitBack)
-            .withName("Arm: Quasi Backward"));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).withName("Arm: Dynamic Forward"));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).withName("Arm: Dynamic Backward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).withName("Arm: Quasi Forward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).withName("Arm: Quasi Backward"));
 
         TuningModeTab.getInstance().addCharacterizer("Arm", this);
     }

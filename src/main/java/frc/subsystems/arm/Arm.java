@@ -144,9 +144,13 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin.get(),
-            ArmConstants.ThroughboreMax.get(), ArmConstants.MinDegreesFront.in(Degrees),
-            ArmConstants.MaxDegreesBack.in(Degrees));
+        double newTBorPos = inputs.throughborePosition;
+        if (inputs.throughborePosition > 0 && inputs.throughborePosition < 0.132) {
+            newTBorPos += 1;
+        }
+        double measurementDegrees = Algebra.linearMap(newTBorPos + ArmConstants.ThroughboreZero.get(),
+            ArmConstants.ThroughboreMin.get(), ArmConstants.ThroughboreMax.get(),
+            ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees));
         differentiableMeasurementDegrees.update(measurementDegrees);
         lastMeasurement = Degrees.of(measurementDegrees);
 
@@ -156,6 +160,7 @@ public class Arm extends SubsystemBase {
         }
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint(), measurementDegrees);
 
+        Logger.recordOutput("Arm/Actual", measurementDegrees);
         Logger.recordOutput("Arm/Goal", goal);
         Logger.recordOutput("Arm/Error", pid.getPositionError());
         Logger.recordOutput("Arm/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());

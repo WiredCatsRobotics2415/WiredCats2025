@@ -31,7 +31,7 @@ public class ArmIOReal implements ArmIO {
 
     public void configureMotors() {
         motor = new TalonFX(ArmConstants.MotorID);
-        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
         motor.setNeutralMode(NeutralModeValue.Brake);
 
         motorStator = motor.getStatorCurrent();

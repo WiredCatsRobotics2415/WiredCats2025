@@ -156,7 +156,7 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
-            CommonCommands.stowNormally(), () -> endEffector.hasCoral()));
+            CommonCommands.stowNormally(), () -> endEffector.hasCoral()).ignoringDisable(true));
         oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
             .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());

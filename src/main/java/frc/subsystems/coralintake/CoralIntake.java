@@ -90,7 +90,8 @@ public class CoralIntake extends GenericSlapdown {
     }
 
     @Override
-    public Angle getPivotAngle() { return lastMeasurement; }
+    // TODO: lastMeasuremnent
+    public Angle getPivotAngle() { return Degrees.of(0); }
 
     @Override
     public Command toggleIntake() {
