@@ -37,11 +37,13 @@ public class ArmCharacterization extends Characterizer {
     }
 
     private boolean willNotHitFront() {
+        if (!Characterizer.enableSafety.get()) return true;
         Angle measurement = arm.getMeasurement();
         return measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront.angle());
     }
 
     private boolean willNotHitBack() {
+        if (!Characterizer.enableSafety.get()) return true;
         Angle measurement = arm.getMeasurement();
         return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack.angle());
     }

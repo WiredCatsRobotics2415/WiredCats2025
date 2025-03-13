@@ -11,6 +11,7 @@ import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Subsystems.ElevatorConstants;
+import frc.subsystems.slapdown.GenericSlapdown;
 import frc.utils.tuning.Characterizer;
 import frc.utils.tuning.TuningModeTab;
 
@@ -39,11 +40,13 @@ public class ElevatorCharacterization extends Characterizer {
     }
 
     private boolean willNotHitTop() {
+        if (!Characterizer.enableSafety.get()) return true;
         Distance measurement = elevator.getMeasurement();
         return measurement.plus(TestSafetyThreshold).lte(ElevatorConstants.MaxHeight.distance());
     }
 
     private boolean willNotHitBottom() {
+        if (!Characterizer.enableSafety.get()) return true;
         Distance measurement = elevator.getMeasurement();
         return measurement.minus(TestSafetyThreshold).gte(ElevatorConstants.MinHeight.distance());
     }
