@@ -9,6 +9,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import frc.constants.Subsystems.ArmConstants;
 import frc.utils.tuning.Characterizer;
 import frc.utils.tuning.TuneableAngle;
 import frc.utils.tuning.TuningModeTab;
@@ -28,20 +29,32 @@ public class GenericSlapdownCharacterizer extends Characterizer {
         testMinAngle = min;
 
         SysIdRoutine sysIDRoutineArm = new SysIdRoutine(
-            new SysIdRoutine.Config(quasiSpeed, Volts.of(4), null,
+            new SysIdRoutine.Config(quasiSpeed, Volts.of(2), null,
                 state -> Logger.recordOutput("SysID" + name + "State", state.toString())),
             new SysIdRoutine.Mechanism(output -> slapdown.getIo().setPivotVoltage(output.in(Volts)), null, slapdown));
 
-        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).onlyWhile(this::willNotHitFront)
             .withName(name + ": Dynamic Forward"));
-        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).onlyWhile(this::willNotHitBack)
             .withName(name + ": Dynamic Backward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).onlyWhile(this::withinSafeThreshold)
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).onlyWhile(this::willNotHitFront)
             .withName(name + ": Quasi Forward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).onlyWhile(this::withinSafeThreshold)
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).onlyWhile(this::willNotHitBack)
             .withName(name + ": Quasi Backward"));
 
         TuningModeTab.getInstance().addCharacterizer(name, this);
+    }
+
+    private boolean willNotHitFront() {
+        if (!Characterizer.enableSafety.get()) return true;
+        Angle measurement = slapdown.getPivotAngle();
+        return measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront.angle());
+    }
+
+    private boolean willNotHitBack() {
+        if (!Characterizer.enableSafety.get()) return true;
+        Angle measurement = slapdown.getPivotAngle();
+        return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack.angle());
     }
 
     private boolean withinSafeThreshold() {
