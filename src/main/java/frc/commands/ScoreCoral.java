@@ -93,13 +93,6 @@ public class ScoreCoral extends GenericAutomation {
     }
 
     @Override
-    public boolean isFinished() {
-        boolean result = super.isFinished();
-        System.out.println("SC: " + result);
-        return result;
-    }
-
-    @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);

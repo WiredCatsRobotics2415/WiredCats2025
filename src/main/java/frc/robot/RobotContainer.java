@@ -12,8 +12,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
@@ -29,7 +29,6 @@ import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
-import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
@@ -124,19 +123,22 @@ public class RobotContainer {
             double rotation = oi.getRotation();
             if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
                 rotation = 0;
-                x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
-                y = Math.abs(y) > minorAdjXPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
+                // this mode disables rotation, and sets the maximum speed of the robot to the minorAdjPct speed.
+                x = x / (1 / minorAdjXPct.get());
+                y = y / (1 / minorAdjYPct.get());
+                // x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
+                // y = Math.abs(y) > minorAdjYPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
                 return drive.driveOpenLoopRobotCentricRequest
-                    .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
-                    .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                    .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
+                    .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
                     .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
             }
             return drive.driveOpenLoopFieldCentricRequest
-                .withVelocityX(driveXLimiter.calculate(-x) * Controls.MaxDriveMeterS)
-                .withVelocityY(driveYLimiter.calculate(-y) * Controls.MaxDriveMeterS)
+                .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
+                .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
                 .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
         }).withName("Teleop Default"));
-        oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.5, DebounceType.kRising)
+        oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.25, DebounceType.kRising)
             .onTrue(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.MinorAdjustment))
             .onFalse(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.Normal));
 
@@ -153,12 +155,10 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake());
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
-        oi.binds.get(OI.Bind.StowPreset)
-            .onTrue(superstructure.beThereAsap(Presets.Stow).andThen(Commands.waitUntil(superstructure::allAtGoal))
-                .andThen(RobotStatus.setRobotStateOnce(RobotState.Stow)));
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(
-            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
-                .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
+        oi.binds.get(OI.Bind.StowPreset).onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
+            CommonCommands.stowNormally(), () -> endEffector.hasCoral()).ignoringDisable(true));
+        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
+            .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
@@ -180,11 +180,12 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .onTrue(new AutoIntake().withTimeout(5).andThen(new InstantCommand(() ->
-            {
-                System.out.println("done with auto intake!!!!");
-            })));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
+            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
+                .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
+
+        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(
+            superstructure.beThereAsap(Presets.ProcessorScore).andThen(Commands.waitUntil(superstructure::allAtGoal)));
     }
 
     private void configureTriggers() {
@@ -199,12 +200,12 @@ public class RobotContainer {
         }));
 
         // Flash the leds when a coral is scored
-        new Trigger(() -> {
-            return (endEffector.isOuttakingAlgae() && !endEffector.cameraTrigger())
-                || (endEffector.isOuttakingCoral() && !endEffector.irSensorTrigger());
-        }).onTrue(new WaitCommand(0.5)
-            .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1))
-            .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
+        // new Trigger(() -> {
+        // return (endEffector.isOuttakingAlgae() && !endEffector.cameraTrigger())
+        // || (endEffector.isOuttakingCoral() && !endEffector.irSensorTrigger());
+        // }).onTrue(new WaitCommand(0.5)
+        // .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1.2))
+        // .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
 
         new Trigger(endEffector::hasAlgae)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));

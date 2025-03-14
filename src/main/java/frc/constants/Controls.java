@@ -57,6 +57,8 @@ public class Controls {
     }
 
     public class Presets {
+        public static final TuneableSuperStructureState BumpStow = new TuneableSuperStructureState(Inches.of(4),
+            Degrees.of(90), CoralIntakeConstants.StowAngle, "BumpStow");
         public static final TuneableSuperStructureState Stow = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(90), CoralIntakeConstants.StowAngle, "Stow");
 
@@ -93,11 +95,13 @@ public class Controls {
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(26),
             Degrees.of(192), "IntakeFromHPS");
+        public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
+            "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");
 
-        public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
-            "Presets/TopDADriveOffset");
+        public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(10),
+            Degrees.of(0), "Processor");
     }
 }

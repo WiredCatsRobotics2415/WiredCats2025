@@ -19,13 +19,13 @@ public class ElevatorIOReal implements ElevatorIO {
     private TalonFX rightMotor;
     private double appliedVoltage;
 
-    private StatusSignal<Current> leftStator = leftMotor.getStatorCurrent();
-    private StatusSignal<Current> leftSupply = leftMotor.getSupplyCurrent();
-    private StatusSignal<Temperature> leftTemp = leftMotor.getDeviceTemp();
+    private StatusSignal<Current> leftStator;
+    private StatusSignal<Current> leftSupply;
+    private StatusSignal<Temperature> leftTemp;
 
-    private StatusSignal<Current> rightStator = rightMotor.getStatorCurrent();
-    private StatusSignal<Current> rightSupply = rightMotor.getSupplyCurrent();
-    private StatusSignal<Temperature> rightTemp = rightMotor.getDeviceTemp();
+    private StatusSignal<Current> rightStator;
+    private StatusSignal<Current> rightSupply;
+    private StatusSignal<Temperature> rightTemp;
 
     private AnalogInput wirePotentiometer;
 
@@ -40,11 +40,20 @@ public class ElevatorIOReal implements ElevatorIO {
             .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
 
         rightMotor = new TalonFX(ElevatorConstants.RightMotorID);
-        leftMotor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        rightMotor.getConfigurator()
+            .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
         rightMotor.setControl(new StrictFollower(leftMotor.getDeviceID()));
 
         leftMotor.setNeutralMode(NeutralModeValue.Brake);
         rightMotor.setNeutralMode(NeutralModeValue.Brake);
+
+        leftStator = leftMotor.getStatorCurrent();
+        leftSupply = leftMotor.getSupplyCurrent();
+        leftTemp = leftMotor.getDeviceTemp();
+
+        rightStator = rightMotor.getStatorCurrent();
+        rightSupply = rightMotor.getSupplyCurrent();
+        rightTemp = rightMotor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, leftStator, leftSupply, leftTemp, rightStator, rightSupply,
             rightTemp);

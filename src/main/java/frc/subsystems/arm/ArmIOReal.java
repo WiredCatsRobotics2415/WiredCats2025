@@ -4,7 +4,9 @@ import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
@@ -15,9 +17,9 @@ public class ArmIOReal implements ArmIO {
     private TalonFX motor;
     private double appliedVoltage;
 
-    private StatusSignal<Current> motorStator = motor.getStatorCurrent();
-    private StatusSignal<Current> motorSupply = motor.getSupplyCurrent();
-    private StatusSignal<Temperature> motorTemp = motor.getDeviceTemp();
+    private StatusSignal<Current> motorStator;
+    private StatusSignal<Current> motorSupply;
+    private StatusSignal<Temperature> motorTemp;
 
     private DutyCycleEncoder throughbore;
 
@@ -29,8 +31,12 @@ public class ArmIOReal implements ArmIO {
 
     public void configureMotors() {
         motor = new TalonFX(ArmConstants.MotorID);
-        motor.getConfigurator().apply(ArmConstants.MotorOutput);
+        motor.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
         motor.setNeutralMode(NeutralModeValue.Brake);
+
+        motorStator = motor.getStatorCurrent();
+        motorSupply = motor.getSupplyCurrent();
+        motorTemp = motor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, motorStator, motorSupply, motorTemp);
     }

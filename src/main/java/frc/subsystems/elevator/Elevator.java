@@ -13,6 +13,7 @@ import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
+import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
@@ -22,6 +23,7 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator extends SubsystemBase {
     private boolean coasting;
     @Getter private Distance goal = Inches.of(0.0);
+    private Distance lastMeasurement = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
     private boolean hasResetPidController = false;
 
@@ -35,6 +37,7 @@ public class Elevator extends SubsystemBase {
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private static Elevator instance;
+    private TuneableDistance deadbandNoVoltageHeight = new TuneableDistance(1.5, "Elevator/NoVoltageBelow");
 
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
@@ -74,17 +77,13 @@ public class Elevator extends SubsystemBase {
         return pid.atGoal();
     }
 
-    public Distance getMeasurement() {
-        return Inches.of(Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt.get(),
-            ElevatorConstants.PotentiometerMaxVolt.get(), ElevatorConstants.MinHeight.in(Inches),
-            ElevatorConstants.MaxHeight.in(Inches)));
-    }
+    public Distance getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
         double feedforward = ff.calculate(setpoint.velocity);
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
-        io.setVoltage(voltOut);
+        if (getMeasurement().gte(deadbandNoVoltageHeight.distance())) io.setVoltage(voltOut);
     }
 
     @Override
@@ -92,8 +91,11 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
-        double measurementInches = getMeasurement().in(Inches);
+        double measurementInches = Algebra.linearMap(inputs.wirePotentiometer,
+            ElevatorConstants.PotentiometerMinVolt.get(), ElevatorConstants.PotentiometerMaxVolt.get(),
+            ElevatorConstants.MinHeight.in(Inches), ElevatorConstants.MaxHeight.in(Inches));
         differentiableMeasurementInches.update(measurementInches);
+        lastMeasurement = Inches.of(measurementInches);
 
         if (!hasResetPidController) {
             pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));

@@ -6,12 +6,16 @@ import edu.wpi.first.units.DistanceUnit;
 import edu.wpi.first.units.measure.Distance;
 
 public class TuneableDistance extends TuneableNumber {
+    private Distance lastMeasure;
+
     public TuneableDistance(double defaultInches, String key) {
         super(defaultInches, key);
+        lastMeasure = Inches.of(defaultInches);
+        this.addListener((newValue) -> lastMeasure = Inches.of(newValue));
     }
 
     public TuneableDistance(Distance initial, String key) {
-        super(initial.in(Inches), key);
+        this(initial.in(Inches), key);
     }
 
     public double in(DistanceUnit unit) {
@@ -19,6 +23,6 @@ public class TuneableDistance extends TuneableNumber {
     }
 
     public Distance distance() {
-        return Inches.of(get());
+        return lastMeasure;
     }
 }

@@ -56,6 +56,7 @@ public class SuperStructure extends SubsystemBase {
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
     private Angle ninetyDeg = Degrees.of(90); // Cache to avoid making more objects
+    private Angle oneEightyDeg = Degrees.of(180);
 
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
     private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
@@ -67,7 +68,13 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
     private TuneableDistance algaeArmPivotElevatorHeight = new TuneableDistance(30,
-        "SuperStructure/Min height that arm can pivot at");
+        "SuperStructure/Min height arm can pivot at w/ algae");
+    private TuneableDistance coralArmPivotElevatorHeight = new TuneableDistance(4,
+        "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
+
+    private TuneableBoolean stowCommandIsDefault = new TuneableBoolean(true, "SuperStructure/EnableStowAsDefault");
+
+    private boolean freezingArmFromCoralContainmentDebounce = false;
 
     private static SuperStructure instance;
 
@@ -80,9 +87,18 @@ public class SuperStructure extends SubsystemBase {
             TuningModeTab.getInstance().addBoolSupplier("freezing arm", () -> isFreezingArm);
             TuningModeTab.getInstance().addDoubleSupplier("last EE height", () -> lastEEHeight);
             TuningModeTab.getInstance().addDoubleSupplier("last EE distance", () -> lastEEDistanceFromElevator);
+            if (stowCommandIsDefault.get()) {
+                setDefaultCommand(beThereAsap(Presets.Stow));
+            }
+            stowCommandIsDefault.addListener((Boolean enable) -> {
+                if (enable)
+                    setDefaultCommand(beThereAsap(Presets.Stow));
+                else
+                    this.removeDefaultCommand();
+            });
+        } else {
+            setDefaultCommand(beThereAsap(Presets.Stow));
         }
-
-        setDefaultCommand(beThereAsap(Presets.Stow));
     }
 
     public static SuperStructure getInstance() {
@@ -117,7 +133,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /**
-     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one.
+     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one. If you are using this in a composition and want to see when it finishes, use ::allAtGoal.
      */
     public Command beThereIn(double secondsToBeThereIn, TuneableSuperStructureState goal) {
         Timer timeTaken = new Timer();
@@ -140,6 +156,8 @@ public class SuperStructure extends SubsystemBase {
                 + armSwitchingToBackSide + ", elevator time prediction: " + lastElevatorTimePrediction);
         }).andThen(run(() -> {
             boolean freezeArmFromAlgaeContainmentElevation = false;
+            boolean freezeArmFromCoralContainment = false;
+            boolean armOnTargetSide = true;
 
             if (!elevator.atGoal()) {
                 if (elevator.getPid().goalError() < 0) {
@@ -155,12 +173,15 @@ public class SuperStructure extends SubsystemBase {
                     }
                 } else {
                     boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
-                    boolean armOnTargetSide = true;
                     if (armSwitchingToFrontSide || armSwitchingToBackSide) {
                         armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
                             || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
                     }
-                    if (elevatorCanMove && armOnTargetSide) {
+                    freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
+                        && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
+                        && EndEffector.getInstance().hasCoral();
+                    if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
+                    if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
                         // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
                         elevator.getPid().setConstraints(
                             new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
@@ -180,7 +201,7 @@ public class SuperStructure extends SubsystemBase {
 
             if (!coralIntake.pivotAtGoal()) {
                 if (coralIntake.getPid().goalError() > 0) {
-                    if (armWillCollideWithCoralIntake) {
+                    if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
                         coralIntake.getPid()
                             .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax));
                     } else {
@@ -197,7 +218,16 @@ public class SuperStructure extends SubsystemBase {
             } else {
                 isFreezingArm = false;
             }
+
             if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
+            if (freezeArmFromCoralContainment && !freezingArmFromCoralContainmentDebounce) {
+                isFreezingArm = true;
+                freezingArmFromCoralContainmentDebounce = true;
+            }
+            if (!freezeArmFromCoralContainment && freezingArmFromCoralContainmentDebounce) {
+                isFreezingArm = false;
+                freezingArmFromCoralContainmentDebounce = false;
+            }
         }));
         command.addRequirements(elevator, arm, coralIntake);
         return command;
@@ -258,7 +288,7 @@ public class SuperStructure extends SubsystemBase {
             // System.out.println(lineResult + " is less than " + cIntakeEnd.y());
             // System.out.println(" eeBottomTip: " + eeBottomTip);
             // System.out.println(" carriagePoint: " + carriagePoint);
-            collisions[1] = lineResult < cIntakeEnd.y();
+            collisions[1] = lineResult < cIntakeEnd.y() && eeBottomTip.x() > cIntakeEnd.x();
         } else {
             Point2d eeTopTip = new Point2d(
                 carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),

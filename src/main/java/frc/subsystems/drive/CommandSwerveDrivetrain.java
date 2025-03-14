@@ -237,16 +237,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         });
     }
 
-    public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int[] tagSet) {
-        return new WaitUntilCommand(() -> vision.limelightsCanSeeOneOf(limelights, tagSet)).andThen(Commands.run(() -> {
-            currentPoseEstimationType = PoseEstimationType.SingleTag;
-            currentSingleTagLLs = limelights;
-            currentSingleTagId = vision.nearestTagToLimelights(limelights);
-        })).finallyDo(() -> {
-            currentPoseEstimationType = PoseEstimationType.Global;
-        });
-    }
-
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
         return new WaitUntilCommand(() -> vision.limelightsCanSeeOneOf(limelights, tagSet)).andThen(Commands.run(() -> {
             currentPoseEstimationType = PoseEstimationType.SingleTag;

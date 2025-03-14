@@ -15,6 +15,7 @@ import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
+import frc.subsystems.vision.Vision.EndEffectorPipeline;
 import frc.subsystems.vision.Vision.ObjectRecognized;
 import frc.utils.tuning.TuneableNumber;
 
@@ -71,7 +72,6 @@ public class AutoIntake extends Command {
             }
         } else {
             if (hasSeenCoral) {
-                vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
                 if (DriverStation.isAutonomous()) {
                     PPHolonomicDriveController.clearXYFeedbackOverride();
                     PPHolonomicDriveController.clearRotationFeedbackOverride();
@@ -87,6 +87,7 @@ public class AutoIntake extends Command {
     public void end(boolean interrupted) {
         countSinceLastSeenCoral.reset();
         countSinceLastSeenCoral.stop();
+        vision.setEndEffectorPipeline(EndEffectorPipeline.DriverView);
         System.out.println("ended" + interrupted);
     }
 

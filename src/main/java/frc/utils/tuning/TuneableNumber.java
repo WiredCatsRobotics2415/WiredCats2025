@@ -36,7 +36,7 @@ public class TuneableNumber {
     }
 
     /**
-     * Consumer to call when value is changed from NT. Do NOT call get() on this tuneable, because the value will not have changed yet.
+     * Consumer to call when value is changed from NT. Do NOT call get() on this tuneable from within the consumer, because the value will not have changed yet.
      *
      * @param toCall
      */

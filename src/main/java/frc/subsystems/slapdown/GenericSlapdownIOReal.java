@@ -45,7 +45,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     @Override
     public void configureHardware(int pivotId, int intakeId, int throughborePort, int sensorAnalogPort) {
         SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
-            .voltageCompensation(12);
+            .voltageCompensation(12).inverted(false);
 
         pivotMotor = new SparkMax(pivotId, MotorType.kBrushless);
         pivotMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
