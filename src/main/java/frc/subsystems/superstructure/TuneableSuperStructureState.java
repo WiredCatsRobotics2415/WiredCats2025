@@ -3,27 +3,26 @@ package frc.subsystems.superstructure;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.constants.Subsystems.CoralIntakeConstants;
-import frc.utils.tuning.TuneableAngle;
-import frc.utils.tuning.TuneableDistance;
+import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 
 public class TuneableSuperStructureState {
-    @Getter private TuneableDistance height;
-    @Getter private TuneableAngle arm;
-    @Getter private TuneableAngle coralIntake;
+    @Getter private TuneableNumber height;
+    @Getter private TuneableNumber arm;
+    @Getter private TuneableNumber coralIntake;
 
     public TuneableSuperStructureState(Distance height, Angle arm, Angle coralIntake, String name) {
-        this.height = new TuneableDistance(height, "SSState/" + name + "/height");
-        this.arm = new TuneableAngle(arm, "SSState/" + name + "/arm");
-        this.coralIntake = new TuneableAngle(coralIntake, "SSState/" + name + "/cIntake");
+        this.height = new TuneableNumber(height, "SSState/" + name + "/height");
+        this.arm = new TuneableNumber(arm, "SSState/" + name + "/arm");
+        this.coralIntake = new TuneableNumber(coralIntake, "SSState/" + name + "/cIntake");
     }
 
     /**
      * Sets coral intake to default stow position
      */
     public TuneableSuperStructureState(Distance height, Angle arm, String name) {
-        this.height = new TuneableDistance(height, "SSState/" + name + "/height");
-        this.arm = new TuneableAngle(arm, "SSState/" + name + "/arm");
-        this.coralIntake = new TuneableAngle(CoralIntakeConstants.StowAngle, "SSState/" + name + "/cIntake");
+        this.height = new TuneableNumber(height, "SSState/" + name + "/height");
+        this.arm = new TuneableNumber(arm, "SSState/" + name + "/arm");
+        this.coralIntake = new TuneableNumber(CoralIntakeConstants.StowAngle, "SSState/" + name + "/cIntake");
     }
 }

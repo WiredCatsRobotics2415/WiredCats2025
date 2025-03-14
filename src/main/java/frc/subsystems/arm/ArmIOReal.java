@@ -1,7 +1,5 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -10,8 +8,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
-import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.constants.Subsystems.ArmConstants;
+import frc.utils.hardware.Throughbore;
 
 public class ArmIOReal implements ArmIO {
     private TalonFX motor;
@@ -21,10 +19,11 @@ public class ArmIOReal implements ArmIO {
     private StatusSignal<Current> motorSupply;
     private StatusSignal<Temperature> motorTemp;
 
-    private DutyCycleEncoder throughbore;
+    private Throughbore throughbore;
 
     public ArmIOReal() {
-        throughbore = new DutyCycleEncoder(ArmConstants.ThroughborePort);
+        throughbore = new Throughbore(ArmConstants.ThroughborePort, ArmConstants.ThroughboreMin,
+            ArmConstants.ThroughboreMax, true, "ArmThroughbore");
 
         configureMotors();
     }
@@ -46,11 +45,11 @@ public class ArmIOReal implements ArmIO {
         BaseStatusSignal.refreshAll(motorStator, motorSupply, motorTemp);
 
         inputs.motorConnected = motor.isAlive();
-        inputs.motorStatorCurrent = motorStator.getValue();
-        inputs.motorSupplyCurrent = motorSupply.getValue();
-        inputs.motorTemp = motorTemp.getValue();
+        inputs.motorStatorCurrent = motorStator.getValueAsDouble();
+        inputs.motorSupplyCurrent = motorSupply.getValueAsDouble();
+        inputs.motorTemp = motorTemp.getValueAsDouble();
 
-        inputs.appliedVoltage = Volts.of(appliedVoltage);
+        inputs.appliedVoltage = appliedVoltage;
         inputs.throughborePosition = throughbore.get();
     }
 

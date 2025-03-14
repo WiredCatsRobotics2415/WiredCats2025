@@ -1,7 +1,5 @@
 package frc.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Volts;
-
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -62,16 +60,16 @@ public class ElevatorIOReal implements ElevatorIO {
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
         inputs.isConnectedLeft = leftMotor.isAlive();
-        inputs.temperatureLeft = leftTemp.getValue();
-        inputs.statorCurrentLeft = leftStator.getValue();
-        inputs.supplyCurrentLeft = leftSupply.getValue();
+        inputs.temperatureLeft = leftTemp.getValueAsDouble();
+        inputs.statorCurrentLeft = leftStator.getValueAsDouble();
+        inputs.supplyCurrentLeft = leftSupply.getValueAsDouble();
 
         inputs.isConnectedRight = rightMotor.isAlive();
-        inputs.temperatureRight = rightTemp.getValue();
-        inputs.statorCurrentRight = rightStator.getValue();
-        inputs.supplyCurrentRight = rightSupply.getValue();
+        inputs.temperatureRight = rightTemp.getValueAsDouble();
+        inputs.statorCurrentRight = rightStator.getValueAsDouble();
+        inputs.supplyCurrentRight = rightSupply.getValueAsDouble();
 
-        inputs.appliedVoltage = Volts.of(appliedVoltage);
+        inputs.appliedVoltage = appliedVoltage;
         inputs.wirePotentiometer = wirePotentiometer.getVoltage();
     }
 

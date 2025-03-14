@@ -26,7 +26,6 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.utils.math.Point2d;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableBoolean;
-import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 
@@ -47,7 +46,7 @@ public class SuperStructure extends SubsystemBase {
     private boolean armWillCollideWithCoralIntake = false;
 
     private double lastEEHeight = 0.0d;
-    private double maxEEHeight = ElevatorConstants.MaxHeight.in(Inches) +
+    private double maxEEHeight = ElevatorConstants.MaxHeight.get() +
         EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double lastEEDistanceFromElevator = 0.0d;
 
@@ -67,9 +66,9 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableDistance algaeArmPivotElevatorHeight = new TuneableDistance(30,
+    private TuneableNumber algaeArmPivotElevatorHeight = new TuneableNumber(30,
         "SuperStructure/Min height arm can pivot at w/ algae");
-    private TuneableDistance coralArmPivotElevatorHeight = new TuneableDistance(4,
+    private TuneableNumber coralArmPivotElevatorHeight = new TuneableNumber(4,
         "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
 
     private TuneableBoolean stowCommandIsDefault = new TuneableBoolean(true, "SuperStructure/EnableStowAsDefault");
@@ -148,7 +147,7 @@ public class SuperStructure extends SubsystemBase {
             armSwitchingToFrontSide = arm.getMeasurement().gte(ninetyDeg) && arm.getGoal().lt(ninetyDeg);
             armSwitchingToBackSide = arm.getMeasurement().lte(ninetyDeg) && arm.getGoal().gt(ninetyDeg);
 
-            lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().in(Inches),
+            lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().get(),
                 elevator.getMeasurement().in(Inches));
             isFreezingArm = false;
             timeTaken.start();
@@ -238,7 +237,9 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public boolean allAtGoal() {
-        return elevator.atGoal() && arm.atGoal() && coralIntake.pivotAtGoal();
+        System.out.println("elevator: " + elevator.atGoal() + " | arm: " + arm.atGoal());
+        return elevator.atGoal() && arm.atGoal();
+        // TODO: when coral intake is in: return elevator.atGoal() && arm.atGoal() && coralIntake.pivotAtGoal();
     }
 
     private void updateCurrentStateCollisions() {
@@ -327,11 +328,11 @@ public class SuperStructure extends SubsystemBase {
         if (!isFreezingArm) {
             // when elevator measurement is high, arm max accel should be % of its base max
             double maxArmAcceleration = ArmConstants.BaseAccelerationMax -
-                ((elevator.getMeasurement().in(Inches) / ElevatorConstants.MaxHeight.in(Inches)) *
+                ((elevator.getMeasurement().in(Inches) / ElevatorConstants.MaxHeight.get()) *
                     (1 - percentOfArmAccel.get()) * ArmConstants.BaseAccelerationMax);
 
             double maxArmVelocity = ArmConstants.BaseVelocityMax -
-                (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight.in(Inches)) *
+                (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight.get()) *
                     (1 - percentOfArmVelo.get()) * ArmConstants.BaseVelocityMax);
             arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
         } else {

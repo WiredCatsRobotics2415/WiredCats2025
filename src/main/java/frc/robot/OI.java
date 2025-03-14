@@ -95,6 +95,11 @@ public class OI {
         return new double[] { newX, newY };
     }
 
+    public double[] getRawXY() {
+        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX),
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) };
+    }
+
     public double getRotation() {
         double deadbanded = deadbandCompensation(
             MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.RightJoystickX), Controls.Deadband));

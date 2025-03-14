@@ -18,7 +18,6 @@ import frc.subsystems.slapdown.GenericSlapdownIOInputsAutoLogged;
 import frc.subsystems.slapdown.GenericSlapdownIOReal;
 import frc.subsystems.slapdown.GenericSlapdownIOSim;
 import frc.utils.Util;
-import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableArmFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
@@ -49,11 +48,12 @@ public class CoralIntake extends GenericSlapdown {
             new GenericSlapdownIO() {});
         pid.setTolerance(CoralIntakeConstants.BaseGoalTolerance);
         io.configureHardware(CoralIntakeConstants.PivotMotorID, CoralIntakeConstants.IntakeMotorID,
-            CoralIntakeConstants.ThroughborePort, -1);
+            CoralIntakeConstants.ThroughborePort, CoralIntakeConstants.ThroughboreMin,
+            CoralIntakeConstants.ThroughboreMax, true, -1);
         io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
             CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle.angle(),
-            CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin.get(),
-            CoralIntakeConstants.ThroughboreMax.get(), CoralIntakeConstants.Weight);
+            CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin,
+            CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
 
         new Trigger(EndEffector.getInstance()::hasCoral).onTrue(turnOffRollers());
 
@@ -71,7 +71,7 @@ public class CoralIntake extends GenericSlapdown {
     @Override
     public Command slapdown() {
         return runOnce(() -> {
-            pid.setGoal(CoralIntakeConstants.GroundAngle.in(Degrees));
+            pid.setGoal(CoralIntakeConstants.GroundAngle.get());
         });
     }
 
@@ -91,7 +91,7 @@ public class CoralIntake extends GenericSlapdown {
 
     @Override
     // TODO: lastMeasuremnent
-    public Angle getPivotAngle() { return Degrees.of(0); }
+    public Angle getPivotAngle() { return lastMeasurement; }
 
     @Override
     public Command toggleIntake() {
@@ -146,9 +146,9 @@ public class CoralIntake extends GenericSlapdown {
         io.updateInputs(inputs);
         Logger.processInputs("CoralIntake", inputs);
 
-        double measurementDegrees = Algebra.linearMap(inputs.throughborePosition,
-            CoralIntakeConstants.ThroughboreMin.get(), CoralIntakeConstants.ThroughboreMax.get(),
-            CoralIntakeConstants.GroundAngle.in(Degrees), CoralIntakeConstants.MaxAngle.in(Degrees));
+        double measurementDegrees = inputs.throughborePosition *
+            (CoralIntakeConstants.MaxAngle.angle().in(Degrees) - CoralIntakeConstants.GroundAngle.angle().in(Degrees)) +
+            CoralIntakeConstants.GroundAngle.angle().in(Degrees);
         differentiableMeasurementDegrees.update(measurementDegrees);
         lastMeasurement = Degrees.of(measurementDegrees);
 
@@ -157,8 +157,12 @@ public class CoralIntake extends GenericSlapdown {
             hasResetPidController = true;
         }
         useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
+
+        Logger.recordOutput("CoralIntake/Actual", measurementDegrees);
         Logger.recordOutput("CoralIntake/Goal", goal);
         Logger.recordOutput("CoralIntake/Error", pid.getPositionError());
+        Logger.recordOutput("CoralIntake/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
+        Logger.recordOutput("CoralIntake/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());
     }
 
     @Override

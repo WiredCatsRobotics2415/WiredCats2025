@@ -1,10 +1,6 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
@@ -21,12 +17,12 @@ public class ArmIOSim implements ArmIO {
 
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
         ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.MinDegreesFront.in(Radians), ArmConstants.MaxDegreesBack.in(Radians), true, Math.PI / 2);
+        ArmConstants.MinDegreesFront.radians(), ArmConstants.MaxDegreesBack.radians(), true, Math.PI / 2);
 
     public ArmIOSim() {
         System.out.println("Arm MOI: " + moi);
-        System.out.println("Max degrees (back): " + ArmConstants.MaxDegreesBack.in(Radians));
-        System.out.println("min degrees (front): " + ArmConstants.MinDegreesFront.in(Radians));
+        System.out.println("Max degrees (back): " + ArmConstants.MaxDegreesBack.radians());
+        System.out.println("min degrees (front): " + ArmConstants.MinDegreesFront.radians());
     }
 
     @Override
@@ -34,12 +30,11 @@ public class ArmIOSim implements ArmIO {
         simArm.update(0.02);
 
         inputs.motorConnected = true;
-        inputs.motorSupplyCurrent = Amps.of(simArm.getCurrentDrawAmps());
-        inputs.appliedVoltage = Volts.of(appliedVoltage);
+        inputs.motorSupplyCurrent = simArm.getCurrentDrawAmps();
+        inputs.appliedVoltage = appliedVoltage;
 
         inputs.throughborePosition = Algebra.linearMap(Units.radiansToDegrees(simArm.getAngleRads()),
-            ArmConstants.MinDegreesFront.in(Degrees), ArmConstants.MaxDegreesBack.in(Degrees),
-            ArmConstants.ThroughboreMin.get(), ArmConstants.ThroughboreMax.get());
+            ArmConstants.MinDegreesFront.get(), ArmConstants.MaxDegreesBack.get(), 0, 1);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package frc.commands;
 
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,13 +12,12 @@ import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.endeffector.EndEffector;
-import frc.utils.tuning.TuneableDistance;
+import frc.utils.tuning.TuneableNumber;
 
 public class IntakeFromHPS extends GenericAutomation {
     private static final Transform2d Offset = new Transform2d(GenericAutomation.CenterToBumper, Inches.of(0),
         Rotation2d.kZero);
-    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3,
-        "IntakeFromHPS/DriveTolerance");
+    private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "IntakeFromHPS/DriveTolerance");
 
     @Override
     public void initialize() {
@@ -29,8 +27,8 @@ public class IntakeFromHPS extends GenericAutomation {
 
         if (GenericAutomation.getCurrentAutomationMode() == AutomationMode.PresetAndAlign) {
             Pose2d driveToPose = apriltagPoseAndId.getFirst().plus(Offset)
-                .plus(new Transform2d(Presets.HPSDriveOffset.distance(), Inches.of(0), Rotation2d.kZero));
-            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.in(Meters));
+                .plus(new Transform2d(Presets.HPSDriveOffset.meters(), 0, Rotation2d.kZero));
+            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveToPose);

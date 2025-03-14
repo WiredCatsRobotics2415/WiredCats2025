@@ -1,17 +1,14 @@
 package frc.subsystems.endeffector;
 
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Temperature;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface EndEffectorIO {
     @AutoLog
     abstract class EndEffectorIOInputs {
         public boolean motorConnected = true;
-        public Temperature motorTemp = Temperature.ofBaseUnits(0.0, Units.Celsius);
-        public Current motorStatorCurrent = Current.ofBaseUnits(0.0, Units.Amps);
-        public Current motorSupplyCurrent = Current.ofBaseUnits(0.0, Units.Amps);
+        public double motorTemp = 0.0d;
+        public double motorStatorCurrent = 0.0d;
+        public double motorSupplyCurrent = 0.0d;
 
         public int sensorValue = 0;
     }

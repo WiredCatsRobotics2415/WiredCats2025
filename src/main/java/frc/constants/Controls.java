@@ -5,7 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.subsystems.superstructure.TuneableSuperStructureState;
-import frc.utils.tuning.TuneableDistance;
+import frc.utils.tuning.TuneableNumber;
 
 public class Controls {
     public static final double MaxDriveMeterS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
@@ -65,41 +65,35 @@ public class Controls {
         // Positive: coral scoring side
         public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(26),
             Degrees.of(-15), "Level1");
-        public static final TuneableDistance Level1DriveOffset = new TuneableDistance(Inches.of(-4.05), // These should be negative because they back away
+        public static final TuneableNumber Level1DriveOffset = new TuneableNumber(-4.05, // These should be negative because they back away
             "Presets/L1Offset");
 
-        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(50),
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(35),
             Degrees.of(-15), "Level2");
-        public static final TuneableDistance Level2DriveOffset = new TuneableDistance(Inches.of(-4.05),
-            "Presets/L2Offset");
+        public static final TuneableNumber Level2DriveOffset = new TuneableNumber(-4.05, "Presets/L2Offset");
 
-        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(60),
+        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(50),
             Degrees.of(-15), "Level3");
-        public static final TuneableDistance Level3DriveOffset = new TuneableDistance(Inches.of(-5.35),
-            "Presets/L3Offset");
+        public static final TuneableNumber Level3DriveOffset = new TuneableNumber(-5.35, "Presets/L3Offset");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77),
-            Degrees.of(-20), "Level4");
-        public static final TuneableDistance Level4DriveOffset = new TuneableDistance(Inches.of(-6.65),
-            "Presets/L4Offset");
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(75),
+            Degrees.of(-15), "Level4");
+        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(-6.65, "Presets/L4Offset");
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(16),
             Degrees.of(0), "BottomDeAlgae");
-        public static final TuneableDistance BottomDADriveOffset = new TuneableDistance(Inches.of(-6),
-            "Presets/BottomDADriveOffset");
+        public static final TuneableNumber BottomDADriveOffset = new TuneableNumber(-6, "Presets/BottomDADriveOffset");
 
         public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(32),
             Degrees.of(0), "TopDeAlgae");
-        public static final TuneableDistance TopDADriveOffset = new TuneableDistance(Inches.of(-6),
-            "Presets/TopDADriveOffset");
+        public static final TuneableNumber TopDADriveOffset = new TuneableNumber(-6, "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(26),
             Degrees.of(192), "IntakeFromHPS");
-        public static final TuneableDistance HPSDriveOffset = new TuneableDistance(Inches.of(-2.5),
-            "Presets/TopDADriveOffset");
+        public static final TuneableNumber HPSDriveOffset = new TuneableNumber(-2.5, "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(195), CoralIntakeConstants.GroundAngle.angle(), "GroundIntake");
+            Degrees.of(195), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
 
         public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(10),
             Degrees.of(0), "Processor");

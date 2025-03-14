@@ -1,7 +1,5 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +11,7 @@ import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.superstructure.TuneableSuperStructureState;
-import frc.utils.tuning.TuneableDistance;
+import frc.utils.tuning.TuneableNumber;
 
 /**
  * Command that pathfinds to the nearest side of the reef + a position offset depending on whether you chose right or left, and moves the elevator and the arm to thier presets
@@ -27,12 +25,12 @@ public class ScoreCoral extends GenericAutomation {
         L1, L2, L3, L4,
     }
 
-    private static final TuneableDistance LeftOffset = new TuneableDistance(6, "ScoreCoral/LeftOffset");
-    private static final TuneableDistance RightOffset = new TuneableDistance(6, "ScoreCoral/RightOffset");
-    private static final TuneableDistance DriveToleranceMeters = new TuneableDistance(3, "ScoreCoral/DriveTolerance");
+    private static final TuneableNumber LeftOffset = new TuneableNumber(6, "ScoreCoral/LeftOffset");
+    private static final TuneableNumber RightOffset = new TuneableNumber(6, "ScoreCoral/RightOffset");
+    private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "ScoreCoral/DriveTolerance");
 
     private TuneableSuperStructureState superStructureState;
-    private TuneableDistance goalDriveOffset;
+    private TuneableNumber goalDriveOffset;
     private Side side;
 
     public ScoreCoral(Side reefSide, Level reefLevel) {
@@ -74,7 +72,7 @@ public class ScoreCoral extends GenericAutomation {
                 ReefMeasurements.reefRedApriltags, ReefMeasurements.reefBlueApriltags, ReefMeasurements.reefIds,
                 LimelightsForElements.Reef);
             Pose2d driveTo = apriltagPoseAndId.getFirst().plus(offset);
-            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters.in(Meters));
+            driveCommand = drive.driveTo(driveTo, DriveToleranceMeters.meters());
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveTo);
