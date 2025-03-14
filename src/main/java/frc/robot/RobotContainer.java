@@ -118,11 +118,9 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
-            double[] linearInput = oi.getXY();
-            double x = linearInput[1], y = linearInput[0];
-            double rotation = oi.getRotation();
             if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
-                rotation = 0;
+                double[] input = oi.getRawXY();
+                double x = input[1], y = input[0];
                 // this mode disables rotation, and sets the maximum speed of the robot to the minorAdjPct speed.
                 x = x / (1 / minorAdjXPct.get());
                 y = y / (1 / minorAdjYPct.get());
@@ -131,8 +129,11 @@ public class RobotContainer {
                 return drive.driveOpenLoopRobotCentricRequest
                     .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
                     .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-                    .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
+                    .withRotationalRate(driveRotationLimiter.calculate(0) * Controls.MaxAngularRadS);
             }
+            double[] linearInput = oi.getXY();
+            double x = linearInput[1], y = linearInput[0];
+            double rotation = oi.getRotation();
             return drive.driveOpenLoopFieldCentricRequest
                 .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
                 .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))

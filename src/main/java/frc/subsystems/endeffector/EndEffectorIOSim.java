@@ -1,7 +1,5 @@
 package frc.subsystems.endeffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -70,9 +68,8 @@ public class EndEffectorIOSim implements EndEffectorIO {
             : 0;
 
         inputs.motorConnected = true;
-        inputs.motorStatorCurrent = Amps.of(motor.getCurrentDrawAmps());
-        inputs.motorSupplyCurrent = Amps.of(0.0d);
-        inputs.motorTemp = Celsius.of(0);
+        inputs.motorStatorCurrent = motor.getCurrentDrawAmps();
+        inputs.motorSupplyCurrent = 0.0d;
     }
 
     @Override

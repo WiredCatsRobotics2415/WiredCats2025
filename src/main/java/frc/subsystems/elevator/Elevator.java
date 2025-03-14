@@ -13,7 +13,6 @@ import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
-import frc.utils.tuning.TuneableDistance;
 import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
@@ -37,7 +36,6 @@ public class Elevator extends SubsystemBase {
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private static Elevator instance;
-    private TuneableDistance deadbandNoVoltageHeight = new TuneableDistance(1.5, "Elevator/NoVoltageBelow");
 
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
@@ -48,7 +46,7 @@ public class Elevator extends SubsystemBase {
                 () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MinHeight.distance())));
             TuningModeTab.getInstance().addCommand("Run to max", runOnce(
                 () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MaxHeight.distance())));
-            TuningModeTab.getInstance().addCommand("Toggle coast", runOnce(() -> {
+            TuningModeTab.getInstance().addCommand("Toggle elevator coast", runOnce(() -> {
                 if (coasting) {
                     io.setCoast(false);
                     coasting = false;
@@ -83,7 +81,7 @@ public class Elevator extends SubsystemBase {
         double feedforward = ff.calculate(setpoint.velocity);
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
-        if (getMeasurement().gte(deadbandNoVoltageHeight.distance())) io.setVoltage(voltOut);
+        io.setVoltage(voltOut);
     }
 
     @Override
@@ -93,7 +91,7 @@ public class Elevator extends SubsystemBase {
 
         double measurementInches = Algebra.linearMap(inputs.wirePotentiometer,
             ElevatorConstants.PotentiometerMinVolt.get(), ElevatorConstants.PotentiometerMaxVolt.get(),
-            ElevatorConstants.MinHeight.in(Inches), ElevatorConstants.MaxHeight.in(Inches));
+            ElevatorConstants.MinHeight.get(), ElevatorConstants.MaxHeight.get());
         differentiableMeasurementInches.update(measurementInches);
         lastMeasurement = Inches.of(measurementInches);
 
@@ -103,6 +101,7 @@ public class Elevator extends SubsystemBase {
         }
         useOutput(pid.calculate(measurementInches), pid.getSetpoint());
 
+        Logger.recordOutput("Elevator/Actual", measurementInches);
         Logger.recordOutput("Elevator/Goal", goal);
         Logger.recordOutput("Elevator/Error", pid.getPositionError());
         Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());

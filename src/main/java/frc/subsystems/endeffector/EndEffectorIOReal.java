@@ -1,8 +1,5 @@
 package frc.subsystems.endeffector;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Celsius;
-
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -31,8 +28,8 @@ public class EndEffectorIOReal implements EndEffectorIO {
         inputs.sensorValue = irSensor.getValue();
 
         inputs.motorConnected = true;
-        inputs.motorStatorCurrent = Amps.of(motor.getOutputCurrent());
-        inputs.motorTemp = Celsius.of(motor.getMotorTemperature());
+        inputs.motorStatorCurrent = motor.getOutputCurrent();
+        inputs.motorTemp = motor.getMotorTemperature();
     }
 
     @Override

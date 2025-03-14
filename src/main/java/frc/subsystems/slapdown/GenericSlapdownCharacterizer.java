@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.tuning.Characterizer;
-import frc.utils.tuning.TuneableAngle;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 import org.littletonrobotics.junction.Logger;
 
@@ -20,10 +20,11 @@ public class GenericSlapdownCharacterizer extends Characterizer {
     private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.5).div(Second.of(1));
 
     private final Angle TestSafetyThreshold = Degrees.of(7);
-    private TuneableAngle testMaxAngle;
-    private TuneableAngle testMinAngle;
+    private TuneableNumber testMaxAngle;
+    private TuneableNumber testMinAngle;
 
-    private GenericSlapdownCharacterizer(GenericSlapdown slapdown, String name, TuneableAngle min, TuneableAngle max) {
+    private GenericSlapdownCharacterizer(GenericSlapdown slapdown, String name, TuneableNumber min,
+        TuneableNumber max) {
         this.slapdown = slapdown;
         testMaxAngle = max;
         testMinAngle = min;
@@ -63,8 +64,8 @@ public class GenericSlapdownCharacterizer extends Characterizer {
             || measurement.plus(TestSafetyThreshold).lte(testMaxAngle.angle());
     }
 
-    public static GenericSlapdownCharacterizer createInstance(GenericSlapdown slapdown, String name, TuneableAngle min,
-        TuneableAngle max) {
+    public static GenericSlapdownCharacterizer createInstance(GenericSlapdown slapdown, String name, TuneableNumber min,
+        TuneableNumber max) {
         return new GenericSlapdownCharacterizer(slapdown, name, min, max);
     }
 }

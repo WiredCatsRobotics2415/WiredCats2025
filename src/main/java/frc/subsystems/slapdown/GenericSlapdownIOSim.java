@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Kilograms;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -43,7 +42,7 @@ public class GenericSlapdownIOSim implements GenericSlapdownIO {
         pivotSim.update(0.02);
 
         inputs.pivotConnected = true;
-        inputs.appliedVoltage = Volts.of(appliedVolts);
+        inputs.appliedVoltage = appliedVolts;
 
         inputs.intakeConnected = true;
 

@@ -1,5 +1,11 @@
 package frc.utils.tuning;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
 import frc.constants.RuntimeConstants;
 import java.util.ArrayList;
 import java.util.function.Consumer;
@@ -24,8 +30,44 @@ public class TuneableNumber {
         }
     }
 
+    public TuneableNumber(Distance defaultDistance, String key) {
+        this(defaultDistance.in(Inches), key);
+    }
+
+    public TuneableNumber(Angle defaultAngle, String key) {
+        this(defaultAngle.in(Degrees), key);
+    }
+
     public double get() {
         return previousNumber;
+    }
+
+    /**
+     * Assuming this number is a distance in inches, convert it to inches
+     */
+    public double meters() {
+        return Units.inchesToMeters(previousNumber);
+    }
+
+    /**
+     * Assuming this number is in inches
+     */
+    public Distance distance() {
+        return Inches.of(previousNumber);
+    }
+
+    /**
+     * Assuming this number is an angle in degrees, convert it to radians
+     */
+    public double radians() {
+        return Units.degreesToRadians(previousNumber);
+    }
+
+    /**
+     * Assuming this number is in degrees
+     */
+    public Angle angle() {
+        return Degrees.of(previousNumber);
     }
 
     public void set(double newNumber) {
