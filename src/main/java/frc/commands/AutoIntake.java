@@ -1,26 +1,21 @@
 
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Radians;
-
+import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.utility.PhoenixPIDController;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls;
-import frc.constants.Measurements.CoralMeasurements;
-import frc.constants.Measurements.RobotMeasurements;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
 import frc.subsystems.vision.Vision.ObjectRecognized;
-import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableNumber;
 
 public class AutoIntake extends Command {
@@ -34,10 +29,14 @@ public class AutoIntake extends Command {
 
     private boolean hasSeenCoral;
     public Timer countSinceLastSeenCoral;
+    private final SwerveRequest.FieldCentricFacingAngle driveHeading = new SwerveRequest.FieldCentricFacingAngle()
+        .withDriveRequestType(DriveRequestType.OpenLoopVoltage);
 
     @Override
     public void initialize() {
         hasSeenCoral = false;
+        driveHeading.HeadingController = new PhoenixPIDController(0.5, 0, 0.3);
+        driveHeading.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
         countSinceLastSeenCoral = new Timer();
         hasSeenCoralSeconds = new TuneableNumber(0.5, "AutoIntaking/hasSeenCoralSeconds");
         vision = Vision.getInstance();
@@ -45,7 +44,6 @@ public class AutoIntake extends Command {
         drive = CommandSwerveDrivetrain.getInstance();
         addRequirements(drive);
         driveBackward = new SwerveRequest.RobotCentric().withVelocityX(-0.4 * Controls.MaxDriveMeterS); // back of robot = intaking side
-
         RobotStatus.setRobotStateOnce(RobotState.AutoGroundIntaking);
         vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
@@ -53,7 +51,6 @@ public class AutoIntake extends Command {
 
     @Override
     public void execute() {
-        if (DriverStation.isAutonomous()) return;
         if (vision.objectDetected() && vision.getObjectDetectedType() == ObjectRecognized.Coral) {
             if (!hasSeenCoral) {
                 System.out.println("Seen a coral");
@@ -61,23 +58,17 @@ public class AutoIntake extends Command {
                 countSinceLastSeenCoral.reset();
                 hasSeenCoral = true;
             }
-            double ty = vision.getObjectDetectedTy();
             double tx = vision.getObjectDetectedTx();
+            double tolerance = 3.4;
 
-            double distanceV = (RobotMeasurements.EECamHeightOffGround
-                .minus(CoralMeasurements.HeightFromCenterOffGround).in(Meters)) /
-                Math.tan(Units.degreesToRadians(RobotMeasurements.EECamForward.in(Radians) + ty));
-            double distanceH = Math.tan(Units.degreesToRadians(tx)) * distanceV;
-            System.out.println("horizontal" + distanceH);
-            double distance = Math.sqrt((distanceV * distanceV) + (distanceH * distanceH));
-            System.out.println(distance);
-
-            double minTimeToObject = distance / Controls.MaxDriveMeterS;
-            // kp used to control rotational rate of robot
-            // drive.setControl(driveBackward.withRotationalRate(Units.degreesToRadians(tx) / minTimeToObject));
-            drive.setControl(driveBackward.withVelocityY(-distanceH / minTimeToObject)
-                .withRotationalRate(Units.degreesToRadians(tx)));
-            System.out.println(Units.degreesToRadians(tx));
+            if (tx > tolerance || tx < -tolerance) {
+                System.out.println(tx);
+                System.out.println("tx outside of tolerance");
+                drive.setControl(driveHeading
+                    .withTargetDirection(drive.getState().Pose.getRotation().minus(Rotation2d.fromDegrees(-tx))));
+            } else {
+                drive.setControl(driveBackward);
+            }
         } else {
             if (hasSeenCoral) {
                 vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView);
