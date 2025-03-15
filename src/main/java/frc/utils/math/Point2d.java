@@ -9,9 +9,13 @@ public class Point2d {
         this.y = y;
     }
 
-    public double x() { return x; }
+    public double x() {
+        return x;
+    }
 
-    public double y() { return y; }
+    public double y() {
+        return y;
+    }
 
     @Override
     public String toString() {

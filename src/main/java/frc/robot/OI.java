@@ -12,16 +12,19 @@ import frc.utils.math.Algebra;
 import frc.utils.math.Trig;
 import java.util.HashMap;
 import java.util.Map;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class OI {
     CommandXboxController controller;
     CommandJoystick numpad;
 
+    private static LoggedNetworkNumber translationStickMult = new LoggedNetworkNumber("OI/translationStickMult", 2.0d);
+
     public enum Bind {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
         AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
         AutoScoreRightL3, AutoScoreRightL4, DealgaePreset, SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive,
-        AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae
+        AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae, ManualIntake
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -48,9 +51,9 @@ public class OI {
         binds.put(Bind.ManualArmForward, controller.rightBumper());
         binds.put(Bind.ManualArmBack, controller.rightTrigger());
 
-        binds.put(Bind.Shoot, controller.button(GulikitButtons.B));
+        binds.put(Bind.Shoot, controller.button(GulikitButtons.X));
         binds.put(Bind.DeAlgae, controller.button(GulikitButtons.A));
-        binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.Y));
+        binds.put(Bind.ManualIntake, controller.button(GulikitButtons.Y));
 
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
         binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
@@ -78,8 +81,10 @@ public class OI {
     }
 
     public double[] getXY() {
-        double x = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickX), Controls.Deadband);
-        double y = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickY), Controls.Deadband);
+        double x = MathUtil.applyDeadband(
+            controller.getRawAxis(GulikitButtons.LeftJoystickX) * translationStickMult.get(), Controls.Deadband);
+        double y = MathUtil.applyDeadband(
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) * translationStickMult.get(), Controls.Deadband);
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
@@ -96,8 +101,8 @@ public class OI {
     }
 
     public double[] getRawXY() {
-        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX),
-            controller.getRawAxis(GulikitButtons.LeftJoystickY) };
+        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX) * translationStickMult.get(),
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) * translationStickMult.get() };
     }
 
     public double getRotation() {

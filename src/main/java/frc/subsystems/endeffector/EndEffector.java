@@ -79,17 +79,17 @@ public class EndEffector extends SubsystemBase {
                 outtakingCoral = false;
                 return;
             }
-            if (irSensorTrigger()) {
-                io.setPower(EndEffectorConstants.OuttakeCoralSpeed.get());
-                intakingCoral = false;
-                intakingAlgae = false;
-                outtakingCoral = true;
-            } else if (cameraTrigger()) {
+            if (cameraTrigger()) {
                 io.setPower(EndEffectorConstants.OuttakeAlageSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
                 outtakingAlgae = true;
+                return;
             }
+            io.setPower(EndEffectorConstants.OuttakeCoralSpeed.get());
+            intakingCoral = false;
+            intakingAlgae = false;
+            outtakingCoral = true;
         });
     }
 

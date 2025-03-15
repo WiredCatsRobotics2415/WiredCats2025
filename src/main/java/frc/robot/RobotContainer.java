@@ -12,10 +12,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
 import frc.commands.GenericAutomation;
 import frc.commands.GenericAutomation.AutomationMode;
@@ -30,7 +28,6 @@ import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.subsystems.arm.Arm;
-import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.drive.CommandSwerveDrivetrain.PoseEstimationType;
 import frc.subsystems.elevator.Elevator;
@@ -52,7 +49,6 @@ public class RobotContainer {
     private Elevator elevator = Elevator.getInstance();
     private SuperStructure superstructure = SuperStructure.getInstance();
     private EndEffector endEffector = EndEffector.getInstance();
-    private CoralIntake coralIntake = CoralIntake.getInstance();
     private LEDStrip ledStrip = LEDStrip.getInstance();
     private @Getter OI oi = OI.getInstance();
     private Vision vision = Vision.getInstance();
@@ -153,20 +149,19 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ManualArmBack)
             .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(1.0))));
 
-        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake()))
-            .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
+        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake()).onFalse(endEffector.turnOff());
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
-        //In case it should be A intakes coral, outtakes algae and B vice versa...
-        //Dealgae is button A:
+        oi.binds.get(OI.Bind.ManualIntake).onTrue(endEffector.toggleIntakeCoral());
+        // In case it should be A intakes coral, outtakes algae and B vice versa...
+        // Dealgae is button A:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeCoral().alongWith(coralIntake.toggleIntake()))
-        //     .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
-        //Shoot is button B:
+        // .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
+        // Shoot is button B:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
-        oi.binds.get(OI.Bind.StowPreset).onTrue(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()).alongWith(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
-            CommonCommands.stowNormally(), () -> endEffector.hasCoral()).ignoringDisable(true)));
-        oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
-            .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
+        oi.binds.get(OI.Bind.StowPreset).onTrue(CommonCommands.stowFromGroundIntake().ignoringDisable(true));
+        oi.binds.get(OI.Bind.IntakeFromGround)
+            .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
         oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
@@ -188,9 +183,9 @@ public class RobotContainer {
             }
         }));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
-            superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
-                .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
+        // oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
+        // superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
+        // .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(
             superstructure.beThereAsap(Presets.ProcessorScore).andThen(Commands.waitUntil(superstructure::allAtGoal)));
@@ -219,7 +214,7 @@ public class RobotContainer {
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
         new Trigger(endEffector::hasCoral)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
-        new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
+        // new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
     }
 
     public void periodic() {

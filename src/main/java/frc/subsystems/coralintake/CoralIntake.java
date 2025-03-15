@@ -7,10 +7,8 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
-import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.slapdown.GenericSlapdown;
 import frc.subsystems.slapdown.GenericSlapdownCharacterizer;
 import frc.subsystems.slapdown.GenericSlapdownIO;
@@ -48,13 +46,13 @@ public class CoralIntake extends GenericSlapdown {
         io = (GenericSlapdownIO) Util.getIOImplementation(GenericSlapdownIOReal.class, GenericSlapdownIOSim.class,
             new GenericSlapdownIO() {});
         pid.setTolerance(CoralIntakeConstants.BaseGoalTolerance);
-        io.configureHardware(CoralIntakeConstants.PivotMotorID, CoralIntakeConstants.IntakeMotorID,
-            CoralIntakeConstants.ThroughborePort, CoralIntakeConstants.ThroughboreMin,
-            CoralIntakeConstants.ThroughboreMax, true, -1);
-        io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
-            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle.angle(),
-            CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin,
-            CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
+        // io.configureHardware(CoralIntakeConstants.PivotMotorID, CoralIntakeConstants.IntakeMotorID,
+        // CoralIntakeConstants.ThroughborePort, CoralIntakeConstants.ThroughboreMin,
+        // CoralIntakeConstants.ThroughboreMax, true, -1);
+        // io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
+        // CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle.angle(),
+        // CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin,
+        // CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
 
         if (RuntimeConstants.TuningMode) {
             GenericSlapdownCharacterizer.createInstance(this, "CoralIntake", CoralIntakeConstants.GroundAngle,
@@ -90,16 +88,18 @@ public class CoralIntake extends GenericSlapdown {
 
     @Override
     // TODO: lastMeasuremnent
-    public Angle getPivotAngle() { return lastMeasurement; }
+    // public Angle getPivotAngle() { return lastMeasurement; }
+
+    public Angle getPivotAngle() { return Degrees.of(0); }
 
     @Override
     public Command toggleIntake() {
         return runOnce(() -> {
             if (!intaking) {
-                io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
+                // io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
                 intaking = true;
             } else {
-                io.setIntakePower(0);
+                // io.setIntakePower(0);
                 intaking = false;
             }
             outtaking = false;
@@ -110,10 +110,10 @@ public class CoralIntake extends GenericSlapdown {
     public Command toggleOuttake() {
         return runOnce(() -> {
             if (!outtaking) {
-                io.setIntakePower(CoralIntakeConstants.OuttakeSpeed.get());
+                // io.setIntakePower(CoralIntakeConstants.OuttakeSpeed.get());
                 outtaking = true;
             } else {
-                io.setIntakePower(0);
+                // io.setIntakePower(0);
                 outtaking = false;
             }
             intaking = false;
@@ -123,7 +123,7 @@ public class CoralIntake extends GenericSlapdown {
     @Override
     public Command turnOffRollers() {
         return runOnce(() -> {
-            io.setIntakePower(0);
+            // io.setIntakePower(0);
             intaking = false;
             outtaking = false;
         });
@@ -137,13 +137,13 @@ public class CoralIntake extends GenericSlapdown {
         double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
         double voltOut = output + feedforward;
 
-        io.setPivotVoltage(voltOut);
+        // io.setPivotVoltage(voltOut);
     }
 
     @Override
     public void periodic() {
-        io.updateInputs(inputs);
-        Logger.processInputs("CoralIntake", inputs);
+        // io.updateInputs(inputs);
+        // Logger.processInputs("CoralIntake", inputs);
 
         double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
             CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),

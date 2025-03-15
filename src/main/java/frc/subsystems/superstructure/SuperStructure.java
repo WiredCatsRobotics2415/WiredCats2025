@@ -157,8 +157,9 @@ public class SuperStructure extends SubsystemBase {
             armSwitchingToFrontSide = arm.getMeasurement().gte(ninetyDeg) && arm.getGoal().lt(ninetyDeg);
             armSwitchingToBackSide = arm.getMeasurement().lte(ninetyDeg) && arm.getGoal().gt(ninetyDeg);
 
-            lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().get(),
-                elevator.getMeasurement().in(Inches));
+            // lastElevatorTimePrediction = elevator.getPid().timeToGetTo(goal.getHeight().get(),
+            // elevator.getMeasurement().in(Inches));
+            lastElevatorTimePrediction = 0;
             isFreezingArm = false;
             timeTaken.start();
             System.out.println("Superstructure beThereIn - front switch: " + armSwitchingToFrontSide + ", back switch: "
@@ -182,7 +183,7 @@ public class SuperStructure extends SubsystemBase {
 
     public boolean allAtGoal() {
         System.out.println("elevator: " + elevator.atGoal() + " | arm: " + arm.atGoal());
-        return elevator.atGoal() && arm.atGoal() && coralIntake.pivotAtGoal();
+        return elevator.atGoal() && arm.atGoal();
     }
 
     private void updateCurrentStateCollisions() {
@@ -212,20 +213,17 @@ public class SuperStructure extends SubsystemBase {
         boolean[] collisions = new boolean[2];
 
         double height = elevator.in(Inches);
-        carriagePoint.set(4.5 - height * Trig.sizzle(elevatorTilt),
-            height * Trig.cosizzle(elevatorTilt) + 1.64);
+        carriagePoint.set(4.5 - height * Trig.sizzle(elevatorTilt), height * Trig.cosizzle(elevatorTilt) + 1.64);
         double armAngle = -arm.in(Radians) + Units.degreesToRadians(90) - elevatorTilt;
         endEffector.set(carriagePoint.x() - Trig.sizzle(armAngle) * eeLength,
             carriagePoint.y() + Trig.cosizzle(armAngle) * eeLength);
         // System.out.println(" endEffector: " + endEffector);
 
         if (arm.gt(ninetyDeg)) { // Test for coral intake
-            eeBottomTip.set(endEffector.x() + Trig.cosizzle(armAngle) * 3,
-                endEffector.y() + Trig.sizzle(armAngle) * 3);
+            eeBottomTip.set(endEffector.x() + Trig.cosizzle(armAngle) * 3, endEffector.y() + Trig.sizzle(armAngle) * 3);
             collisions[0] = eeBottomTip.x() < 18 && eeBottomTip.y() < 0;
 
-            cIntakeEnd.set(10.4 + Trig.cosizzle(cIntake) * cIntakeLength,
-                0.5 + Trig.sizzle(cIntake) * cIntakeLength);
+            cIntakeEnd.set(10.4 + Trig.cosizzle(cIntake) * cIntakeLength, 0.5 + Trig.sizzle(cIntake) * cIntakeLength);
 
             double lineResult = ((eeBottomTip.y() - carriagePoint.y()) / (eeBottomTip.x() - carriagePoint.x())) *
                 (cIntakeEnd.x() - carriagePoint.x()) + carriagePoint.y();
@@ -234,8 +232,7 @@ public class SuperStructure extends SubsystemBase {
             // System.out.println(" carriagePoint: " + carriagePoint);
             collisions[1] = lineResult < cIntakeEnd.y() && eeBottomTip.x() > cIntakeEnd.x();
         } else {
-            eeTopTip.set(
-                carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
+            eeTopTip.set(carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
                 carriagePoint.y() + Trig.cosizzle(armAngle) * 13 - 15.5 * Trig.sizzle(armAngle + elevatorTilt));
             collisions[0] = eeTopTip.x() > -18 && eeTopTip.y() < 0;
 
@@ -276,8 +273,8 @@ public class SuperStructure extends SubsystemBase {
             if (elevator.getPid().goalError() < 0) {
                 if (!armWillCollideWithDrivebase) {
                     // If elevator wants to move down and it won't collide the arm with the drivebase, then move
-                    elevator.getPid().setConstraints(
-                        new Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()));
+                    elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
+                        ElevatorConstants.BaseAccelerationMax.get()));
                     // System.out.println("elevator wants to move down and can");
                 } else {
                     // Stop elevator so the arm can get out of the way
@@ -290,15 +287,16 @@ public class SuperStructure extends SubsystemBase {
                     armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
                         || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
                 }
-                freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
-                    && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
-                    && EndEffector.getInstance().hasCoral();
+                // freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
+                // && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
+                // && EndEffector.getInstance().hasCoral();
+                freezeArmFromCoralContainment = false;
                 // if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
-                // System.out.println("can move? " + elevatorCanMove + " | target side? " + armOnTargetSide);
-                if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
+                System.out.println("can move? " + elevatorCanMove + " | target side? " + armOnTargetSide);
+                if (elevatorCanMove && armOnTargetSide) {
                     // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
-                    elevator.getPid().setConstraints(
-                        new Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()));
+                    elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
+                        ElevatorConstants.BaseAccelerationMax.get()));
                 } else {
                     elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
                 }
@@ -316,7 +314,8 @@ public class SuperStructure extends SubsystemBase {
         if (!coralIntake.pivotAtGoal()) {
             if (coralIntake.getPid().goalError() > 0) {
                 if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
-                    coralIntake.getPid().setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax.get()));
+                    coralIntake.getPid()
+                        .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax.get()));
                 } else {
                     coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax.get(),
                         CoralIntakeConstants.BaseAccelerationMax.get()));

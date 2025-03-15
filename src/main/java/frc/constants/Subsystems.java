@@ -101,24 +101,24 @@ public class Subsystems {
         public static final int LeftMotorID = 9; // (2/14): this is Elevator1
         public static final int RightMotorID = 10; // (2/14): this is Elevator2
 
-        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0.405d, "Elevator/PotMinVolt");
-        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(1.951d, "Elevator/PotMaxVolt");
+        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0.372d, "Elevator/PotMinVolt");
+        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(1.981d, "Elevator/PotMaxVolt");
         public static final TuneableNumber MinHeight = new TuneableNumber(Inches.of(0.0d), "Elevator/MinHeight");
-        public static final TuneableNumber MaxHeight = new TuneableNumber(Inches.of(72.0d), "Elevator/MaxHeight");
+        public static final TuneableNumber MaxHeight = new TuneableNumber(Inches.of(78.0d), "Elevator/MaxHeight");
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
-        public static final double kS = 0.45;
-        public static final double kG = 0.2;
+        public static final double kS = 0.3;
+        public static final double kG = 0.6;
         public static final double kV = 0.001;
         public static final double kA = 0.001;
-        public static final double kP = 0.4;
-        public static final double kD = 0.02;
+        public static final double kP = 0.5;
+        public static final double kD = 0.06;
 
-        public static final TuneableNumber kGForArm = new TuneableNumber(0.2 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
+        public static final TuneableNumber kGForArm = new TuneableNumber(0.1, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(39.5d, "Elevator/BaseVelocityMax");
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(79d, "Elevator/BaseAccelMax");
-        public static final double BaseGoalTolerance = .5d;
+        public static final double BaseGoalTolerance = 3d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
         public static final Distance BaseHeight = Inches.of(25.75 + 0.5833333333);
@@ -143,11 +143,11 @@ public class Subsystems {
         public static final double kV = 0.004;
         public static final double kA = 0.002;
         public static final double kP = 0.05;
-        public static final double kD = 0.02;
+        public static final double kD = 0.005;
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");; // (2/18) copied from akit2024
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "Arm/BaseAccelMax");; // (2/18) copied from akit2024
-        public static final double GoalTolerance = 3;
+        public static final double GoalTolerance = 6;
 
         public static final double ApproximateMassKg = 1.814;
         public static final float RotorToArmGearRatio = 25 / 1; // Planetaries amount unknown as of 3/5
@@ -158,11 +158,11 @@ public class Subsystems {
         public static final int MotorID = 12;
         public static final int IRSensorPort = NavxMXPPorts.Analog3;
 
-        public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(0.6, "EndEffector/IntakeCoralSpeed");
-        public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(-0.8, "EndEffector/IntakeAlgaeSpeed");
-        public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(-0.35,
+        public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(-0.3, "EndEffector/IntakeCoralSpeed");
+        public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeSpeed");
+        public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(0.35,
             "EndEffector/OuttakeCoralSpeed");
-        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(0.35,
+        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(-0.35,
             "EndEffector/OuttakeAlageSpeed");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024

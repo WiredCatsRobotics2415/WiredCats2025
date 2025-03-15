@@ -14,7 +14,8 @@ import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableElevatorFF;
-import frc.utils.tuning.TuneableProfiledPIDController;
+import frc.utils.tuning.TuneableNumber;
+import frc.utils.tuning.TuneablePIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -28,10 +29,11 @@ public class Elevator extends SubsystemBase {
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
-    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
-        ElevatorConstants.kD,
-        new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()),
-        "ElevatorPID");
+    @Getter private TuneablePIDController pid = new TuneablePIDController(ElevatorConstants.kP, 0.0d,
+        ElevatorConstants.kD, "ElevatorPID");
+
+    private TuneableNumber downThreshold = new TuneableNumber(3, "Elevator/downThreshold");
+    private TuneableNumber downPower = new TuneableNumber(0.1, "Elevator/downPower");
 
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -68,11 +70,11 @@ public class Elevator extends SubsystemBase {
         if (setGoal.gt(ElevatorConstants.MaxHeight.distance()) || setGoal.lt(ElevatorConstants.MinHeight.distance()))
             return;
         this.goal = setGoal;
-        pid.setGoal(setGoal.in(Inches));
+        pid.setSetpoint(setGoal.in(Inches));
     }
 
     public boolean atGoal() {
-        return pid.atGoal();
+        return pid.atSetpoint();
     }
 
     public Distance getMeasurement() { return lastMeasurement; }
@@ -81,6 +83,7 @@ public class Elevator extends SubsystemBase {
         double feedforward = ff.calculate(setpoint.velocity);
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
+
         io.setVoltage(voltOut);
     }
 
@@ -96,10 +99,10 @@ public class Elevator extends SubsystemBase {
         lastMeasurement = Inches.of(measurementInches);
 
         if (!hasResetPidController) {
-            pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));
+            // pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));
             hasResetPidController = true;
         }
-        useOutput(pid.calculate(measurementInches), pid.getSetpoint());
+        useOutput(pid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
 
         Logger.recordOutput("Elevator/Actual", measurementInches);
         Logger.recordOutput("Elevator/Goal", goal);

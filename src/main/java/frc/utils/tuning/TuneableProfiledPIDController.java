@@ -39,14 +39,18 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
     @Override
     public void setConstraints(Constraints constraints) {
         super.setConstraints(constraints);
-        this.veloMax.set(constraints.maxVelocity);
-        this.accelMax.set(constraints.maxAcceleration);
+        if (RuntimeConstants.TuningMode) {
+            this.veloMax.set(constraints.maxVelocity);
+            this.accelMax.set(constraints.maxAcceleration);
+        }
     }
 
     @Override
     public void setTolerance(double positionTolerance) {
         super.setTolerance(positionTolerance);
-        this.tolerance.set(positionTolerance);
+        if (RuntimeConstants.TuningMode) {
+            this.tolerance.set(positionTolerance);
+        }
     }
 
     /**
