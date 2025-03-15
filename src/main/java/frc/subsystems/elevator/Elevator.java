@@ -30,7 +30,7 @@ public class Elevator extends SubsystemBase {
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
     @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
         ElevatorConstants.kD,
-        new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax),
+        new TrapezoidProfile.Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()),
         "ElevatorPID");
 
     @Getter private ElevatorIO io;

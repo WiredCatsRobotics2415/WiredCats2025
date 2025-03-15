@@ -116,8 +116,8 @@ public class Subsystems {
 
         public static final TuneableNumber kGForArm = new TuneableNumber(0.2 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
 
-        public static final double BaseVelocityMax = 39.5d;
-        public static final double BaseAccelerationMax = 79d;
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(39.5d, "Elevator/BaseVelocityMax");
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(79d, "Elevator/BaseAccelMax");
         public static final double BaseGoalTolerance = .5d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
@@ -145,8 +145,8 @@ public class Subsystems {
         public static final double kP = 0.05;
         public static final double kD = 0.02;
 
-        public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
-        public static final double BaseAccelerationMax = 360; // (2/18) copied from akit2024
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");; // (2/18) copied from akit2024
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "Arm/BaseAccelMax");; // (2/18) copied from akit2024
         public static final Angle GoalTolerance = Degrees.of(3);
 
         public static final double ApproximateMassKg = 1.814;
@@ -199,8 +199,8 @@ public class Subsystems {
 
         public static final double BaseGoalTolerance = 1;
 
-        public static final double BaseVelocityMax = 180;
-        public static final double BaseAccelerationMax = 360;
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "CoralIntake/BaseVelocityMax");;
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "CoralIntake/BaseAccelMax");;
 
         public static final TuneableNumber IntakeSpeed = new TuneableNumber(0.6, "CoralIntake/IntakeSpeed");
         public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");

@@ -271,11 +271,11 @@ public class SuperStructure extends SubsystemBase {
                 if (!armWillCollideWithDrivebase) {
                     // If elevator wants to move down and it won't collide the arm with the drivebase, then move
                     elevator.getPid().setConstraints(
-                        new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
+                        new Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()));
                     // System.out.println("elevator wants to move down and can");
                 } else {
                     // Stop elevator so the arm can get out of the way
-                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
+                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
                     // System.out.println("elevator wants to move down and CAN'T");
                 }
             } else {
@@ -292,9 +292,9 @@ public class SuperStructure extends SubsystemBase {
                 if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
                     // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
                     elevator.getPid().setConstraints(
-                        new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
+                        new Constraints(ElevatorConstants.BaseVelocityMax.get(), ElevatorConstants.BaseAccelerationMax.get()));
                 } else {
-                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
+                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
                 }
 
                 // if we have an algae, we have to switch sides AND the elevator is too low
@@ -310,10 +310,10 @@ public class SuperStructure extends SubsystemBase {
         if (!coralIntake.pivotAtGoal()) {
             if (coralIntake.getPid().goalError() > 0) {
                 if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
-                    coralIntake.getPid().setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax));
+                    coralIntake.getPid().setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax.get()));
                 } else {
-                    coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax,
-                        CoralIntakeConstants.BaseAccelerationMax));
+                    coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax.get(),
+                        CoralIntakeConstants.BaseAccelerationMax.get()));
                 }
             } else { // if it wants to go down, we need to make sure the arm wont hit it
                 if (armWillCollideWithCoralIntake) {
@@ -338,16 +338,16 @@ public class SuperStructure extends SubsystemBase {
 
         if (!isFreezingArm) {
             // when elevator measurement is high, arm max accel should be % of its base max
-            double maxArmAcceleration = ArmConstants.BaseAccelerationMax -
+            double maxArmAcceleration = ArmConstants.BaseAccelerationMax.get() -
                 ((elevator.getMeasurement().in(Inches) / ElevatorConstants.MaxHeight.get()) *
-                    (1 - percentOfArmAccel.get()) * ArmConstants.BaseAccelerationMax);
+                    (1 - percentOfArmAccel.get()) * ArmConstants.BaseAccelerationMax.get());
 
-            double maxArmVelocity = ArmConstants.BaseVelocityMax -
+            double maxArmVelocity = ArmConstants.BaseVelocityMax.get() -
                 (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight.get()) *
-                    (1 - percentOfArmVelo.get()) * ArmConstants.BaseVelocityMax);
+                    (1 - percentOfArmVelo.get()) * ArmConstants.BaseVelocityMax.get());
             arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
         } else {
-            arm.getPid().setConstraints(new Constraints(0, ArmConstants.BaseAccelerationMax));
+            arm.getPid().setConstraints(new Constraints(0, ArmConstants.BaseAccelerationMax.get()));
         }
     }
 }

@@ -33,7 +33,7 @@ public class Arm extends SubsystemBase {
         "ArmFF");
     @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ArmConstants.kP, 0.0d,
         ArmConstants.kD,
-        new TrapezoidProfile.Constraints(ArmConstants.BaseVelocityMax, ArmConstants.BaseAccelerationMax), "ArmPID");
+        new TrapezoidProfile.Constraints(ArmConstants.BaseVelocityMax.get(), ArmConstants.BaseAccelerationMax.get()), "ArmPID");
 
     @Getter private ArmIO io;
     private ArmIOInputsAutoLogged inputs = new ArmIOInputsAutoLogged();

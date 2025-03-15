@@ -34,7 +34,7 @@ public class CoralIntake extends GenericSlapdown {
         CoralIntakeConstants.kV, CoralIntakeConstants.kA, "CoralIntakeFF");
     @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(CoralIntakeConstants.kP, 0,
         CoralIntakeConstants.kD,
-        new Constraints(CoralIntakeConstants.BaseVelocityMax, CoralIntakeConstants.BaseAccelerationMax),
+        new Constraints(CoralIntakeConstants.BaseVelocityMax.get(), CoralIntakeConstants.BaseAccelerationMax.get()),
         "CoralIntakePID");
 
     @Getter private Angle goal = Degrees.of(0.0);

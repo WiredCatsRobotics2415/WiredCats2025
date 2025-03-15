@@ -60,18 +60,18 @@ public class Dealgae extends GenericAutomation {
                 driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
                 driveCommand.schedule();
 
-            double timeTo = drive.maxTimeToGetToPose(driveToPose);
-            superStructureCommand = superStructure.beThereInNoEnd(timeTo,
-                algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
-            System.out.println("Dealgae time to: " + timeTo);
+                double timeTo = drive.maxTimeToGetToPose(driveToPose);
+                superStructureCommand = superStructure.beThereInNoEnd(timeTo,
+                    algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+                System.out.println("Dealgae time to: " + timeTo);
 
                 focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
                     apriltagPoseAndId.getSecond());
                 focusCommand.schedule();
             } else {
                 superStructureCommand = superStructure
-                    
-                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+
+                    .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
             }
             System.out.println("Auto selected top: " + algaeOnTop);
         } else {
