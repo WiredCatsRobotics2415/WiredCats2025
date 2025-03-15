@@ -19,6 +19,9 @@ public class Dealgae extends GenericAutomation {
         Rotation2d.kZero);
     private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "DeAlgae/DriveTolerance");
 
+    boolean autoSelectDealgae = true;
+    boolean manualSelectGettingTop = true;
+
     private boolean algaeOnTopForPose(Pose2d apriltagPose) {
         if (AllianceDependent.isCurrentlyBlue()) {
             return ReefMeasurements.ReefAlgaeOnTopAlphabeticOrder
@@ -29,41 +32,56 @@ public class Dealgae extends GenericAutomation {
         }
     }
 
+    public Dealgae() {
+        autoSelectDealgae = true;
+    }
+
+    /**
+     * Manually select whether to dealgae top or bottom. Disables driveTo.
+     */
+    public Dealgae(boolean dealgaeTop) {
+        autoSelectDealgae = false;
+        manualSelectGettingTop = dealgaeTop;
+    }
+
     @Override
     public void initialize() {
-        Pair<Pose2d, Integer> apriltagPoseAndId = this.findNearestApriltag(ReefMeasurements.reefApriltagsAlphabetic,
-            ReefMeasurements.reefRedApriltags, ReefMeasurements.reefBlueApriltags, ReefMeasurements.reefIds,
-            LimelightsForElements.Reef);
-        boolean algaeOnTop = algaeOnTopForPose(apriltagPoseAndId.getFirst());
+        if (autoSelectDealgae) {
+            Pair<Pose2d, Integer> apriltagPoseAndId = this.findNearestApriltag(ReefMeasurements.reefApriltagsAlphabetic,
+                ReefMeasurements.reefRedApriltags, ReefMeasurements.reefBlueApriltags, ReefMeasurements.reefIds,
+                LimelightsForElements.Reef);
+            boolean algaeOnTop = algaeOnTopForPose(apriltagPoseAndId.getFirst());
 
-        if (GenericAutomation.getCurrentAutomationMode() == AutomationMode.PresetAndAlign) {
-            Pose2d driveToPose = apriltagPoseAndId.getFirst().plus(Offset)
-                .plus(new Transform2d(
-                    algaeOnTop ? Presets.TopDADriveOffset.meters() : Presets.BottomDADriveOffset.meters(), 0,
-                    Rotation2d.kZero));
-            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
-            driveCommand.schedule();
+            if (GenericAutomation.getCurrentAutomationMode() == AutomationMode.PresetAndAlign) {
+                Pose2d driveToPose = apriltagPoseAndId.getFirst().plus(Offset)
+                    .plus(new Transform2d(
+                        algaeOnTop ? Presets.TopDADriveOffset.meters() : Presets.BottomDADriveOffset.meters(), 0,
+                        Rotation2d.kZero));
+                driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
+                driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveToPose);
             superStructureCommand = superStructure.beThereInNoEnd(timeTo,
                 algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
             System.out.println("Dealgae time to: " + timeTo);
 
-            focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
-                apriltagPoseAndId.getSecond());
-            focusCommand.schedule();
+                focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
+                    apriltagPoseAndId.getSecond());
+                focusCommand.schedule();
+            } else {
+                superStructureCommand = superStructure
+                    
+                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+            }
+            System.out.println("Auto selected top: " + algaeOnTop);
         } else {
             superStructureCommand = superStructure
-                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+                .beThereAsapNoEnd(manualSelectGettingTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+            System.out.println("Manual selected top: " + manualSelectGettingTop);
         }
         superStructureCommand.schedule();
 
         RobotStatus.setRobotState(RobotState.AligningToDeAlgae);
-    }
-
-    @Override
-    public void execute() {
-        if (driveCommand != null) System.out.println(driveCommand.isFinished());
     }
 
     @Override

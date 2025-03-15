@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkBoolean;
 
 public class TuneableBoolean {
     private static ArrayList<TuneableBoolean> all = new ArrayList<TuneableBoolean>();
+    private static int indexToUpdate = 0;
 
     private LoggedNetworkBoolean thisNetworkBoolean;
     private boolean previousValue;
@@ -45,8 +46,10 @@ public class TuneableBoolean {
     }
 
     public static void periodic() {
-        for (TuneableBoolean bool : all) {
-            bool.updateFromNT();
+        all.get(indexToUpdate).updateFromNT();
+        indexToUpdate += 1;
+        if (indexToUpdate == all.size()) {
+            indexToUpdate = 0;
         }
     }
 }

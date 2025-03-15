@@ -48,11 +48,6 @@ public class IntakeFromHPS extends GenericAutomation {
     }
 
     @Override
-    public void execute() {
-        if (driveCommand != null) System.out.println(driveCommand.isFinished());
-    }
-
-    @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
         RobotStatus.setRobotState(RobotState.WaitingForCoralAtHPS);

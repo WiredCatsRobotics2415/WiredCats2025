@@ -72,20 +72,20 @@ public class Controls {
             Degrees.of(-15), "Level2");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(-4.05, "Presets/L2Offset");
 
-        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(50),
-            Degrees.of(-15), "Level3");
-        public static final TuneableNumber Level3DriveOffset = new TuneableNumber(-5.35, "Presets/L3Offset");
+        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(41),
+            Degrees.of(-12.5), "Level3");
+        public static final TuneableNumber Level3DriveOffset = new TuneableNumber(-5, "Presets/L3Offset");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(75),
-            Degrees.of(-15), "Level4");
-        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(-6.65, "Presets/L4Offset");
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(68),
+            Degrees.of(-20), "Level4");
+        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(-5.5, "Presets/L4Offset");
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(16),
             Degrees.of(0), "BottomDeAlgae");
         public static final TuneableNumber BottomDADriveOffset = new TuneableNumber(-6, "Presets/BottomDADriveOffset");
 
-        public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(32),
-            Degrees.of(0), "TopDeAlgae");
+        public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(49),
+            Degrees.of(-2.5d), "TopDeAlgae");
         public static final TuneableNumber TopDADriveOffset = new TuneableNumber(-6, "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(26),

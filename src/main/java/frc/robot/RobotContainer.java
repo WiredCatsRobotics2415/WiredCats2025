@@ -153,7 +153,8 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ManualArmBack)
             .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(1.0))));
 
-        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake());
+        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake()))
+            .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),

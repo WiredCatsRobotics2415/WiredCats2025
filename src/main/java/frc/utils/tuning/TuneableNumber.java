@@ -13,6 +13,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class TuneableNumber {
     private static ArrayList<TuneableNumber> all = new ArrayList<TuneableNumber>();
+    private static int indexToUpdate = 0;
 
     private LoggedNetworkNumber thisNetworkNumber;
     private double previousNumber;
@@ -96,8 +97,10 @@ public class TuneableNumber {
     }
 
     public static void periodic() {
-        for (TuneableNumber number : all) {
-            number.updateFromNT();
+        all.get(indexToUpdate).updateFromNT();
+        indexToUpdate += 1;
+        if (indexToUpdate == all.size()) {
+            indexToUpdate = 0;
         }
     }
 }
