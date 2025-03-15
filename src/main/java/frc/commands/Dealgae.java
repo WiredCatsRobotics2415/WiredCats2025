@@ -45,7 +45,7 @@ public class Dealgae extends GenericAutomation {
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveToPose);
-            superStructureCommand = superStructure.beThereIn(timeTo,
+            superStructureCommand = superStructure.beThereInNoEnd(timeTo,
                 algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
             System.out.println("Dealgae time to: " + timeTo);
 
@@ -53,7 +53,8 @@ public class Dealgae extends GenericAutomation {
                 apriltagPoseAndId.getSecond());
             focusCommand.schedule();
         } else {
-            superStructureCommand = superStructure.beThereAsap(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+            superStructureCommand = superStructure
+                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
         }
         superStructureCommand.schedule();
 

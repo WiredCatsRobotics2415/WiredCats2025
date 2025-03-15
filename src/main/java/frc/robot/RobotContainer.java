@@ -196,9 +196,9 @@ public class RobotContainer {
             return arm.getMeasurement().in(Degrees) > 90.0d;
         }).onTrue(new InstantCommand(() -> {
             vision.setEndEffectorStreamOrientation(true);
-        })).onFalse(new InstantCommand(() -> {
+        }).ignoringDisable(true)).onFalse(new InstantCommand(() -> {
             vision.setEndEffectorStreamOrientation(false);
-        }));
+        }).ignoringDisable(true));
 
         // Flash the leds when a coral is scored
         // new Trigger(() -> {

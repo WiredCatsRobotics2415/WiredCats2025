@@ -35,6 +35,7 @@ public class AutoIntake extends Command {
 
     @Override
     public void initialize() {
+        System.out.println("autointaking!");
         hasSeenCoral = false;
         driveHeading.HeadingController = new PhoenixPIDController(0.5, 0, 0.3);
         driveHeading.HeadingController.enableContinuousInput(-Math.PI, Math.PI);

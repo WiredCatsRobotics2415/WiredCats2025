@@ -32,14 +32,14 @@ public class IntakeFromHPS extends GenericAutomation {
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveToPose);
-            superStructureCommand = superStructure.beThereIn(timeTo, Presets.IntakeFromHPS);
+            superStructureCommand = superStructure.beThereInNoEnd(timeTo, Presets.IntakeFromHPS);
             System.out.println("HPS time to: " + timeTo);
 
             focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.HumanPlayerStation,
                 apriltagPoseAndId.getSecond());
             focusCommand.schedule();
         } else {
-            superStructureCommand = superStructure.beThereAsap(Presets.IntakeFromHPS);
+            superStructureCommand = superStructure.beThereAsapNoEnd(Presets.IntakeFromHPS);
         }
         superStructureCommand.schedule();
         EndEffector.getInstance().intakeAndWaitForCoral().schedule();

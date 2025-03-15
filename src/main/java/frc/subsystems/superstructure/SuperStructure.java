@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.RobotMeasurements;
@@ -54,6 +55,9 @@ public class SuperStructure extends SubsystemBase {
     private double eeLength = EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
+    private Timer timeTaken = new Timer();
+    private double secondsToBeThereIn;
+
     private Angle ninetyDeg = Degrees.of(90); // Cache to avoid making more objects
     private Angle oneEightyDeg = Degrees.of(180);
 
@@ -87,16 +91,16 @@ public class SuperStructure extends SubsystemBase {
             TuningModeTab.getInstance().addDoubleSupplier("last EE height", () -> lastEEHeight);
             TuningModeTab.getInstance().addDoubleSupplier("last EE distance", () -> lastEEDistanceFromElevator);
             if (stowCommandIsDefault.get()) {
-                setDefaultCommand(beThereAsap(Presets.Stow));
+                setDefaultCommand(beThereAsapNoEnd(Presets.Stow));
             }
             stowCommandIsDefault.addListener((Boolean enable) -> {
                 if (enable)
-                    setDefaultCommand(beThereAsap(Presets.Stow));
+                    setDefaultCommand(beThereAsapNoEnd(Presets.Stow));
                 else
                     this.removeDefaultCommand();
             });
         } else {
-            setDefaultCommand(beThereAsap(Presets.Stow));
+            setDefaultCommand(beThereAsapNoEnd(Presets.Stow));
         }
     }
 
@@ -132,14 +136,14 @@ public class SuperStructure extends SubsystemBase {
     }
 
     /**
-     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command does not finish, meaning the superstructure will stay here until you start a new command or interrupt this one. If you are using this in a composition and want to see when it finishes, use ::allAtGoal.
+     * Immediately sets all superstructure mechanism goals, and moves all mechanisms such that the risk of tipping the drivebase is minimized (ie. elevator moves last). This command is a "set it and forget it". if you want to wait until the superstructure is done: thisCommand.andThen(Commands.waitUntil(superstructure:allAtGoal))
      */
     public Command beThereIn(double secondsToBeThereIn, TuneableSuperStructureState goal) {
-        Timer timeTaken = new Timer();
         Command command = runOnce(() -> {
             timeTaken.stop();
             timeTaken.reset();
 
+            System.out.println("e goal: " + goal.getHeight().distance().in(Inches));
             elevator.setGoal(goal.getHeight().distance());
             arm.setGoal(goal.getArm().angle());
             coralIntake.setPivotGoal(goal.getCoralIntake().angle());
@@ -153,93 +157,26 @@ public class SuperStructure extends SubsystemBase {
             timeTaken.start();
             System.out.println("Superstructure beThereIn - front switch: " + armSwitchingToFrontSide + ", back switch: "
                 + armSwitchingToBackSide + ", elevator time prediction: " + lastElevatorTimePrediction);
-        }).andThen(run(() -> {
-            boolean freezeArmFromAlgaeContainmentElevation = false;
-            boolean freezeArmFromCoralContainment = false;
-            boolean armOnTargetSide = true;
-
-            if (!elevator.atGoal()) {
-                if (elevator.getPid().goalError() < 0) {
-                    if (!armWillCollideWithDrivebase) {
-                        // If elevator wants to move down and it won't collide the arm with the drivebase, then move
-                        elevator.getPid().setConstraints(
-                            new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
-                        System.out.println("elevator wants to move down and can");
-                    } else {
-                        // Stop elevator so the arm can get out of the way
-                        elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
-                        System.out.println("elevator wants to move down and CAN'T");
-                    }
-                } else {
-                    boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
-                    if (armSwitchingToFrontSide || armSwitchingToBackSide) {
-                        armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
-                            || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
-                    }
-                    freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
-                        && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
-                        && EndEffector.getInstance().hasCoral();
-                    if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
-                    if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
-                        // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
-                        elevator.getPid().setConstraints(
-                            new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
-                    } else {
-                        elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
-                    }
-
-                    // if we have an algae, we have to switch sides AND the elevator is too low
-                    if (EndEffector.getInstance().hasAlgae() && !armOnTargetSide
-                        && elevator.getMeasurement().gt(algaeArmPivotElevatorHeight.distance())) {
-                        freezeArmFromAlgaeContainmentElevation = true;
-                    } else {
-                        freezeArmFromAlgaeContainmentElevation = false;
-                    }
-                }
-            }
-
-            if (!coralIntake.pivotAtGoal()) {
-                if (coralIntake.getPid().goalError() > 0) {
-                    if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
-                        coralIntake.getPid()
-                            .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax));
-                    } else {
-                        coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax,
-                            CoralIntakeConstants.BaseAccelerationMax));
-                    }
-                } else { // if it wants to go down, we need to make sure the arm wont hit it
-                    if (armWillCollideWithCoralIntake) {
-                        isFreezingArm = true;
-                    } else {
-                        isFreezingArm = false;
-                    }
-                }
-            } else {
-                isFreezingArm = false;
-            }
-
-            if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
-            if (freezeArmFromCoralContainment && !freezingArmFromCoralContainmentDebounce) {
-                isFreezingArm = true;
-                freezingArmFromCoralContainmentDebounce = true;
-            }
-            if (!freezeArmFromCoralContainment && freezingArmFromCoralContainmentDebounce) {
-                isFreezingArm = false;
-                freezingArmFromCoralContainmentDebounce = false;
-            }
-        }));
+        });
         command.addRequirements(elevator, arm, coralIntake);
         return command;
     }
 
     public Command beThereAsap(TuneableSuperStructureState goal) {
-        return beThereIn(0, goal);
+        return beThereIn(0, goal).andThen(Commands.waitSeconds(0.04));
+    }
+
+    public Command beThereInNoEnd(double secondsToBeThereIn, TuneableSuperStructureState goal) {
+        return beThereIn(secondsToBeThereIn, goal).andThen(Commands.idle(this));
+    }
+
+    public Command beThereAsapNoEnd(TuneableSuperStructureState goal) {
+        return beThereAsap(goal).andThen(Commands.idle(this));
     }
 
     public boolean allAtGoal() {
         System.out.println("elevator: " + elevator.atGoal() + " | arm: " + arm.atGoal());
-        return elevator.atGoal() && arm.atGoal();
-        // TODO: when coral intake is in: return elevator.atGoal() && arm.atGoal() && coralIntake.pivotAtGoal();
+        return elevator.atGoal() && arm.atGoal() && coralIntake.pivotAtGoal();
     }
 
     private void updateCurrentStateCollisions() {
@@ -324,6 +261,80 @@ public class SuperStructure extends SubsystemBase {
     @Override
     public void periodic() {
         updateCurrentStateCollisions();
+
+        boolean freezeArmFromAlgaeContainmentElevation = false;
+        boolean freezeArmFromCoralContainment = false;
+        boolean armOnTargetSide = true;
+
+        if (!elevator.atGoal()) {
+            if (elevator.getPid().goalError() < 0) {
+                if (!armWillCollideWithDrivebase) {
+                    // If elevator wants to move down and it won't collide the arm with the drivebase, then move
+                    elevator.getPid().setConstraints(
+                        new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
+                    // System.out.println("elevator wants to move down and can");
+                } else {
+                    // Stop elevator so the arm can get out of the way
+                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
+                    // System.out.println("elevator wants to move down and CAN'T");
+                }
+            } else {
+                boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
+                if (armSwitchingToFrontSide || armSwitchingToBackSide) {
+                    armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
+                        || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
+                }
+                freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
+                    && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
+                    && EndEffector.getInstance().hasCoral();
+                // if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
+                // System.out.println("can move? " + elevatorCanMove + " | target side? " + armOnTargetSide);
+                if (elevatorCanMove && (armOnTargetSide || freezeArmFromCoralContainment)) {
+                    // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
+                    elevator.getPid().setConstraints(
+                        new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseAccelerationMax));
+                } else {
+                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax));
+                }
+
+                // if we have an algae, we have to switch sides AND the elevator is too low
+                if (EndEffector.getInstance().hasAlgae() && !armOnTargetSide
+                    && elevator.getMeasurement().gt(algaeArmPivotElevatorHeight.distance())) {
+                    freezeArmFromAlgaeContainmentElevation = true;
+                } else {
+                    freezeArmFromAlgaeContainmentElevation = false;
+                }
+            }
+        }
+
+        if (!coralIntake.pivotAtGoal()) {
+            if (coralIntake.getPid().goalError() > 0) {
+                if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
+                    coralIntake.getPid().setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax));
+                } else {
+                    coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax,
+                        CoralIntakeConstants.BaseAccelerationMax));
+                }
+            } else { // if it wants to go down, we need to make sure the arm wont hit it
+                if (armWillCollideWithCoralIntake) {
+                    isFreezingArm = true;
+                } else {
+                    isFreezingArm = false;
+                }
+            }
+        } else {
+            isFreezingArm = false;
+        }
+
+        if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
+        if (freezeArmFromCoralContainment && !freezingArmFromCoralContainmentDebounce) {
+            isFreezingArm = true;
+            freezingArmFromCoralContainmentDebounce = true;
+        }
+        if (!freezeArmFromCoralContainment && freezingArmFromCoralContainmentDebounce) {
+            isFreezingArm = false;
+            freezingArmFromCoralContainmentDebounce = false;
+        }
 
         if (!isFreezingArm) {
             // when elevator measurement is high, arm max accel should be % of its base max

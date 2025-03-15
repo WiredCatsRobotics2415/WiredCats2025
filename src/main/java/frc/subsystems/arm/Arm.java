@@ -12,6 +12,7 @@ import frc.constants.Subsystems.ArmConstants;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
+import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableArmFF;
@@ -143,9 +144,11 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        double measurementDegrees = inputs.throughborePosition *
-            (ArmConstants.MaxDegreesBack.angle().in(Degrees) - ArmConstants.MinDegreesFront.angle().in(Degrees)) +
-            ArmConstants.MinDegreesFront.angle().in(Degrees);
+        double newTBorPos = inputs.throughborePosition;
+        if (inputs.throughborePosition > 0 && inputs.throughborePosition < 0.132) {
+            newTBorPos += 1;
+        }
+        double measurementDegrees = Algebra.linearMap(newTBorPos, 1.13, 0.456, -30, 210);
         differentiableMeasurementDegrees.update(measurementDegrees);
         lastMeasurement = Degrees.of(measurementDegrees);
 

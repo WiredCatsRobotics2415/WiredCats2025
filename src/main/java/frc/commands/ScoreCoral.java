@@ -76,14 +76,14 @@ public class ScoreCoral extends GenericAutomation {
             driveCommand.schedule();
 
             double timeTo = drive.maxTimeToGetToPose(driveTo);
-            superStructureCommand = superStructure.beThereIn(timeTo, superStructureState);
+            superStructureCommand = superStructure.beThereInNoEnd(timeTo, superStructureState);
             System.out.println("Score coral time to: " + timeTo);
 
             focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
                 apriltagPoseAndId.getSecond());
             focusCommand.schedule();
         } else {
-            superStructureCommand = superStructure.beThereAsap(superStructureState);
+            superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState);
         }
         superStructureCommand.schedule();
 

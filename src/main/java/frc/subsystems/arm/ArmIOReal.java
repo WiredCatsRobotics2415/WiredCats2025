@@ -50,7 +50,8 @@ public class ArmIOReal implements ArmIO {
         inputs.motorTemp = motorTemp.getValueAsDouble();
 
         inputs.appliedVoltage = appliedVoltage;
-        inputs.throughborePosition = throughbore.get();
+        throughbore.get(); // DO NOT REMOVE
+        inputs.throughborePosition = throughbore.getRaw();
     }
 
     @Override

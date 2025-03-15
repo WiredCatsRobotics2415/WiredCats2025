@@ -25,16 +25,17 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     public void updateInputs(GenericSlapdownIOInputsAutoLogged inputs) {
         if (pivotMotor == null || intakeMotor == null) return;
 
-        inputs.pivotConnected = pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
+        inputs.pivotConnected = !pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.pivotTemp = pivotMotor.getMotorTemperature();
         inputs.pivotStatorCurrent = pivotMotor.getOutputCurrent();
         inputs.appliedVoltage = appliedVolts;
 
-        inputs.intakeConnected = intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
+        inputs.intakeConnected = !intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.intakeTemp = intakeMotor.getMotorTemperature();
         inputs.intakeStatorCurrent = intakeMotor.getOutputCurrent();
 
-        inputs.throughborePosition = throughbore.get();
+        throughbore.get();
+        inputs.throughborePosition = throughbore.getRaw();
         if (sensor != null) inputs.sensorValue = sensor.getValue();
     }
 

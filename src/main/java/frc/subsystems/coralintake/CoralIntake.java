@@ -18,6 +18,7 @@ import frc.subsystems.slapdown.GenericSlapdownIOInputsAutoLogged;
 import frc.subsystems.slapdown.GenericSlapdownIOReal;
 import frc.subsystems.slapdown.GenericSlapdownIOSim;
 import frc.utils.Util;
+import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableArmFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
@@ -38,7 +39,7 @@ public class CoralIntake extends GenericSlapdown {
 
     @Getter private Angle goal = Degrees.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
-    private Angle lastMeasurement;
+    private Angle lastMeasurement = Degrees.of(0.0);
     @Getter private boolean intaking = false;
     @Getter private boolean outtaking = false;
     private boolean hasResetPidController = false;
@@ -146,9 +147,9 @@ public class CoralIntake extends GenericSlapdown {
         io.updateInputs(inputs);
         Logger.processInputs("CoralIntake", inputs);
 
-        double measurementDegrees = inputs.throughborePosition *
-            (CoralIntakeConstants.MaxAngle.angle().in(Degrees) - CoralIntakeConstants.GroundAngle.angle().in(Degrees)) +
-            CoralIntakeConstants.GroundAngle.angle().in(Degrees);
+        double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
+            CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
+            CoralIntakeConstants.MaxAngle.get());
         differentiableMeasurementDegrees.update(measurementDegrees);
         lastMeasurement = Degrees.of(measurementDegrees);
 

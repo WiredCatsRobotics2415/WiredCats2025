@@ -109,9 +109,9 @@ public class Subsystems {
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final double kS = 0.45;
         public static final double kG = 0.2;
-        public static final double kV = 0.025;
+        public static final double kV = 0.001;
         public static final double kA = 0.001;
-        public static final double kP = 0.2;
+        public static final double kP = 0.4;
         public static final double kD = 0.02;
 
         public static final TuneableNumber kGForArm = new TuneableNumber(0.2 - kG, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
@@ -142,7 +142,7 @@ public class Subsystems {
         public static final double kG = 0.58;
         public static final double kV = 0.004;
         public static final double kA = 0.002;
-        public static final double kP = 0.2;
+        public static final double kP = 0.05;
         public static final double kD = 0.02;
 
         public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
@@ -156,7 +156,7 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final int MotorID = 12;
-        public static final int IRSensorPort = 1;
+        public static final int IRSensorPort = NavxMXPPorts.Analog3;
 
         public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(0.6, "EndEffector/IntakeCoralSpeed");
         public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(-0.8, "EndEffector/IntakeAlgaeSpeed");
@@ -182,9 +182,9 @@ public class Subsystems {
         public static final int PivotMotorID = 13;
         public static final int IntakeMotorID = 14;
 
-        public static final int ThroughborePort = 18;
-        public static final double ThroughboreMin = 0;
-        public static final double ThroughboreMax = 1;
+        public static final int ThroughborePort = 1;
+        public static final double ThroughboreMin = 0.228;
+        public static final double ThroughboreMax = 0.52;
 
         public static final double RotorToArmRatio = 15;
         public static final Distance EffectiveLength = Inches.of(23);

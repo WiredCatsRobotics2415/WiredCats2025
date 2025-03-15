@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Volts;
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Velocity;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Subsystems.ArmConstants;
@@ -17,7 +18,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class GenericSlapdownCharacterizer extends Characterizer {
     private GenericSlapdown slapdown;
-    private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.5).div(Second.of(1));
+    private final Velocity<VoltageUnit> quasiSpeed = Volts.of(2.5).div(Second.of(1));
 
     private final Angle TestSafetyThreshold = Degrees.of(7);
     private TuneableNumber testMaxAngle;
@@ -30,18 +31,18 @@ public class GenericSlapdownCharacterizer extends Characterizer {
         testMinAngle = min;
 
         SysIdRoutine sysIDRoutineArm = new SysIdRoutine(
-            new SysIdRoutine.Config(quasiSpeed, Volts.of(2), null,
+            new SysIdRoutine.Config(quasiSpeed, Volts.of(7), null,
                 state -> Logger.recordOutput("SysID" + name + "State", state.toString())),
             new SysIdRoutine.Mechanism(output -> slapdown.getIo().setPivotVoltage(output.in(Volts)), null, slapdown));
 
-        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).onlyWhile(this::willNotHitFront)
-            .withName(name + ": Dynamic Forward"));
-        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).onlyWhile(this::willNotHitBack)
-            .withName(name + ": Dynamic Backward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).onlyWhile(this::willNotHitFront)
-            .withName(name + ": Quasi Forward"));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).onlyWhile(this::willNotHitBack)
-            .withName(name + ": Quasi Backward"));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).withName(name + ": Dynamic Forward")
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).withName(name + ": Dynamic Backward")
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).withName(name + ": Quasi Forward")
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).withName(name + ": Quasi Backward")
+            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
 
         TuningModeTab.getInstance().addCharacterizer(name, this);
     }

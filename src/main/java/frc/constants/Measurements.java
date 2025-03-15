@@ -40,7 +40,7 @@ public class Measurements {
 
         public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
 
-        public static final Mass RobotWeight = Pounds.of(90); // TODO: update with real value
+        public static final Mass RobotWeight = Pounds.of(107.5); // TODO: with climber, 114.5
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
             (DriveTrainTrackWidth.in(Meters) / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
