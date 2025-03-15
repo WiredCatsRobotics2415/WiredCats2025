@@ -56,8 +56,6 @@ public class CoralIntake extends GenericSlapdown {
             CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin,
             CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
 
-        new Trigger(EndEffector.getInstance()::hasCoral).onTrue(turnOffRollers());
-
         if (RuntimeConstants.TuningMode) {
             GenericSlapdownCharacterizer.createInstance(this, "CoralIntake", CoralIntakeConstants.GroundAngle,
                 CoralIntakeConstants.MaxAngle);

@@ -118,7 +118,7 @@ public class Subsystems {
 
         public static final double BaseVelocityMax = 39.5d;
         public static final double BaseAccelerationMax = 79d;
-        public static final double BaseGoalTolerance = .5d;
+        public static final double BaseGoalTolerance = 2.0d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
         public static final Distance BaseHeight = Inches.of(25.75 + 0.5833333333);
@@ -147,7 +147,7 @@ public class Subsystems {
 
         public static final double BaseVelocityMax = 180; // (2/18) copied from akit2024
         public static final double BaseAccelerationMax = 360; // (2/18) copied from akit2024
-        public static final Angle GoalTolerance = Degrees.of(3);
+        public static final double GoalTolerance = 5;
 
         public static final double ApproximateMassKg = 1.814;
         public static final float RotorToArmGearRatio = 25 / 1; // Planetaries amount unknown as of 3/5
@@ -197,7 +197,7 @@ public class Subsystems {
         public static final double kP = 0.0;
         public static final double kD = 0.0;
 
-        public static final double BaseGoalTolerance = 1;
+        public static final double BaseGoalTolerance = 5;
 
         public static final double BaseVelocityMax = 180;
         public static final double BaseAccelerationMax = 360;
