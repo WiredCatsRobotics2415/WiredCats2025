@@ -43,7 +43,7 @@ public class Arm extends SubsystemBase {
     private TuneableNumber elevatorVelocityMultiplier = new TuneableNumber(0.0d, "Arm/ArmVelocityMultiplier");
 
     private Arm() {
-        pid.setTolerance(ArmConstants.GoalTolerance.in(Degrees));
+        pid.setTolerance(ArmConstants.GoalTolerance);
         io = (ArmIO) Util.getIOImplementation(ArmIOReal.class, ArmIOSim.class, new ArmIO() {});
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);

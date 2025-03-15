@@ -156,9 +156,15 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake()))
             .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
+        //In case it should be A intakes coral, outtakes algae and B vice versa...
+        //Dealgae is button A:
+        // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeCoral().alongWith(coralIntake.toggleIntake()))
+        //     .onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
+        //Shoot is button B:
+        // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
-        oi.binds.get(OI.Bind.StowPreset).onTrue(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
-            CommonCommands.stowNormally(), () -> endEffector.hasCoral()).ignoringDisable(true));
+        oi.binds.get(OI.Bind.StowPreset).onTrue(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()).alongWith(new ConditionalCommand(CommonCommands.stowFromGroundIntake(),
+            CommonCommands.stowNormally(), () -> endEffector.hasCoral()).ignoringDisable(true)));
         oi.binds.get(OI.Bind.IntakeFromGround).onTrue(superstructure.beThereAsap(Presets.GroundIntake)
             .andThen(coralIntake.toggleIntake()).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
@@ -213,6 +219,7 @@ public class RobotContainer {
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
         new Trigger(endEffector::hasCoral)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
+        new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
     }
 
     public void periodic() {

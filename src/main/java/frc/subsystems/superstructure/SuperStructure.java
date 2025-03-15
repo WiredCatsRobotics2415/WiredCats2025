@@ -79,6 +79,12 @@ public class SuperStructure extends SubsystemBase {
 
     private boolean freezingArmFromCoralContainmentDebounce = false;
 
+    private Point2d carriagePoint = new Point2d(0, 0);
+    private Point2d endEffector = new Point2d(0, 0);
+    private Point2d eeBottomTip = new Point2d(0, 0);
+    private Point2d cIntakeEnd = new Point2d(0, 0);
+    private Point2d eeTopTip = new Point2d(0, 0);
+
     private static SuperStructure instance;
 
     private SuperStructure() {
@@ -206,19 +212,19 @@ public class SuperStructure extends SubsystemBase {
         boolean[] collisions = new boolean[2];
 
         double height = elevator.in(Inches);
-        Point2d carriagePoint = new Point2d(4.5 - height * Trig.sizzle(elevatorTilt),
+        carriagePoint.set(4.5 - height * Trig.sizzle(elevatorTilt),
             height * Trig.cosizzle(elevatorTilt) + 1.64);
         double armAngle = -arm.in(Radians) + Units.degreesToRadians(90) - elevatorTilt;
-        Point2d endEffector = new Point2d(carriagePoint.x() - Trig.sizzle(armAngle) * eeLength,
+        endEffector.set(carriagePoint.x() - Trig.sizzle(armAngle) * eeLength,
             carriagePoint.y() + Trig.cosizzle(armAngle) * eeLength);
         // System.out.println(" endEffector: " + endEffector);
 
         if (arm.gt(ninetyDeg)) { // Test for coral intake
-            Point2d eeBottomTip = new Point2d(endEffector.x() + Trig.cosizzle(armAngle) * 3,
+            eeBottomTip.set(endEffector.x() + Trig.cosizzle(armAngle) * 3,
                 endEffector.y() + Trig.sizzle(armAngle) * 3);
             collisions[0] = eeBottomTip.x() < 18 && eeBottomTip.y() < 0;
 
-            Point2d cIntakeEnd = new Point2d(10.4 + Trig.cosizzle(cIntake) * cIntakeLength,
+            cIntakeEnd.set(10.4 + Trig.cosizzle(cIntake) * cIntakeLength,
                 0.5 + Trig.sizzle(cIntake) * cIntakeLength);
 
             double lineResult = ((eeBottomTip.y() - carriagePoint.y()) / (eeBottomTip.x() - carriagePoint.x())) *
@@ -228,7 +234,7 @@ public class SuperStructure extends SubsystemBase {
             // System.out.println(" carriagePoint: " + carriagePoint);
             collisions[1] = lineResult < cIntakeEnd.y() && eeBottomTip.x() > cIntakeEnd.x();
         } else {
-            Point2d eeTopTip = new Point2d(
+            eeTopTip.set(
                 carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
                 carriagePoint.y() + Trig.cosizzle(armAngle) * 13 - 15.5 * Trig.sizzle(armAngle + elevatorTilt));
             collisions[0] = eeTopTip.x() > -18 && eeTopTip.y() < 0;

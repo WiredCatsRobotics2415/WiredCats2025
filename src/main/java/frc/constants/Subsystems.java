@@ -147,7 +147,7 @@ public class Subsystems {
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");; // (2/18) copied from akit2024
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "Arm/BaseAccelMax");; // (2/18) copied from akit2024
-        public static final Angle GoalTolerance = Degrees.of(3);
+        public static final double GoalTolerance = 3;
 
         public static final double ApproximateMassKg = 1.814;
         public static final float RotorToArmGearRatio = 25 / 1; // Planetaries amount unknown as of 3/5
@@ -197,7 +197,7 @@ public class Subsystems {
         public static final double kP = 0.0;
         public static final double kD = 0.0;
 
-        public static final double BaseGoalTolerance = 1;
+        public static final double BaseGoalTolerance = 5;
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "CoralIntake/BaseVelocityMax");;
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "CoralIntake/BaseAccelMax");;
