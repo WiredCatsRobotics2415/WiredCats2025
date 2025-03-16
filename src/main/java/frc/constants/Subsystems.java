@@ -181,6 +181,10 @@ public class Subsystems {
         public static final Angle AngleFromArmWrtGround = Degrees.of(14);
     }
 
+    public class ClimberConstants {
+        public static int MotorID = 15;
+    }
+
     public class CoralIntakeConstants {
         public static final int PivotMotorID = 13;
         public static final int IntakeMotorID = 14;
