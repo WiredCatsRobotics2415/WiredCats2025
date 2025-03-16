@@ -28,6 +28,7 @@ import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.subsystems.arm.Arm;
+import frc.subsystems.climb.Climb;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.drive.CommandSwerveDrivetrain.PoseEstimationType;
 import frc.subsystems.elevator.Elevator;
@@ -52,6 +53,7 @@ public class RobotContainer {
     private LEDStrip ledStrip = LEDStrip.getInstance();
     private @Getter OI oi = OI.getInstance();
     private Vision vision = Vision.getInstance();
+    private Climb climber = Climb.getInstance();
 
     private LoggedDashboardChooser<Command> autoChooser;
 
@@ -195,6 +197,9 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(
             superstructure.beThereAsap(Presets.ProcessorScore).andThen(Commands.waitUntil(superstructure::allAtGoal)));
+
+        oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
+        oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runBackward()).onFalse(climber.stop());
     }
 
     private void configureTriggers() {

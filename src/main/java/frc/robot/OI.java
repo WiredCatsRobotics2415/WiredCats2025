@@ -25,7 +25,7 @@ public class OI {
         AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
         AutoScoreRightL3, AutoScoreRightL4, DealgaePresetTop, SeedFieldCentric, StowPreset,
         ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot,
-        DeAlgae, ManualIntake, DealgaePresetBottom
+        DeAlgae, ManualIntake, DealgaePresetBottom, ClimberForward, ClimberBackward
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -72,6 +72,8 @@ public class OI {
         binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
         binds.put(Bind.ProcessorPreset, numpad.button(NumpadButtons.NumberNine));
         binds.put(Bind.BargePreset, numpad.button(NumpadButtons.Asterisk));
+        binds.put(Bind.ClimberForward, controller.povUp());
+        binds.put(Bind.ClimberBackward, controller.povDown());
     }
 
     private double deadbandCompensation(double r) {
