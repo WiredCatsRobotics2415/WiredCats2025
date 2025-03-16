@@ -145,23 +145,23 @@ public class CoralIntake extends GenericSlapdown {
         // io.updateInputs(inputs);
         // Logger.processInputs("CoralIntake", inputs);
 
-        double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
-            CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
-            CoralIntakeConstants.MaxAngle.get());
-        differentiableMeasurementDegrees.update(measurementDegrees);
-        lastMeasurement = Degrees.of(measurementDegrees);
+        // double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
+        //     CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
+        //     CoralIntakeConstants.MaxAngle.get());
+        // differentiableMeasurementDegrees.update(measurementDegrees);
+        // lastMeasurement = Degrees.of(measurementDegrees);
 
-        if (!hasResetPidController) {
-            pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
-            hasResetPidController = true;
-        }
-        useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
+        // if (!hasResetPidController) {
+        //     pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
+        //     hasResetPidController = true;
+        // }
+        // useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
 
-        Logger.recordOutput("CoralIntake/Actual", measurementDegrees);
-        Logger.recordOutput("CoralIntake/Goal", goal);
-        Logger.recordOutput("CoralIntake/Error", pid.getPositionError());
-        Logger.recordOutput("CoralIntake/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
-        Logger.recordOutput("CoralIntake/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());
+        // Logger.recordOutput("CoralIntake/Actual", measurementDegrees);
+        // Logger.recordOutput("CoralIntake/Goal", goal);
+        // Logger.recordOutput("CoralIntake/Error", pid.getPositionError());
+        // Logger.recordOutput("CoralIntake/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
+        // Logger.recordOutput("CoralIntake/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());
     }
 
     @Override

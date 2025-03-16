@@ -219,15 +219,15 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
-        driveXLimiter.setRateLimit(ssLimits[0]);
-        driveYLimiter.setRateLimit(ssLimits[1]);
-        driveRotationLimiter.setRateLimit(ssLimits[2]);
+        // double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        // driveXLimiter.setRateLimit(ssLimits[0]);
+        // driveYLimiter.setRateLimit(ssLimits[1]);
+        // driveRotationLimiter.setRateLimit(ssLimits[2]);
 
-        drive.getDriveToPositionXController()
-            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
-        drive.getDriveToPositionYController()
-            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        // drive.getDriveToPositionXController()
+        //     .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        // drive.getDriveToPositionYController()
+        //     .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

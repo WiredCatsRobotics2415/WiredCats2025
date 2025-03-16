@@ -22,10 +22,12 @@ import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
     private boolean coasting;
+    private boolean hasResetPidController = false;
+    private double goalInches;
     @Getter private Distance goal = Inches.of(0.0);
+
     private Distance lastMeasurement = Inches.of(0.0);
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
-    private boolean hasResetPidController = false;
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
@@ -73,6 +75,7 @@ public class Elevator extends SubsystemBase {
     public void setGoal(Distance setGoal) {
         if (setGoal.gt(ElevatorConstants.MaxHeight.distance()) || setGoal.lt(ElevatorConstants.MinHeight.distance()))
             return;
+        goalInches = setGoal.in(Inches);
         this.goal = setGoal;
         lowPid.setSetpoint(setGoal.in(Inches));
         pid.setSetpoint(setGoal.in(Inches));

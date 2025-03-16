@@ -15,14 +15,15 @@ public class TuneableNumber {
     private static ArrayList<TuneableNumber> all = new ArrayList<TuneableNumber>();
     private static int indexToUpdate = 0;
 
+    private Angle lastAngle;
+    private Distance lastDistance;
+
     private LoggedNetworkNumber thisNetworkNumber;
     private double previousNumber;
     private ArrayList<Consumer<Double>> listeners;
-    private String key;
 
     public TuneableNumber(double defaultNumber, String key) {
         this.previousNumber = defaultNumber;
-        this.key = key;
         if (RuntimeConstants.TuningMode) {
             thisNetworkNumber = new LoggedNetworkNumber("/Tuning/" + key);
             thisNetworkNumber.setDefault(defaultNumber);
@@ -54,7 +55,10 @@ public class TuneableNumber {
      * Assuming this number is in inches
      */
     public Distance distance() {
-        return Inches.of(previousNumber);
+        if (this.lastDistance == null) {
+            this.lastDistance = Inches.of(previousNumber);
+        }
+        return lastDistance;
     }
 
     /**
@@ -68,7 +72,10 @@ public class TuneableNumber {
      * Assuming this number is in degrees
      */
     public Angle angle() {
-        return Degrees.of(previousNumber);
+        if (this.lastAngle == null) {
+            this.lastAngle = Degrees.of(previousNumber);
+        }
+        return lastAngle;
     }
 
     public void set(double newNumber) {
@@ -91,6 +98,8 @@ public class TuneableNumber {
         double entry = thisNetworkNumber.get();
         if (entry != previousNumber) {
             previousNumber = entry;
+            if (lastAngle != null) lastAngle = Degrees.of(previousNumber);
+            if (lastDistance != null) lastDistance = Inches.of(previousNumber);
             for (Consumer<Double> r : listeners)
                 r.accept(entry);
         }

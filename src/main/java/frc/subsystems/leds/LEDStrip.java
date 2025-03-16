@@ -27,11 +27,6 @@ public class LEDStrip extends SubsystemBase {
         return instance;
     }
 
-    @Override
-    public void periodic() {
-        if (Robot.isSimulation()) return;
-    }
-
     public void setColor(UseableColor color) {
         if (!color.equals(this.currentUseable)) {
             this.currentColor = color.color;
