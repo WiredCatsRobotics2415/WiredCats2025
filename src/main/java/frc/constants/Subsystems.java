@@ -165,8 +165,7 @@ public class Subsystems {
         public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeSpeed");
         public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(0.65,
             "EndEffector/OuttakeCoralSpeed");
-        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(-0.35,
-            "EndEffector/OuttakeAlageSpeed");
+        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(-1, "EndEffector/OuttakeAlageSpeed");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
         public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(200,
