@@ -24,6 +24,14 @@ public class TuneablePIDController extends PIDController {
         }
     }
 
+    public void freeze() {
+        frozen = true;
+    }
+
+    public void unfreeze() {
+        frozen = false;
+    }
+
     public void setConstraints(Constraints constraints) { frozen = constraints.maxVelocity == 0; }
 
     @Override

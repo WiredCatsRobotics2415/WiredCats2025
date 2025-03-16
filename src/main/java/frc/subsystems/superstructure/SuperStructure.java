@@ -86,6 +86,8 @@ public class SuperStructure extends SubsystemBase {
     private Point2d cIntakeEnd = new Point2d(0, 0);
     private Point2d eeTopTip = new Point2d(0, 0);
 
+    private Constraints armFreeze = new Constraints(0, ArmConstants.BaseAccelerationMax.get());
+
     private static SuperStructure instance;
 
     private SuperStructure() {
@@ -276,12 +278,11 @@ public class SuperStructure extends SubsystemBase {
             if (elevator.getPid().goalError() < 0) {
                 if (!armWillCollideWithDrivebase) {
                     // If elevator wants to move down and it won't collide the arm with the drivebase, then move
-                    elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
-                        ElevatorConstants.BaseAccelerationMax.get()));
+                    elevator.getPid().unfreeze();
                     // System.out.println("elevator wants to move down and can");
                 } else {
                     // Stop elevator so the arm can get out of the way
-                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
+                    elevator.getPid().freeze();;
                     // System.out.println("elevator wants to move down and CAN'T");
                 }
             } else {
@@ -297,8 +298,7 @@ public class SuperStructure extends SubsystemBase {
                 // if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
                 // if (elevatorCanMove) {
                 // // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
-                elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
-                    ElevatorConstants.BaseAccelerationMax.get()));
+                elevator.getPid().unfreeze();
                 // } else {
                 // elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
                 // }
@@ -361,7 +361,7 @@ public class SuperStructure extends SubsystemBase {
                     (1 - percentOfArmVelo.get()) * ArmConstants.BaseVelocityMax.get());
             arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
         } else {
-            arm.getPid().setConstraints(new Constraints(0, ArmConstants.BaseAccelerationMax.get()));
+            arm.getPid().setConstraints(armFreeze);
         }
     }
 }
