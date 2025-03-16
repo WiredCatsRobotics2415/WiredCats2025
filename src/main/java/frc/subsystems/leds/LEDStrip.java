@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.RepeatCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
-import frc.robot.Robot;
 import frc.utils.Util;
 import lombok.Getter;
 

@@ -9,7 +9,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -96,9 +96,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("SwitchToGlobalPE",
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
-        //named commands for 2025 gwinnett
+        // named commands for 2025 gwinnett
         NamedCommands.registerCommand("Outtake", endEffector.toggleOuttake());
-        Named.registerCommand("RaiseUp", elevator.setGoal(40));
+        NamedCommands.registerCommand("RaiseUp",
+            new InstantCommand(() -> elevator.setGoal(Distance.ofBaseUnits(40, Inches))));
 
         autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser(""));
 
@@ -228,9 +229,9 @@ public class RobotContainer {
         // driveRotationLimiter.setRateLimit(ssLimits[2]);
 
         // drive.getDriveToPositionXController()
-        //     .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
         // drive.getDriveToPositionYController()
-        //     .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

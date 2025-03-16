@@ -16,12 +16,10 @@ import frc.subsystems.slapdown.GenericSlapdownIOInputsAutoLogged;
 import frc.subsystems.slapdown.GenericSlapdownIOReal;
 import frc.subsystems.slapdown.GenericSlapdownIOSim;
 import frc.utils.Util;
-import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.tuning.TuneableArmFF;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import lombok.Getter;
-import org.littletonrobotics.junction.Logger;
 
 public class CoralIntake extends GenericSlapdown {
     private GenericSlapdownIO io;
@@ -146,14 +144,14 @@ public class CoralIntake extends GenericSlapdown {
         // Logger.processInputs("CoralIntake", inputs);
 
         // double measurementDegrees = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
-        //     CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
-        //     CoralIntakeConstants.MaxAngle.get());
+        // CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
+        // CoralIntakeConstants.MaxAngle.get());
         // differentiableMeasurementDegrees.update(measurementDegrees);
         // lastMeasurement = Degrees.of(measurementDegrees);
 
         // if (!hasResetPidController) {
-        //     pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
-        //     hasResetPidController = true;
+        // pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
+        // hasResetPidController = true;
         // }
         // useOutput(pid.calculate(measurementDegrees), pid.getSetpoint());
 

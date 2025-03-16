@@ -321,23 +321,23 @@ public class SuperStructure extends SubsystemBase {
         }
 
         // if (!coralIntake.pivotAtGoal()) {
-        //     if (coralIntake.getPid().goalError() > 0) {
-        //         if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
-        //             coralIntake.getPid()
-        //                 .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax.get()));
-        //         } else {
-        //             coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax.get(),
-        //                 CoralIntakeConstants.BaseAccelerationMax.get()));
-        //         }
-        //     } else { // if it wants to go down, we need to make sure the arm wont hit it
-        //         if (armWillCollideWithCoralIntake) {
-        //             isFreezingArm = true;
-        //         } else {
-        //             isFreezingArm = false;
-        //         }
-        //     }
+        // if (coralIntake.getPid().goalError() > 0) {
+        // if (armWillCollideWithCoralIntake || arm.getMeasurement().gte(Degrees.of(135))) {
+        // coralIntake.getPid()
+        // .setConstraints(new Constraints(0, CoralIntakeConstants.BaseAccelerationMax.get()));
         // } else {
-        //     isFreezingArm = false;
+        // coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.BaseVelocityMax.get(),
+        // CoralIntakeConstants.BaseAccelerationMax.get()));
+        // }
+        // } else { // if it wants to go down, we need to make sure the arm wont hit it
+        // if (armWillCollideWithCoralIntake) {
+        // isFreezingArm = true;
+        // } else {
+        // isFreezingArm = false;
+        // }
+        // }
+        // } else {
+        // isFreezingArm = false;
         // }
 
         if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
