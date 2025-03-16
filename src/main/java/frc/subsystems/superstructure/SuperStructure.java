@@ -74,6 +74,7 @@ public class SuperStructure extends SubsystemBase {
         "SuperStructure/Min height arm can pivot at w/ algae");
     private TuneableNumber coralArmPivotElevatorHeight = new TuneableNumber(4,
         "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(34.75, "SuperStructure/swingThroughMinHeight");
 
     private TuneableBoolean stowCommandIsDefault = new TuneableBoolean(true, "SuperStructure/EnableStowAsDefault");
 
@@ -223,14 +224,15 @@ public class SuperStructure extends SubsystemBase {
             eeBottomTip.set(endEffector.x() + Trig.cosizzle(armAngle) * 3, endEffector.y() + Trig.sizzle(armAngle) * 3);
             collisions[0] = eeBottomTip.x() < 18 && eeBottomTip.y() < 0;
 
-            cIntakeEnd.set(10.4 + Trig.cosizzle(cIntake) * cIntakeLength, 0.5 + Trig.sizzle(cIntake) * cIntakeLength);
+            // cIntakeEnd.set(10.4 + Trig.cosizzle(cIntake) * cIntakeLength, 0.5 + Trig.sizzle(cIntake) * cIntakeLength);
 
-            double lineResult = ((eeBottomTip.y() - carriagePoint.y()) / (eeBottomTip.x() - carriagePoint.x())) *
-                (cIntakeEnd.x() - carriagePoint.x()) + carriagePoint.y();
-            // System.out.println(lineResult + " is less than " + cIntakeEnd.y());
-            // System.out.println(" eeBottomTip: " + eeBottomTip);
-            // System.out.println(" carriagePoint: " + carriagePoint);
-            collisions[1] = lineResult < cIntakeEnd.y() && eeBottomTip.x() > cIntakeEnd.x();
+            // double lineResult = ((eeBottomTip.y() - carriagePoint.y()) / (eeBottomTip.x() - carriagePoint.x())) *
+            // (cIntakeEnd.x() - carriagePoint.x()) + carriagePoint.y();
+            // // System.out.println(lineResult + " is less than " + cIntakeEnd.y());
+            // // System.out.println(" eeBottomTip: " + eeBottomTip);
+            // // System.out.println(" carriagePoint: " + carriagePoint);
+            // collisions[1] = lineResult < cIntakeEnd.y() && eeBottomTip.x() > cIntakeEnd.x();
+            collisions[1] = false;
         } else {
             eeTopTip.set(carriagePoint.x() + Trig.sizzle(armAngle) * 13 - 15.5 * Trig.cosizzle(armAngle + elevatorTilt),
                 carriagePoint.y() + Trig.cosizzle(armAngle) * 13 - 15.5 * Trig.sizzle(armAngle + elevatorTilt));
@@ -267,7 +269,8 @@ public class SuperStructure extends SubsystemBase {
 
         boolean freezeArmFromAlgaeContainmentElevation = false;
         boolean freezeArmFromCoralContainment = false;
-        boolean armOnTargetSide = true;
+        boolean armOnTargetSide = (arm.getGoal().lt(ninetyDeg) && arm.getMeasurement().lt(ninetyDeg))
+            || (arm.getGoal().gt(ninetyDeg) && arm.getMeasurement().gt(ninetyDeg));
 
         if (!elevator.atGoal()) {
             if (elevator.getPid().goalError() < 0) {
@@ -283,23 +286,22 @@ public class SuperStructure extends SubsystemBase {
                 }
             } else {
                 boolean elevatorCanMove = lastElevatorTimePrediction > (secondsToBeThereIn - timeTaken.get());
-                if (armSwitchingToFrontSide || armSwitchingToBackSide) {
-                    armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
-                        || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
-                }
+                // if (armSwitchingToFrontSide || armSwitchingToBackSide) {
+                // armOnTargetSide = (armSwitchingToFrontSide && arm.getMeasurement().lt(ninetyDeg))
+                // || (armSwitchingToBackSide && arm.getMeasurement().gt(ninetyDeg));
+                // }
                 // freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
                 // && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
                 // && EndEffector.getInstance().hasCoral();
                 freezeArmFromCoralContainment = false;
                 // if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
-                System.out.println("can move? " + elevatorCanMove + " | target side? " + armOnTargetSide);
-                if (elevatorCanMove && armOnTargetSide) {
-                    // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
-                    elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
-                        ElevatorConstants.BaseAccelerationMax.get()));
-                } else {
-                    elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
-                }
+                // if (elevatorCanMove) {
+                // // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
+                elevator.getPid().setConstraints(new Constraints(ElevatorConstants.BaseVelocityMax.get(),
+                    ElevatorConstants.BaseAccelerationMax.get()));
+                // } else {
+                // elevator.getPid().setConstraints(new Constraints(0, ElevatorConstants.BaseAccelerationMax.get()));
+                // }
 
                 // if we have an algae, we have to switch sides AND the elevator is too low
                 if (EndEffector.getInstance().hasAlgae() && !armOnTargetSide
@@ -309,6 +311,13 @@ public class SuperStructure extends SubsystemBase {
                     freezeArmFromAlgaeContainmentElevation = false;
                 }
             }
+        }
+
+        if (!armOnTargetSide && elevator.getMeasurement().lte(swingThroughMinHeight.distance()) && !elevator.atGoal()) {
+            System.out.println("freezing arm for elevator to move");
+            isFreezingArm = true;
+        } else {
+            isFreezingArm = false;
         }
 
         if (!coralIntake.pivotAtGoal()) {

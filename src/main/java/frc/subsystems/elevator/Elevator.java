@@ -29,11 +29,14 @@ public class Elevator extends SubsystemBase {
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
-    @Getter private TuneablePIDController pid = new TuneablePIDController(ElevatorConstants.kP, 0.0d,
-        ElevatorConstants.kD, "ElevatorPID");
+    private TuneablePIDController pid = new TuneablePIDController(ElevatorConstants.kP, 0.0d, ElevatorConstants.kD,
+        "ElevatorPID");
+    @Getter private TuneablePIDController lowPid = new TuneablePIDController(ElevatorConstants.lowkP, 0.0d,
+        ElevatorConstants.lowkD, "ElevatorLowPID");
 
-    private TuneableNumber downThreshold = new TuneableNumber(3, "Elevator/downThreshold");
-    private TuneableNumber downPower = new TuneableNumber(0.1, "Elevator/downPower");
+    private TuneableNumber constant = new TuneableNumber(0.01, "Elevator/constant");
+    private TuneableNumber stopMap = new TuneableNumber(40, "Elevator/stopMap");
+    private TuneableNumber kg = new TuneableNumber(0.6, "Elevator/kg");
 
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -42,6 +45,7 @@ public class Elevator extends SubsystemBase {
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         pid.setTolerance(ElevatorConstants.BaseGoalTolerance);
+        lowPid.setTolerance(ElevatorConstants.BaseGoalTolerance);
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to 0", runOnce(
@@ -70,22 +74,31 @@ public class Elevator extends SubsystemBase {
         if (setGoal.gt(ElevatorConstants.MaxHeight.distance()) || setGoal.lt(ElevatorConstants.MinHeight.distance()))
             return;
         this.goal = setGoal;
+        lowPid.setSetpoint(setGoal.in(Inches));
         pid.setSetpoint(setGoal.in(Inches));
     }
 
     public boolean atGoal() {
-        return pid.atSetpoint();
+        if (lastMeasurement.gte(stopMap.distance())) {
+            return pid.atSetpoint();
+        } else {
+            return lowPid.atSetpoint();
+        }
     }
 
     public Distance getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = ff.calculate(setpoint.velocity);
+        double feedforward = lastMeasurement.lte(stopMap.distance()) ? constant.get() * lastMeasurement.in(Inches)
+            : kg.get();
+
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
 
         io.setVoltage(voltOut);
     }
+
+    public TuneablePIDController getPid() { return lastMeasurement.gte(stopMap.distance()) ? pid : lowPid; }
 
     @Override
     public void periodic() {
@@ -102,11 +115,15 @@ public class Elevator extends SubsystemBase {
             // pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));
             hasResetPidController = true;
         }
-        useOutput(pid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+        if (lastMeasurement.gte(stopMap.distance()) && pid.getError() > 0) {
+            useOutput(pid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+        } else {
+            useOutput(lowPid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+        }
 
         Logger.recordOutput("Elevator/Actual", measurementInches);
         Logger.recordOutput("Elevator/Goal", goal);
-        Logger.recordOutput("Elevator/Error", pid.getPositionError());
+        Logger.recordOutput("Elevator/Error", pid.getError());
         Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());
         Logger.recordOutput("Elevator/ActualAcceleration", differentiableMeasurementInches.getSecondDerivative());
     }

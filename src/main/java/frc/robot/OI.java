@@ -23,8 +23,9 @@ public class OI {
     public enum Bind {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
         AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
-        AutoScoreRightL3, AutoScoreRightL4, DealgaePreset, SeedFieldCentric, StowPreset, ToggleScorePresetsAlignDrive,
-        AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae, ManualIntake
+        AutoScoreRightL3, AutoScoreRightL4, DealgaePresetTop, SeedFieldCentric, StowPreset,
+        ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot,
+        DeAlgae, ManualIntake, DealgaePresetBottom
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -57,9 +58,10 @@ public class OI {
 
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
         binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
-        binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
+        // binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
-        binds.put(Bind.DealgaePreset, numpad.button(NumpadButtons.NumberSeven));
+        binds.put(Bind.DealgaePresetTop, numpad.button(NumpadButtons.NumberSeven));
+        binds.put(Bind.DealgaePresetBottom, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.AutoScoreLeftL1, numpad.button(NumpadButtons.NumberTwo));
         binds.put(Bind.AutoScoreLeftL2, numpad.button(NumpadButtons.NumberFive));
         binds.put(Bind.AutoScoreLeftL3, numpad.button(NumpadButtons.NumberEight));

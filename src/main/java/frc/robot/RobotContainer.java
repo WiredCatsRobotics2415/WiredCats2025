@@ -140,9 +140,9 @@ public class RobotContainer {
             .onFalse(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.Normal));
 
         oi.binds.get(OI.Bind.ManualElevatorUp)
-            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(1.0))));
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(0.25))));
         oi.binds.get(OI.Bind.ManualElevatorDown)
-            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(-1.0))));
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(-0.25))));
 
         oi.binds.get(OI.Bind.ManualArmForward)
             .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(-1.0))));
@@ -160,10 +160,11 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(CommonCommands.stowFromGroundIntake().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromGround)
-            .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
+        // oi.binds.get(OI.Bind.IntakeFromGround)
+        // .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
-        oi.binds.get(OI.Bind.DealgaePreset).onTrue(new Dealgae());
+        oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new Dealgae(true));
+        oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new Dealgae(false));
         oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
         oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));
         oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3));

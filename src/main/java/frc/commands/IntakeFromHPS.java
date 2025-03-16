@@ -21,11 +21,11 @@ public class IntakeFromHPS extends GenericAutomation {
 
     @Override
     public void initialize() {
-        Pair<Pose2d, Integer> apriltagPoseAndId = this.findNearestApriltag(HumanPlayerStation.hpsApriltags,
-            HumanPlayerStation.hpsRedApriltags, HumanPlayerStation.hpsBlueApriltags, HumanPlayerStation.hpsIds,
-            LimelightsForElements.HumanPlayerStation);
-
         if (GenericAutomation.getCurrentAutomationMode() == AutomationMode.PresetAndAlign) {
+            Pair<Pose2d, Integer> apriltagPoseAndId = this.findNearestApriltag(HumanPlayerStation.hpsApriltags,
+                HumanPlayerStation.hpsRedApriltags, HumanPlayerStation.hpsBlueApriltags, HumanPlayerStation.hpsIds,
+                LimelightsForElements.HumanPlayerStation);
+
             Pose2d driveToPose = apriltagPoseAndId.getFirst().plus(Offset)
                 .plus(new Transform2d(Presets.HPSDriveOffset.meters(), 0, Rotation2d.kZero));
             driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
