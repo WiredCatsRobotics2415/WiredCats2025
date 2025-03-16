@@ -3,11 +3,14 @@ package frc.utils.tuning;
 import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import frc.constants.RuntimeConstants;
+import lombok.Getter;
 
 public class TuneableProfiledPIDController extends ProfiledPIDController {
     private TuneableNumber kP, kI, kD, veloMax, accelMax, tolerance;
     private double lastMeasure;
+    @Getter private double lastCalculation = Double.MAX_VALUE;
 
     public TuneableProfiledPIDController(double kP, double kI, double kD, Constraints baseConstraints,
         String controllerName) {
@@ -71,6 +74,24 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
     public double calculate(double measurement) {
         lastMeasure = measurement;
         return super.calculate(measurement);
+    }
+
+    @Override
+    public double calculate(double measurement, State goal) {
+        lastCalculation = super.calculate(measurement, goal);
+        return lastCalculation;
+    }
+
+    @Override
+    public double calculate(double measurement, double goal) {
+        lastCalculation = super.calculate(measurement, goal);
+        return lastCalculation;
+    }
+
+    @Override
+    public double calculate(double measurement, State goal, Constraints constraints) {
+        lastCalculation = super.calculate(measurement, goal, constraints);
+        return lastCalculation;
     }
 
     /**

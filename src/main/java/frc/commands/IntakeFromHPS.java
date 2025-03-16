@@ -31,9 +31,7 @@ public class IntakeFromHPS extends GenericAutomation {
             driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
             driveCommand.schedule();
 
-            double timeTo = drive.maxTimeToGetToPose(driveToPose);
-            superStructureCommand = superStructure.beThereInNoEnd(timeTo, Presets.IntakeFromHPS);
-            System.out.println("HPS time to: " + timeTo);
+            superStructureCommand = superStructure.beThereAsapNoEnd(Presets.IntakeFromHPS);
 
             focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.HumanPlayerStation,
                 apriltagPoseAndId.getSecond());
@@ -50,6 +48,7 @@ public class IntakeFromHPS extends GenericAutomation {
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
+        if (focusCommand != null) focusCommand.cancel();
         RobotStatus.setRobotState(RobotState.WaitingForCoralAtHPS);
     }
 }

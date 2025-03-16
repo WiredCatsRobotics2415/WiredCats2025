@@ -4,6 +4,7 @@ import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.wpilibj.Timer;
 import frc.commands.GenericAutomation.AutomationMode;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
@@ -68,16 +69,18 @@ public class ScoreCoral extends GenericAutomation {
             Transform2d rightOffset = new Transform2d(GenericAutomation.CenterToBumper.plus(goalDriveOffset.distance()),
                 RightOffset.distance().times(-1), Rotation2d.kZero);
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
+
+            double startTime = Timer.getFPGATimestamp();
             Pair<Pose2d, Integer> apriltagPoseAndId = this.findNearestApriltag(ReefMeasurements.reefApriltagsAlphabetic,
                 ReefMeasurements.reefRedApriltags, ReefMeasurements.reefBlueApriltags, ReefMeasurements.reefIds,
                 LimelightsForElements.Reef);
+            System.out.println("findNearestApriltag time: " + (Timer.getFPGATimestamp() - startTime));
+
             Pose2d driveTo = apriltagPoseAndId.getFirst().plus(offset);
             driveCommand = drive.driveTo(driveTo, DriveToleranceMeters.meters());
             driveCommand.schedule();
 
-            double timeTo = drive.maxTimeToGetToPose(driveTo);
-            superStructureCommand = superStructure.beThereInNoEnd(timeTo, superStructureState);
-            System.out.println("Score coral time to: " + timeTo);
+            superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState);
 
             focusCommand = drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef,
                 apriltagPoseAndId.getSecond());
@@ -93,6 +96,7 @@ public class ScoreCoral extends GenericAutomation {
     @Override
     public void end(boolean interrupted) {
         super.end(interrupted);
+        if (focusCommand != null) focusCommand.cancel();
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
 }

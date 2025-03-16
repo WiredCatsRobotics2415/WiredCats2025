@@ -11,7 +11,7 @@ public class Climb extends SubsystemBase {
     private ClimbIO io;
 
     private Climb() {
-        io = (ClimbIO) Util.getIOImplementation(ClimbIOReal.class, ClimbIO.class, new ClimbIO() {});
+        io = (ClimbIO) Util.getIOImplementation(ClimbIOReal.class, ClimbIOSim.class, new ClimbIO() {});
     }
 
     public static Climb getInstance() {

@@ -93,6 +93,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
     private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1.3, "Drive/singleTagDistanceFromTag");
 
+    private TuneableNumber headingTolerance = new TuneableNumber(DriveConstants.HeadingTolerance,
+        "Drive/HeadingTolerance");
+
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
 
@@ -135,6 +138,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 DriveConstants.RotationPID = new PIDConstants(newP);
                 DriveConstants.PathFollowingController = new PPHolonomicDriveController(DriveConstants.PPTranslationPID,
                     DriveConstants.RotationPID);
+            });
+
+            headingTolerance.addListener((newTol) -> {
+                driveToPositionHeadingController.setTolerance(newTol);
             });
 
             // Add torque safety to all motors
@@ -300,8 +307,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
                 .withVelocityX(velocityX).withVelocityY(velocityY);
         })).until(() -> {
-            return driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
-                && driveToPositionHeadingController.atSetpoint();
+            System.out.println("xCon: " + driveToPositionXController.getLastCalculation());
+            System.out.println("yCon: " + driveToPositionYController.getLastCalculation());
+            // return (driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
+            // && driveToPositionHeadingController.atSetpoint())
+            // || (Math.abs(driveToPositionXController.getLastCalculation()) < Controls.MaxDriveMeterS * 0.025
+            // && Math.abs(driveToPositionYController.getLastCalculation()) < Controls.MaxDriveMeterS * 0.025);
+            return (driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
+                && driveToPositionHeadingController.atSetpoint());
         });
     }
 
