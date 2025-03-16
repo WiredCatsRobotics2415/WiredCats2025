@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
+import frc.robot.Robot;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
@@ -150,6 +151,7 @@ public class Arm extends SubsystemBase {
             newTBorPos += 1;
         }
         double measurementDegrees = Algebra.linearMap(newTBorPos, 1.13, 0.456, -30, 210);
+        if (Robot.isSimulation()) measurementDegrees = Algebra.linearMap(inputs.throughborePosition, 0, 1, -30, 210);
         differentiableMeasurementDegrees.update(measurementDegrees);
         lastMeasurement = Degrees.of(measurementDegrees);
 

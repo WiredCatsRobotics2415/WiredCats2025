@@ -70,7 +70,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableNumber algaeArmPivotElevatorHeight = new TuneableNumber(30,
+    private TuneableNumber algaeArmPivotElevatorHeight = new TuneableNumber(40,
         "SuperStructure/Min height arm can pivot at w/ algae");
     private TuneableNumber coralArmPivotElevatorHeight = new TuneableNumber(4,
         "SuperStructure/Min height that arm can leave cIntake"); // should be same as bump stow preset elevator height
@@ -270,7 +270,6 @@ public class SuperStructure extends SubsystemBase {
         updateCurrentStateCollisions();
 
         boolean freezeArmFromAlgaeContainmentElevation = false;
-        boolean freezeArmFromCoralContainment = false;
         boolean armOnTargetSide = (arm.getGoal().lt(ninetyDeg) && arm.getMeasurement().lt(ninetyDeg))
             || (arm.getGoal().gt(ninetyDeg) && arm.getMeasurement().gt(ninetyDeg));
 
@@ -294,7 +293,6 @@ public class SuperStructure extends SubsystemBase {
                 // freezeArmFromCoralContainment = !arm.atGoal() && arm.getMeasurement().gte(oneEightyDeg)
                 // && elevator.getMeasurement().lte(coralArmPivotElevatorHeight.distance())
                 // && EndEffector.getInstance().hasCoral();
-                freezeArmFromCoralContainment = false;
                 // if (freezeArmFromCoralContainment) System.out.println("freezeArmFromCoralContainment");
                 // if (elevatorCanMove) {
                 // // if elevator wants to move up, it's time for it to move up AND the arm is mostly done getting to its goal, then the elevator can move
@@ -305,7 +303,7 @@ public class SuperStructure extends SubsystemBase {
 
                 // if we have an algae, we have to switch sides AND the elevator is too low
                 if (EndEffector.getInstance().hasAlgae() && !armOnTargetSide
-                    && elevator.getMeasurement().gt(algaeArmPivotElevatorHeight.distance())) {
+                    && elevator.getMeasurement().lt(algaeArmPivotElevatorHeight.distance())) {
                     freezeArmFromAlgaeContainmentElevation = true;
                 } else {
                     freezeArmFromAlgaeContainmentElevation = false;
@@ -341,14 +339,6 @@ public class SuperStructure extends SubsystemBase {
         // }
 
         if (freezeArmFromAlgaeContainmentElevation) isFreezingArm = true;
-        if (freezeArmFromCoralContainment && !freezingArmFromCoralContainmentDebounce) {
-            isFreezingArm = true;
-            freezingArmFromCoralContainmentDebounce = true;
-        }
-        if (!freezeArmFromCoralContainment && freezingArmFromCoralContainmentDebounce) {
-            isFreezingArm = false;
-            freezingArmFromCoralContainmentDebounce = false;
-        }
 
         if (!isFreezingArm) {
             // when elevator measurement is high, arm max accel should be % of its base max

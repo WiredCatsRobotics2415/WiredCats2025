@@ -25,8 +25,8 @@ public class ScoreCoral extends GenericAutomation {
         L1, L2, L3, L4,
     }
 
-    private static final TuneableNumber LeftOffset = new TuneableNumber(6, "ScoreCoral/LeftOffset");
-    private static final TuneableNumber RightOffset = new TuneableNumber(6, "ScoreCoral/RightOffset");
+    private static final TuneableNumber LeftOffset = new TuneableNumber(5, "ScoreCoral/LeftOffset");
+    private static final TuneableNumber RightOffset = new TuneableNumber(8, "ScoreCoral/RightOffset");
     private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "ScoreCoral/DriveTolerance");
 
     private TuneableSuperStructureState superStructureState;

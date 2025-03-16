@@ -35,6 +35,7 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
+import frc.utils.driver.DashboardManager;
 import frc.utils.math.AdjustableSLR;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
@@ -177,16 +178,16 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
         oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
 
-        // DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
-        // () -> ScoreCoral.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign), null);
-        // oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
-        // if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
+        DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
+            () -> GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign), null);
+        oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
+            if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
+            } else {
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
+            }
+        }));
         // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
-        // } else {
-        // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
-        // }
-        // }));
-        GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
 
         // oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
         // superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
