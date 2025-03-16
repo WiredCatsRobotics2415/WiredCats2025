@@ -96,6 +96,9 @@ public class RobotContainer {
         NamedCommands.registerCommand("SwitchToGlobalPE",
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
+        //named commands for 2025 gwinnett
+        NamedCommands.registerCommand("Outtake", endEffector.toggleOuttake());
+        Named.registerCommand("RaiseUp", elevator.setGoal(40));
 
         autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser(""));
 
