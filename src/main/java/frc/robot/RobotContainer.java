@@ -1,7 +1,5 @@
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -98,7 +96,7 @@ public class RobotContainer {
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
         // named commands for 2025 gwinnett
         NamedCommands.registerCommand("Outtake", endEffector.toggleOuttake());
-        NamedCommands.registerCommand("RaiseUp", new InstantCommand(() -> elevator.setGoal(Inches.of(40))));
+        NamedCommands.registerCommand("RaiseUp", new InstantCommand(() -> elevator.setGoal(40)));
 
         autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser(""));
 
@@ -143,14 +141,12 @@ public class RobotContainer {
             .onFalse(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.Normal));
 
         oi.binds.get(OI.Bind.ManualElevatorUp)
-            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(0.25))));
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(0.25)));
         oi.binds.get(OI.Bind.ManualElevatorDown)
-            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(Inches.of(-0.25))));
+            .whileTrue(Commands.run(() -> superstructure.changeElevatorGoalSafely(-0.25)));
 
-        oi.binds.get(OI.Bind.ManualArmForward)
-            .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(-1.0))));
-        oi.binds.get(OI.Bind.ManualArmBack)
-            .whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(Degrees.of(1.0))));
+        oi.binds.get(OI.Bind.ManualArmForward).whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(-1.0)));
+        oi.binds.get(OI.Bind.ManualArmBack).whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(1.0)));
 
         oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake()).onFalse(endEffector.turnOff());
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
@@ -203,7 +199,7 @@ public class RobotContainer {
         // Triggers that interact across multiple subsystems/utils should be defined here
         // Flip driver camera based on arm angle
         new Trigger(() -> {
-            return arm.getMeasurement().in(Degrees) > 90.0d;
+            return arm.getMeasurement() > 90.0d;
         }).onTrue(new InstantCommand(() -> {
             vision.setEndEffectorStreamOrientation(true);
         }).ignoringDisable(true)).onFalse(new InstantCommand(() -> {

@@ -28,7 +28,7 @@ public interface GenericSlapdownIO {
      * Configures hardware. If this slapdown does not have an IR sensor, make sensorAnalogPort -1;
      */
     public default void configureHardware(int pivotId, int intakeId, int throughborePort, double tBorMin,
-        double tBorMax, boolean tBorWrap, int sensorAnalogPort) {};
+        double tBorMax, int sensorAnalogPort) {};
 
     public default void configureSim(String targetGamePiece, Distance width, Distance lengthExtended, IntakeSide side,
         double rotorToGearRatio, Distance effectiveLength, Angle max, Angle min, double throughboreMin,

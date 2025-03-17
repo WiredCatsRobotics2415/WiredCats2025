@@ -6,6 +6,7 @@ import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.controllers.PathFollowingController;
 import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.util.Color;
 import frc.subsystems.leds.TuneableColor;
@@ -101,10 +102,10 @@ public class Subsystems {
         public static final int LeftMotorID = 9; // (2/14): this is Elevator1
         public static final int RightMotorID = 10; // (2/14): this is Elevator2
 
-        public static final TuneableNumber PotentiometerMinVolt = new TuneableNumber(0.372d, "Elevator/PotMinVolt");
-        public static final TuneableNumber PotentiometerMaxVolt = new TuneableNumber(1.981d, "Elevator/PotMaxVolt");
-        public static final TuneableNumber MinHeight = new TuneableNumber(Inches.of(0.0d), "Elevator/MinHeight");
-        public static final TuneableNumber MaxHeight = new TuneableNumber(Inches.of(78.0d), "Elevator/MaxHeight");
+        public static final double PotentiometerMinVolt = 0.372d;
+        public static final double PotentiometerMaxVolt = 1.981d;
+        public static final double MinHeight = 0.0d;
+        public static final double MaxHeight = 78.0d;
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final double kS = 0.0;
@@ -124,9 +125,9 @@ public class Subsystems {
         public static final double BaseGoalTolerance = 4d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
-        public static final Distance BaseHeight = Inches.of(25.75 + 0.5833333333);
-        public static final Distance Stage2Height = Inches.of(25.75 + 0.5833333333);
-        public static final Distance Stage3Height = Inches.of(25.75 + 0.5833333333);
+        public static final double BaseHeightM = Units.inchesToMeters(25.75 + 0.5833333333);
+        public static final double Stage2HeightM = Units.inchesToMeters(25.75 + 0.5833333333);
+        public static final double Stage3HeightM = Units.inchesToMeters(25.75 + 0.5833333333);
     }
 
     public class ArmConstants {
@@ -135,10 +136,10 @@ public class Subsystems {
 
         // 0 degrees: the arm rail is parallel with the drivebase on the scoring side (front of robot)
         // 180 degrees: the arm rail is parallel with the drive base on the cintake side (back of robot)
-        public static final double ThroughboreMin = 0.132;
+        public static final double ThroughboreMin = 1.13;
         public static final double ThroughboreMax = 0.456;
-        public static final TuneableNumber MaxDegreesBack = new TuneableNumber(Degrees.of(210), "Arm/MaxDegreesBack");
-        public static final TuneableNumber MinDegreesFront = new TuneableNumber(Degrees.of(-30), "Arm/MinDegreesFront");
+        public static final double MaxDegreesBack = 210;
+        public static final double MinDegreesFront = -30;
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.12;
@@ -212,7 +213,7 @@ public class Subsystems {
         public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");
 
         public static final TuneableNumber MaxAngle = new TuneableNumber(100, "CoralIntake/MaxAngle");
-        public static final Angle StowAngle = Degrees.of(70);
+        public static final double StowAngle = 70;
         public static final TuneableNumber GroundAngle = new TuneableNumber(0, "CoralIntake/GroundAngle");
 
         public static final Mass Weight = Pounds.of(2.3);

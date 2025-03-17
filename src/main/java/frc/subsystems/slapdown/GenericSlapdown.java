@@ -1,6 +1,5 @@
 package frc.subsystems.slapdown;
 
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -11,9 +10,9 @@ public abstract class GenericSlapdown extends SubsystemBase {
 
     public abstract Command stow();
 
-    public abstract void setPivotGoal(Angle goal);
+    public abstract void setPivotGoal(double goal);
 
-    public abstract Angle getPivotAngle();
+    public abstract double getPivotAngle();
 
     public abstract Command toggleIntake();
 

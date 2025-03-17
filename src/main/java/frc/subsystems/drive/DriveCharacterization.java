@@ -106,7 +106,7 @@ public class DriveCharacterization extends Characterizer {
     }
 
     public class WheelRadiusCharacterization extends Command {
-        double driveBaseRadius = RobotMeasurements.DriveTrainRadius.in(Inches);
+        double driveBaseRadius = RobotMeasurements.DriveTrainRadius;
         double wheelRadiusMeters = TunerConstants.kWheelRadius.in(Meters);
         CommandSwerveDrivetrain drive;
 

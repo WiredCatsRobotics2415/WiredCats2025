@@ -1,5 +1,6 @@
 package frc.subsystems.endeffector;
 
+import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
@@ -36,7 +37,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
 
     private void outtakeNote() {
         Pose3d carriagePose = Visualizer.getLastCarriagePoint();
-        Angle armAngle = armSubsystem.getMeasurement();
+        Angle armAngle = Degrees.of(armSubsystem.getMeasurement());
         Angle endEffectorAngle = armAngle.plus(EndEffectorConstants.AngleFromArmWrtCarraige);
 
         ReefscapeCoralOnFly outtakedNote = new ReefscapeCoralOnFly(

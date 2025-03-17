@@ -15,9 +15,8 @@ import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
-import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.constants.Subsystems.DriveConstants;
@@ -30,19 +29,19 @@ public class Measurements {
 
     public class RobotMeasurements {
         // Front of the robot: coral scoring side
-        public static final Distance BumperLength = Inches.of(3.204);
-        public static final Distance BumperToBumper = Inches.of(36);
+        public static final double BumperLength = 3.204;
+        public static final double BumperToBumper = 36;
 
-        public static final Distance CenterToFrameRadius = Inches.of(21.313);
-        public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
-        public static final Distance DriveTrainRadius = Inches.of(18.432785);
-        public static final Distance DriveTrainTrackWidth = Inches.of(24.625);
+        public static final double CenterToFrameRadius = 21.313;
+        public static final double CenterToFramePerpendicular = 15.401;
+        public static final double DriveTrainRadius = 18.432785;
+        public static final double DriveTrainTrackWidth = 24.625;
 
-        public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
+        public static final double ElevatorTilt = 3.7; // Towards the front
 
         public static final Mass RobotWeight = Pounds.of(107.5); // TODO: with climber, 114.5
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
-            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
+            Units.inchesToMeters(DriveTrainTrackWidth / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
             TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with slip current characerization
             DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);
@@ -79,16 +78,16 @@ public class Measurements {
 
         public static final Transform2d EECamOnGround = new Transform2d(Inches.of(-11.972173), Inches.of(0),
             Rotation2d.fromDegrees(180));
-        public static final Distance EECamHeightOffGround = Inches.of(13.82);
-        public static final Angle EECamForward = Degrees.of(1.284);
+        public static final double EECamHeightOffGround = 13.82;
+        public static final double EECamForward = 1.284;
     }
 
     public class CoralMeasurements {
-        public static final Distance HeightFromCenterOffGround = Inches.of(4.5);
+        public static final double HeightFromCenterOffGround = 4.5;
 
         public static final Translation2d LeftBlueHPSDropPosition = new Translation2d(0, 0);
         public static final Translation2d RightBlueHPSDropPosition = new Translation2d(0, 0);
-        public static final Distance HPSDropStdDev = Meters.of(0);
+        public static final double HPSDropStdDev = 0;
     }
 
     public class ReefMeasurements {
@@ -234,16 +233,16 @@ public class Measurements {
     }
 
     public static class LimelightSpecs {
-        public static final Angle ThreeGFOV = Degrees.of(82);
-        public static final Angle ThreeGVerticalFOV = Degrees.of(56.2);
+        public static final double ThreeGFOV = 82;
+        public static final double ThreeGVerticalFOV = 56.2;
         public static final double ThreeGDiagnolFOV = 91.144;
 
-        public static final Angle TwoPlusHorizontalFOV = Degrees.of(62.5);
-        public static final Angle TwoPlusVerticalFOV = Degrees.of(48.9);
+        public static final double TwoPlusHorizontalFOV = 62.5;
+        public static final double TwoPlusVerticalFOV = 48.9;
         public static final double TwoPlusDiagnolFOV = 2 *
-            Math.atan(Math.sqrt(Math.pow(Math.tan(TwoPlusHorizontalFOV.in(Radians) / 2), 2) +
-                Math.pow(Math.tan(TwoPlusVerticalFOV.in(Radians) / 2), 2)));
+            Math.atan(Math.sqrt(Math.pow(Math.tan(Units.degreesToRadians(TwoPlusHorizontalFOV) / 2), 2) +
+                Math.pow(Math.tan(Units.degreesToRadians(TwoPlusVerticalFOV) / 2), 2)));
 
-        public static final Distance TwoPlusMaxObjectDetectionDistance = Feet.of(6);
+        public static final double TwoPlusMaxObjectDetectionDistance = 6 * 12;
     }
 }

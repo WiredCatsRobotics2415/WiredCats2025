@@ -13,14 +13,17 @@ import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.wpilibj.AnalogInput;
-import frc.utils.hardware.Throughbore;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class GenericSlapdownIOReal implements GenericSlapdownIO {
     // private SparkMax pivotMotor;
     private TalonFX pivotMotor;
     private SparkMax intakeMotor;
-    private Throughbore throughbore;
+    private DutyCycleEncoder throughbore;
     private AnalogInput sensor;
+
+    private double tBorMin;
+    private double tBorMax;
 
     private double appliedVolts;
 
@@ -42,14 +45,13 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         inputs.intakeTemp = intakeMotor.getMotorTemperature();
         inputs.intakeStatorCurrent = intakeMotor.getOutputCurrent();
 
-        throughbore.get();
-        inputs.throughborePosition = throughbore.getRaw();
+        inputs.throughborePosition = throughbore.get();
         if (sensor != null) inputs.sensorValue = sensor.getValue();
     }
 
     @Override
     public void configureHardware(int pivotId, int intakeId, int throughborePort, double tBorMin, double tBorMax,
-        boolean tBorWrap, int sensorAnalogPort) {
+        int sensorAnalogPort) {
         SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
             .voltageCompensation(12).inverted(false);
 
@@ -65,7 +67,9 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         intakeMotor.setCANTimeout(250);
 
-        throughbore = new Throughbore(throughborePort, tBorMin, tBorMax, tBorWrap, "GenericSlapdown/tBor");
+        throughbore = new DutyCycleEncoder(throughborePort);
+        this.tBorMin = tBorMin;
+        this.tBorMax = tBorMax;
         if (sensorAnalogPort > 0) sensor = new AnalogInput(sensorAnalogPort);
     }
 

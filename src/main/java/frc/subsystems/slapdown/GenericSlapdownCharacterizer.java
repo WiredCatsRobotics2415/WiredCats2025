@@ -1,16 +1,14 @@
 package frc.subsystems.slapdown;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.constants.Subsystems.ArmConstants;
+import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.utils.tuning.Characterizer;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
@@ -20,7 +18,7 @@ public class GenericSlapdownCharacterizer extends Characterizer {
     private GenericSlapdown slapdown;
     private final Velocity<VoltageUnit> quasiSpeed = Volts.of(2.5).div(Second.of(1));
 
-    private final Angle TestSafetyThreshold = Degrees.of(7);
+    private final double TestSafetyThreshold = 7;
     private TuneableNumber testMaxAngle;
     private TuneableNumber testMinAngle;
 
@@ -49,20 +47,18 @@ public class GenericSlapdownCharacterizer extends Characterizer {
 
     private boolean willNotHitFront() {
         if (!Characterizer.enableSafety.get()) return true;
-        Angle measurement = slapdown.getPivotAngle();
-        return measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront.angle());
+        return (slapdown.getPivotAngle() - TestSafetyThreshold) < CoralIntakeConstants.GroundAngle.get();
     }
 
     private boolean willNotHitBack() {
         if (!Characterizer.enableSafety.get()) return true;
-        Angle measurement = slapdown.getPivotAngle();
-        return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack.angle());
+        return (slapdown.getPivotAngle() + TestSafetyThreshold) > CoralIntakeConstants.MaxAngle.get();
     }
 
     private boolean withinSafeThreshold() {
-        Angle measurement = slapdown.getPivotAngle();
-        return measurement.minus(TestSafetyThreshold).gte(testMinAngle.angle())
-            || measurement.plus(TestSafetyThreshold).lte(testMaxAngle.angle());
+        double measurement = slapdown.getPivotAngle();
+        return (measurement - TestSafetyThreshold) > testMinAngle.get()
+            || (measurement + TestSafetyThreshold) < testMaxAngle.get();
     }
 
     public static GenericSlapdownCharacterizer createInstance(GenericSlapdown slapdown, String name, TuneableNumber min,

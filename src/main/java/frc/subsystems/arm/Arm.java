@@ -1,15 +1,11 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
-import frc.robot.Robot;
 import frc.subsystems.elevator.Elevator;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
@@ -24,8 +20,8 @@ import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
-    @Getter private Angle goal = Degrees.mutable(0.0d);
-    private Angle lastMeasurement = Degrees.of(90);
+    @Getter private double goalDegrees = 0.0d;
+    private double lastMeasurement = 90.0d;
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
@@ -50,11 +46,11 @@ public class Arm extends SubsystemBase {
         if (RuntimeConstants.TuningMode) {
             ArmCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to cintake side",
-                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MaxDegreesBack.angle())));
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MaxDegreesBack)));
             TuningModeTab.getInstance().addCommand("Run to stow",
-                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(Degrees.of(90))));
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(90)));
             TuningModeTab.getInstance().addCommand("Run to scoring side",
-                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MinDegreesFront.angle())));
+                runOnce(() -> SuperStructure.getInstance().setArmGoalSafely(ArmConstants.MinDegreesFront)));
             TuningModeTab.getInstance().addCommand("Toggle Arm Coast Mode", runOnce(() -> {
                 if (isCoasting)
                     brake();
@@ -70,10 +66,10 @@ public class Arm extends SubsystemBase {
     }
 
     /** Sets the goal height. If goal is out of the physical range, it is not set. */
-    public void setGoal(Angle goal) {
-        if (goal.gt(ArmConstants.MaxDegreesBack.angle()) || goal.lt(ArmConstants.MinDegreesFront.angle())) return;
-        this.goal = goal;
-        pid.setGoal(new TrapezoidProfile.State(goal.in(Degrees), 0.0d));
+    public void setGoal(double goal) {
+        if (goal > ArmConstants.MaxDegreesBack || goal < ArmConstants.MinDegreesFront) return;
+        this.goalDegrees = goal;
+        pid.setGoal(new TrapezoidProfile.State(goal, 0.0d));
     }
 
     /**
@@ -81,12 +77,11 @@ public class Arm extends SubsystemBase {
      */
     public Command increaseGoal() {
         return runOnce(() -> {
-            if (goal.gt(ArmConstants.MaxDegreesBack.angle())) {
-                goal = ArmConstants.MaxDegreesBack.angle();
+            if (goalDegrees > ArmConstants.MaxDegreesBack) {
+                goalDegrees = ArmConstants.MaxDegreesBack;
                 return;
             }
-            goal = goal.plus(Degrees.of(0.5));
-            this.setGoal(goal);
+            this.goalDegrees += 0.5;
         });
     }
 
@@ -95,12 +90,11 @@ public class Arm extends SubsystemBase {
      */
     public Command decreaseGoal() {
         return runOnce(() -> {
-            if (goal.lt(ArmConstants.MinDegreesFront.angle())) {
-                goal = ArmConstants.MinDegreesFront.angle();
+            if (goalDegrees < ArmConstants.MinDegreesFront) {
+                goalDegrees = ArmConstants.MinDegreesFront;
                 return;
             }
-            goal = goal.minus(Degrees.of(0.5));
-            this.setGoal(goal);
+            this.goalDegrees += 0.5;
         });
     }
 
@@ -118,7 +112,7 @@ public class Arm extends SubsystemBase {
         return pid.atGoal();
     }
 
-    public Angle getMeasurement() { return lastMeasurement; }
+    public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint, double measurementDegrees) {
         double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
@@ -146,23 +140,18 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        double newTBorPos = inputs.throughborePosition;
-        if (inputs.throughborePosition > 0 && inputs.throughborePosition < 0.132) {
-            newTBorPos += 1;
-        }
-        double measurementDegrees = Algebra.linearMap(newTBorPos, 1.13, 0.456, -30, 210);
-        if (Robot.isSimulation()) measurementDegrees = Algebra.linearMap(inputs.throughborePosition, 0, 1, -30, 210);
-        differentiableMeasurementDegrees.update(measurementDegrees);
-        lastMeasurement = Degrees.of(measurementDegrees);
+        lastMeasurement = Algebra.linearMap(inputs.throughborePosition, ArmConstants.ThroughboreMin,
+            ArmConstants.ThroughboreMax, ArmConstants.MinDegreesFront, ArmConstants.MaxDegreesBack);
+        differentiableMeasurementDegrees.update(lastMeasurement);
 
         if (!hasResetPidController) {
-            pid.reset(new TrapezoidProfile.State(measurementDegrees, 0));
+            pid.reset(new TrapezoidProfile.State(lastMeasurement, 0));
             hasResetPidController = true;
         }
-        useOutput(pid.calculate(measurementDegrees), pid.getSetpoint(), measurementDegrees);
+        useOutput(pid.calculate(lastMeasurement), pid.getSetpoint(), lastMeasurement);
 
-        Logger.recordOutput("Arm/Actual", measurementDegrees);
-        Logger.recordOutput("Arm/Goal", goal);
+        Logger.recordOutput("Arm/Actual", lastMeasurement);
+        Logger.recordOutput("Arm/Goal", goalDegrees);
         Logger.recordOutput("Arm/Error", pid.getPositionError());
         Logger.recordOutput("Arm/ActualVelocity", differentiableMeasurementDegrees.getFirstDerivative());
         Logger.recordOutput("Arm/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());

@@ -2,7 +2,7 @@ package frc.commands;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
@@ -24,8 +24,8 @@ public class GenericAutomation extends Command {
     @Getter
     @Setter private static AutomationMode currentAutomationMode = AutomationMode.PresetOnly;
 
-    public static final Distance CenterToBumper = RobotMeasurements.CenterToFramePerpendicular
-        .plus(RobotMeasurements.BumperLength).times(-1);
+    public static final double CenterToBumper = -Units
+        .inchesToMeters(RobotMeasurements.CenterToFramePerpendicular + RobotMeasurements.BumperLength);
 
     public final CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
     public final SuperStructure superStructure = SuperStructure.getInstance();

@@ -1,9 +1,6 @@
 package frc.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Inches;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
@@ -23,10 +20,9 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator extends SubsystemBase {
     private boolean coasting;
     private boolean hasResetPidController = false;
-    private double goalInches;
-    @Getter private Distance goal = Inches.of(0.0);
+    @Getter private double goalInches;
 
-    private Distance lastMeasurement = Inches.of(0.0);
+    private double lastMeasurement = 0.0;
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
@@ -50,10 +46,10 @@ public class Elevator extends SubsystemBase {
         lowPid.setTolerance(ElevatorConstants.BaseGoalTolerance);
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Run to 0", runOnce(
-                () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MinHeight.distance())));
-            TuningModeTab.getInstance().addCommand("Run to max", runOnce(
-                () -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MaxHeight.distance())));
+            TuningModeTab.getInstance().addCommand("Run to 0",
+                runOnce(() -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MinHeight)));
+            TuningModeTab.getInstance().addCommand("Run to max",
+                runOnce(() -> SuperStructure.getInstance().setElevatorGoalSafely(ElevatorConstants.MaxHeight)));
             TuningModeTab.getInstance().addCommand("Toggle elevator coast", runOnce(() -> {
                 if (coasting) {
                     io.setCoast(false);
@@ -72,28 +68,25 @@ public class Elevator extends SubsystemBase {
     }
 
     /** Sets the goal height. If goalInches is out of the physical range, it is not set. */
-    public void setGoal(Distance setGoal) {
-        if (setGoal.gt(ElevatorConstants.MaxHeight.distance()) || setGoal.lt(ElevatorConstants.MinHeight.distance()))
-            return;
-        goalInches = setGoal.in(Inches);
-        this.goal = setGoal;
-        lowPid.setSetpoint(setGoal.in(Inches));
-        pid.setSetpoint(setGoal.in(Inches));
+    public void setGoal(double setGoal) {
+        if (setGoal > ElevatorConstants.MaxHeight || setGoal < ElevatorConstants.MinHeight) return;
+        this.goalInches = setGoal;
+        lowPid.setSetpoint(setGoal);
+        pid.setSetpoint(setGoal);
     }
 
     public boolean atGoal() {
-        if (lastMeasurement.gte(stopMap.distance())) {
+        if (lastMeasurement > stopMap.get()) {
             return pid.atSetpoint();
         } else {
             return lowPid.atSetpoint();
         }
     }
 
-    public Distance getMeasurement() { return lastMeasurement; }
+    public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        double feedforward = lastMeasurement.lte(stopMap.distance()) ? constant.get() * lastMeasurement.in(Inches)
-            : kg.get();
+        double feedforward = lastMeasurement < stopMap.get() ? constant.get() * lastMeasurement : kg.get();
 
         double voltOut = output + feedforward +
             Trig.cosizzle(Arm.getInstance().getMeasurement()) * ElevatorConstants.kGForArm.get();
@@ -101,31 +94,29 @@ public class Elevator extends SubsystemBase {
         io.setVoltage(voltOut);
     }
 
-    public TuneablePIDController getPid() { return lastMeasurement.gte(stopMap.distance()) ? pid : lowPid; }
+    public TuneablePIDController getPid() { return lastMeasurement > stopMap.get() ? pid : lowPid; }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
-        double measurementInches = Algebra.linearMap(inputs.wirePotentiometer,
-            ElevatorConstants.PotentiometerMinVolt.get(), ElevatorConstants.PotentiometerMaxVolt.get(),
-            ElevatorConstants.MinHeight.get(), ElevatorConstants.MaxHeight.get());
-        differentiableMeasurementInches.update(measurementInches);
-        lastMeasurement = Inches.of(measurementInches);
+        lastMeasurement = Algebra.linearMap(inputs.wirePotentiometer, ElevatorConstants.PotentiometerMinVolt,
+            ElevatorConstants.PotentiometerMaxVolt, ElevatorConstants.MinHeight, ElevatorConstants.MaxHeight);
+        differentiableMeasurementInches.update(lastMeasurement);
 
         if (!hasResetPidController) {
             // pid.reset(new TrapezoidProfile.State(getMeasurement().in(Inches), 0));
             hasResetPidController = true;
         }
-        if (lastMeasurement.gte(stopMap.distance()) && pid.getError() > 0) {
-            useOutput(pid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+        if (lastMeasurement > stopMap.get() && pid.getError() > 0) {
+            useOutput(pid.calculate(lastMeasurement), new TrapezoidProfile.State(pid.getSetpoint(), 0));
         } else {
-            useOutput(lowPid.calculate(measurementInches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+            useOutput(lowPid.calculate(lastMeasurement), new TrapezoidProfile.State(pid.getSetpoint(), 0));
         }
 
-        Logger.recordOutput("Elevator/Actual", measurementInches);
-        Logger.recordOutput("Elevator/Goal", goal);
+        Logger.recordOutput("Elevator/Actual", lastMeasurement);
+        Logger.recordOutput("Elevator/Goal", goalInches);
         Logger.recordOutput("Elevator/Error", pid.getError());
         Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());
         Logger.recordOutput("Elevator/ActualAcceleration", differentiableMeasurementInches.getSecondDerivative());

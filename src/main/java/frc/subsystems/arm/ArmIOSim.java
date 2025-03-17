@@ -17,12 +17,11 @@ public class ArmIOSim implements ArmIO {
 
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
         ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
-        ArmConstants.MinDegreesFront.radians(), ArmConstants.MaxDegreesBack.radians(), true, Math.PI / 2);
+        Units.degreesToRadians(ArmConstants.MinDegreesFront), Units.degreesToRadians(ArmConstants.MaxDegreesBack), true,
+        Math.PI / 2);
 
     public ArmIOSim() {
         System.out.println("Arm MOI: " + moi);
-        System.out.println("Max degrees (back): " + ArmConstants.MaxDegreesBack.radians());
-        System.out.println("min degrees (front): " + ArmConstants.MinDegreesFront.radians());
     }
 
     @Override
@@ -34,7 +33,8 @@ public class ArmIOSim implements ArmIO {
         inputs.appliedVoltage = appliedVoltage;
 
         inputs.throughborePosition = Algebra.linearMap(Units.radiansToDegrees(simArm.getAngleRads()),
-            ArmConstants.MinDegreesFront.get(), ArmConstants.MaxDegreesBack.get(), 0, 1);
+            ArmConstants.MinDegreesFront, ArmConstants.MaxDegreesBack, ArmConstants.ThroughboreMin,
+            ArmConstants.ThroughboreMax);
     }
 
     @Override

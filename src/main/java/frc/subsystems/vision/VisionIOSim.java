@@ -1,5 +1,8 @@
 package frc.subsystems.vision;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -138,8 +141,9 @@ public class VisionIOSim implements VisionIO {
             inputs.endEffectorCameraAveragePixelValue = 255;
         } else {
             Triangle2d fovTriangle = Triangle2d.isocelesFromPointAndDiagonal(
-                currentEndEffectorPosition.getTranslation(), LimelightSpecs.TwoPlusMaxObjectDetectionDistance,
-                LimelightSpecs.TwoPlusHorizontalFOV, currentEndEffectorPosition.getRotation().getMeasure());
+                currentEndEffectorPosition.getTranslation(),
+                Inches.of(LimelightSpecs.TwoPlusMaxObjectDetectionDistance),
+                Degrees.of(LimelightSpecs.TwoPlusHorizontalFOV), currentEndEffectorPosition.getRotation().getMeasure());
             Logger.recordOutput("Visualization/VisionIOSim/EETriangle",
                 new Translation2d[] { fovTriangle.getA(), fovTriangle.getB(), fovTriangle.getC(), fovTriangle.getA() });
             List<Pose3d> allCoralsOnField = SimulatedArena.getInstance().getGamePiecesByType("Coral");

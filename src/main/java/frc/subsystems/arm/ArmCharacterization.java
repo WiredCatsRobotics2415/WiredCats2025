@@ -1,12 +1,10 @@
 package frc.subsystems.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.units.VoltageUnit;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Velocity;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
@@ -18,7 +16,7 @@ public class ArmCharacterization extends Characterizer {
     private static ArmCharacterization instance;
     private Arm arm;
     private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.25).div(Second.of(1));
-    private final Angle TestSafetyThreshold = Degrees.of(7);
+    private final double TestSafetyThreshold = 7;
 
     private ArmCharacterization(Arm arm) {
         this.arm = arm;
@@ -38,14 +36,12 @@ public class ArmCharacterization extends Characterizer {
 
     private boolean willNotHitFront() {
         if (!Characterizer.enableSafety.get()) return true;
-        Angle measurement = arm.getMeasurement();
-        return measurement.minus(TestSafetyThreshold).lte(ArmConstants.MinDegreesFront.angle());
+        return (arm.getMeasurement() - TestSafetyThreshold) < ArmConstants.MinDegreesFront;
     }
 
     private boolean willNotHitBack() {
         if (!Characterizer.enableSafety.get()) return true;
-        Angle measurement = arm.getMeasurement();
-        return measurement.plus(TestSafetyThreshold).gte(ArmConstants.MaxDegreesBack.angle());
+        return (arm.getMeasurement() + TestSafetyThreshold) > ArmConstants.MaxDegreesBack;
     }
 
     public static void enable(Arm armSubsystem) {

@@ -1,5 +1,7 @@
 package frc.commands;
 
+import static edu.wpi.first.units.Units.Inches;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -64,9 +66,11 @@ public class ScoreCoral extends GenericAutomation {
     @Override
     public void initialize() {
         if (GenericAutomation.getCurrentAutomationMode() == AutomationMode.PresetAndAlign) {
-            Transform2d leftOffset = new Transform2d(GenericAutomation.CenterToBumper.plus(goalDriveOffset.distance()),
-                LeftOffset.distance(), Rotation2d.kZero);
-            Transform2d rightOffset = new Transform2d(GenericAutomation.CenterToBumper.plus(goalDriveOffset.distance()),
+            Transform2d leftOffset = new Transform2d(
+                Inches.of(GenericAutomation.CenterToBumper).plus(goalDriveOffset.distance()), LeftOffset.distance(),
+                Rotation2d.kZero);
+            Transform2d rightOffset = new Transform2d(
+                Inches.of(GenericAutomation.CenterToBumper).plus(goalDriveOffset.distance()),
                 RightOffset.distance().times(-1), Rotation2d.kZero);
             Transform2d offset = side.equals(Side.Left) ? leftOffset : rightOffset;
 

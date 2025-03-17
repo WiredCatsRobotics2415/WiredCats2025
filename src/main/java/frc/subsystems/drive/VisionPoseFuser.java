@@ -1,6 +1,7 @@
 package frc.subsystems.drive;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -37,7 +38,7 @@ public class VisionPoseFuser {
     private final TuneableNumber AngularAccelerationOfRobot = new TuneableNumber(6, "VPF/AngularAccelerationOfRobot");
     private final TuneableNumber PoseLatencyScalar = new TuneableNumber(0.075, "VPF/PoseLatencyScalar");
     // To disable vision pose fusing: set this to 0
-    private final Distance DistanceFromCurrentPoseCutoffThreshold = RobotMeasurements.CenterToFrameRadius;
+    private final Distance DistanceFromCurrentPoseCutoffThreshold = Inches.of(RobotMeasurements.CenterToFrameRadius);
 
     private StatusSignal<LinearAcceleration> pigeonLinearAccelX;
     private StatusSignal<LinearAcceleration> pigeonLinearAccelY;

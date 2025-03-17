@@ -1,11 +1,8 @@
 package frc.subsystems.coralintake;
 
-import static edu.wpi.first.units.Units.Degrees;
-
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
@@ -33,9 +30,9 @@ public class CoralIntake extends GenericSlapdown {
         new Constraints(CoralIntakeConstants.BaseVelocityMax.get(), CoralIntakeConstants.BaseAccelerationMax.get()),
         "CoralIntakePID");
 
-    @Getter private Angle goal = Degrees.of(0.0);
+    @Getter private double goal = 0.0;
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
-    private Angle lastMeasurement = Degrees.of(0.0);
+    private double lastMeasurement = 0.0;
     @Getter private boolean intaking = false;
     @Getter private boolean outtaking = false;
     private boolean hasResetPidController = false;
@@ -73,14 +70,14 @@ public class CoralIntake extends GenericSlapdown {
     @Override
     public Command stow() {
         return runOnce(() -> {
-            pid.setGoal(CoralIntakeConstants.StowAngle.in(Degrees));
+            pid.setGoal(CoralIntakeConstants.StowAngle);
         });
     }
 
-    public void setPivotGoal(Angle goal) {
-        if (goal.lte(CoralIntakeConstants.MaxAngle.angle()) && goal.gte(CoralIntakeConstants.GroundAngle.angle())) {
+    public void setPivotGoal(double goal) {
+        if (goal <= CoralIntakeConstants.MaxAngle.get() && goal >= CoralIntakeConstants.GroundAngle.get()) {
             this.goal = goal;
-            pid.setGoal(goal.in(Degrees));
+            pid.setGoal(goal);
         }
     }
 
@@ -88,7 +85,7 @@ public class CoralIntake extends GenericSlapdown {
     // TODO: lastMeasuremnent
     // public Angle getPivotAngle() { return lastMeasurement; }
 
-    public Angle getPivotAngle() { return Degrees.of(0); }
+    public double getPivotAngle() { return 0; }
 
     @Override
     public Command toggleIntake() {

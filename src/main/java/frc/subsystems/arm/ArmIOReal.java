@@ -8,8 +8,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
+import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.constants.Subsystems.ArmConstants;
-import frc.utils.hardware.Throughbore;
 
 public class ArmIOReal implements ArmIO {
     private TalonFX motor;
@@ -19,11 +19,10 @@ public class ArmIOReal implements ArmIO {
     private StatusSignal<Current> motorSupply;
     private StatusSignal<Temperature> motorTemp;
 
-    private Throughbore throughbore;
+    private DutyCycleEncoder throughbore;
 
     public ArmIOReal() {
-        throughbore = new Throughbore(ArmConstants.ThroughborePort, ArmConstants.ThroughboreMin,
-            ArmConstants.ThroughboreMax, true, "ArmThroughbore");
+        throughbore = new DutyCycleEncoder(ArmConstants.ThroughborePort);
 
         configureMotors();
     }
@@ -50,8 +49,11 @@ public class ArmIOReal implements ArmIO {
         inputs.motorTemp = motorTemp.getValueAsDouble();
 
         inputs.appliedVoltage = appliedVoltage;
-        throughbore.get(); // DO NOT REMOVE
-        inputs.throughborePosition = throughbore.getRaw();
+        double tBor = inputs.throughborePosition;
+        if (tBor > 0 && tBor < 0.132) {
+            tBor += 1;
+        }
+        inputs.throughborePosition = tBor;
     }
 
     @Override
