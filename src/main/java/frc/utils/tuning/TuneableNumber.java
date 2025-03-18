@@ -48,7 +48,7 @@ public class TuneableNumber {
     }
 
     /**
-     * Assuming this number is a distance in inches, convert it to inches
+     * Assuming this number is a distance in inches, convert it to meters
      */
     public double meters() {
         return Units.inchesToMeters(get());

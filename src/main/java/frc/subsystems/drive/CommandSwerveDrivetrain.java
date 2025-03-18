@@ -155,8 +155,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
              */
         }
 
-        DashboardManager.getInstance().addBoolSupplier(true, "Single tag?",
-            () -> currentPoseEstimationType == PoseEstimationType.SingleTag, null);
+        DashboardManager.getInstance().addBoolSupplier(true, "Using ST",
+            () -> currentPoseEstimationType == PoseEstimationType.SingleTag);
     }
 
     public static CommandSwerveDrivetrain getInstance() {

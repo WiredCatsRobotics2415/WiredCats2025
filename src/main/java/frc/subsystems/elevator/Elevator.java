@@ -5,11 +5,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.subsystems.arm.Arm;
+import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableElevatorFF;
+import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuneablePIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
@@ -26,6 +28,8 @@ public class Elevator extends SubsystemBase {
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
     @Getter private TuneablePIDController pid = new TuneablePIDController(ElevatorConstants.kP, 0.0d,
         ElevatorConstants.kD, "ElevatorPID");
+
+    private TuneableNumber noVoltDeadbandHeight = new TuneableNumber(1.5, "Elevator/noVoltDeadbandHeight");
 
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
@@ -71,10 +75,16 @@ public class Elevator extends SubsystemBase {
     public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
+        if (getMeasurement() < noVoltDeadbandHeight.get() && pid.atSetpoint()) {
+            io.setVoltage(0.0d);
+            return;
+        }
+
         double feedforward = ff.calculate(setpoint.velocity);
 
-        double voltOut = output + feedforward + Trig.cosizzle(Arm.getInstance().getMeasurement()) *
-            (ElevatorConstants.kGForArm.get() + ElevatorConstants.kGForArmWithAlgae.get());
+        double cosArm = Trig.cosizzle(Arm.getInstance().getMeasurement());
+        double voltOut = output + feedforward + cosArm * ElevatorConstants.kGForArm.get();
+        if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
         io.setVoltage(voltOut);
     }

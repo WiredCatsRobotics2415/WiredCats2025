@@ -7,9 +7,12 @@ import com.ctre.phoenix6.controls.StrictFollower;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.RobotController;
 import frc.constants.Subsystems.ElevatorConstants;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -20,10 +23,14 @@ public class ElevatorIOReal implements ElevatorIO {
     private StatusSignal<Current> leftStator;
     private StatusSignal<Current> leftSupply;
     private StatusSignal<Temperature> leftTemp;
+    private StatusSignal<Angle> leftRotorPosition;
+    private StatusSignal<AngularVelocity> leftRotorVelocity;
 
     private StatusSignal<Current> rightStator;
     private StatusSignal<Current> rightSupply;
     private StatusSignal<Temperature> rightTemp;
+
+    private double rotorRotationToElevatorHeight = (1.7567 * 3 * Math.PI) / 5.0d;
 
     private AnalogInput wirePotentiometer;
 
@@ -48,13 +55,15 @@ public class ElevatorIOReal implements ElevatorIO {
         leftStator = leftMotor.getStatorCurrent();
         leftSupply = leftMotor.getSupplyCurrent();
         leftTemp = leftMotor.getDeviceTemp();
+        leftRotorPosition = leftMotor.getRotorPosition();
+        leftRotorVelocity = leftMotor.getRotorVelocity();
 
         rightStator = rightMotor.getStatorCurrent();
         rightSupply = rightMotor.getSupplyCurrent();
         rightTemp = rightMotor.getDeviceTemp();
 
         BaseStatusSignal.setUpdateFrequencyForAll(50, leftStator, leftSupply, leftTemp, rightStator, rightSupply,
-            rightTemp);
+            rightTemp, leftRotorPosition, leftRotorVelocity);
     }
 
     @Override
@@ -70,9 +79,17 @@ public class ElevatorIOReal implements ElevatorIO {
         inputs.supplyCurrentRight = rightSupply.getValueAsDouble();
 
         inputs.appliedVoltage = appliedVoltage;
-        inputs.wirePotentiometer = wirePotentiometer.getVoltage();
-        inputs.inches = Math.pow(19.25064 * inputs.wirePotentiometer, 2) + (-8.32661 * inputs.wirePotentiometer) +
-            1.56748; // TODO: substitute in regression eq
+        inputs.wirePotentiometer = wirePotentiometer.getVoltage() / RobotController.getVoltage5V();
+        // Unstandardized:
+        // inputs.inches = Math.pow(19.25064 * wirePotentiometer.getVoltage(), 2) + (-8.32661 * wirePotentiometer.getVoltage()) +
+        // 1.56748;
+
+        // Standardized:
+        inputs.inches = Math.pow(481.26598 * inputs.wirePotentiometer, 2) + (-41.63306 * inputs.wirePotentiometer) +
+            1.56748;
+
+        // Rotor encoder:
+        // inputs.inches = BaseStatusSignal.getLatencyCompensatedValueAsDouble(leftRotorPosition, leftRotorVelocity) * rotorRotationToElevatorHeight;
     }
 
     @Override

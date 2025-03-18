@@ -17,7 +17,7 @@ import frc.utils.tuning.TuneableNumber;
 public class Dealgae extends GenericAutomation {
     private static final Transform2d Offset = new Transform2d(Inches.of(GenericAutomation.CenterToBumper), Inches.of(0),
         Rotation2d.kZero);
-    private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "DeAlgae/DriveTolerance");
+    private static final TuneableNumber DriveTolerance = new TuneableNumber(3, "DeAlgae/DriveTolerance");
 
     boolean autoSelectDealgae = true;
     boolean manualSelectGettingTop = true;
@@ -57,7 +57,7 @@ public class Dealgae extends GenericAutomation {
                     .plus(new Transform2d(
                         algaeOnTop ? Presets.TopDADriveOffset.meters() : Presets.BottomDADriveOffset.meters(), 0,
                         Rotation2d.kZero));
-                driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
+                driveCommand = drive.driveTo(driveToPose, DriveTolerance.meters());
                 driveCommand.schedule();
 
                 superStructureCommand = superStructure

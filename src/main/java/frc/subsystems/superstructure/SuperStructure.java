@@ -3,6 +3,7 @@ package frc.subsystems.superstructure;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -10,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.RobotMeasurements;
 import frc.constants.RuntimeConstants;
+import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.ElevatorConstants;
@@ -56,7 +58,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(10, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(15, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
@@ -306,5 +308,15 @@ public class SuperStructure extends SubsystemBase {
     @Override
     public void periodic() {
         // updateCurrentStateCollisions();
+        double currentMaxAccel = EndEffector.getInstance().hasAlgae() ? ArmConstants.AlgaeAccelerationMax.get()
+            : ArmConstants.BaseAccelerationMax.get();
+        double maxArmAcceleration = currentMaxAccel - ((elevator.getMeasurement() / ElevatorConstants.MaxHeight) *
+            (1 - percentOfArmAccel.get()) * currentMaxAccel);
+
+        double maxArmVelocity = ArmConstants.BaseVelocityMax.get() -
+            (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight) * (1 - percentOfArmVelo.get()) *
+                ArmConstants.BaseVelocityMax.get());
+
+        arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
     }
 }

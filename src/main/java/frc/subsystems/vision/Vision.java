@@ -3,10 +3,12 @@ package frc.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.driver.DashboardManager;
 import frc.utils.Util;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,12 +27,13 @@ public class Vision extends SubsystemBase {
         Coral, Algae
     }
 
-    @Getter
-    @Setter private LimelightsForElements currentFocusedElement = LimelightsForElements.Reef;
-
     private Vision() {
         io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, new VisionIO() {});
         setEndEffectorPipeline(EndEffectorPipeline.DriverView);
+
+        DashboardManager.getInstance().addBoolSupplier(true, "Reef ST available", () -> {
+            return limelightsCanSeeOneOf(LimelightsForElements.Reef, ReefMeasurements.reefIds);
+        });
     }
 
     public static Vision getInstance() {

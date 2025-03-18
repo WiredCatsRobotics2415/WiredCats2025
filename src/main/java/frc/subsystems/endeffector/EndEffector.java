@@ -1,7 +1,9 @@
 package frc.subsystems.endeffector;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.vision.Vision;
 import frc.utils.Util;
@@ -21,6 +23,15 @@ public class EndEffector extends SubsystemBase {
     private EndEffector() {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             new EndEffectorIO() {});
+        
+        new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
+            io.setPower(EndEffectorConstants.HoldCoralSpeed.get());
+            intakingCoral = false;
+        }));
+        new Trigger(this::hasAlgae).onTrue(Commands.runOnce(() -> {
+            io.setPower(EndEffectorConstants.HoldAlgaeSpeed.get());
+            intakingAlgae = false;
+        }));
     }
 
     public static EndEffector getInstance() {

@@ -17,7 +17,7 @@ import frc.utils.tuning.TuneableNumber;
 public class IntakeFromHPS extends GenericAutomation {
     private static final Transform2d Offset = new Transform2d(Inches.of(GenericAutomation.CenterToBumper), Inches.of(0),
         Rotation2d.kZero);
-    private static final TuneableNumber DriveToleranceMeters = new TuneableNumber(3, "IntakeFromHPS/DriveTolerance");
+    private static final TuneableNumber DriveTolerance = new TuneableNumber(3, "IntakeFromHPS/DriveTolerance");
 
     @Override
     public void initialize() {
@@ -28,7 +28,7 @@ public class IntakeFromHPS extends GenericAutomation {
 
             Pose2d driveToPose = apriltagPoseAndId.getFirst().plus(Offset)
                 .plus(new Transform2d(Presets.HPSDriveOffset.meters(), 0, Rotation2d.kZero));
-            driveCommand = drive.driveTo(driveToPose, DriveToleranceMeters.meters());
+            driveCommand = drive.driveTo(driveToPose, DriveTolerance.meters());
             driveCommand.schedule();
 
             superStructureCommand = superStructure.beThereAsapNoEnd(Presets.IntakeFromHPS);
