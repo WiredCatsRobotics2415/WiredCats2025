@@ -25,7 +25,7 @@ public class TuneableNumber {
     public TuneableNumber(double defaultNumber, String key) {
         this.previousNumber = defaultNumber;
         if (RuntimeConstants.TuningMode) {
-            thisNetworkNumber = new LoggedNetworkNumber("/Tuning/" + key);
+            thisNetworkNumber = new LoggedNetworkNumber("/Tuning/" + key, defaultNumber);
             thisNetworkNumber.setDefault(defaultNumber);
             listeners = new ArrayList<Consumer<Double>>();
             all.add(this);
@@ -34,13 +34,16 @@ public class TuneableNumber {
 
     public TuneableNumber(Distance defaultDistance, String key) {
         this(defaultDistance.in(Inches), key);
+        lastDistance = defaultDistance;
     }
 
     public TuneableNumber(Angle defaultAngle, String key) {
         this(defaultAngle.in(Degrees), key);
+        lastAngle = defaultAngle;
     }
 
     public double get() {
+        if (RuntimeConstants.TuningMode && listeners.size() == 0) return thisNetworkNumber.get();
         return previousNumber;
     }
 
@@ -48,7 +51,7 @@ public class TuneableNumber {
      * Assuming this number is a distance in inches, convert it to inches
      */
     public double meters() {
-        return Units.inchesToMeters(previousNumber);
+        return Units.inchesToMeters(get());
     }
 
     /**
@@ -56,7 +59,7 @@ public class TuneableNumber {
      */
     public Distance distance() {
         if (this.lastDistance == null) {
-            this.lastDistance = Inches.of(previousNumber);
+            this.lastDistance = Inches.of(get());
         }
         return lastDistance;
     }
@@ -65,7 +68,7 @@ public class TuneableNumber {
      * Assuming this number is an angle in degrees, convert it to radians
      */
     public double radians() {
-        return Units.degreesToRadians(previousNumber);
+        return Units.degreesToRadians(get());
     }
 
     /**
@@ -73,7 +76,7 @@ public class TuneableNumber {
      */
     public Angle angle() {
         if (this.lastAngle == null) {
-            this.lastAngle = Degrees.of(previousNumber);
+            this.lastAngle = Degrees.of(get());
         }
         return lastAngle;
     }
@@ -95,6 +98,7 @@ public class TuneableNumber {
     }
 
     private void updateFromNT() {
+        if (listeners.size() == 0) return;
         double entry = thisNetworkNumber.get();
         if (entry != previousNumber) {
             previousNumber = entry;

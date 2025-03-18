@@ -8,8 +8,8 @@ import edu.wpi.first.wpilibj.RobotBase;
 public final class RuntimeConstants {
     public static final Mode SimMode = Mode.SIM;
     public static final Mode CurrentMode = RobotBase.isReal() ? Mode.REAL : SimMode;
-    public static final boolean TuningMode = false;
-    public static final boolean VisualizationEnabled = false;
+    public static final boolean TuningMode = true;
+    public static final boolean VisualizationEnabled = !RobotBase.isReal();
 
     public static final String HootFileName = "";
 

@@ -16,7 +16,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.constants.Subsystems.DriveConstants;
@@ -29,19 +31,19 @@ public class Measurements {
 
     public class RobotMeasurements {
         // Front of the robot: coral scoring side
-        public static final double BumperLength = 3.204;
-        public static final double BumperToBumper = 36;
+        public static final Distance BumperLength = Inches.of(3.204);
+        public static final Distance BumperToBumper = Inches.of(36);
 
-        public static final double CenterToFrameRadius = 21.313;
-        public static final double CenterToFramePerpendicular = 15.401;
-        public static final double DriveTrainRadius = 18.432785;
-        public static final double DriveTrainTrackWidth = 24.625;
+        public static final Distance CenterToFrameRadius = Inches.of(21.313);
+        public static final Distance CenterToFramePerpendicular = Inches.of(15.401);
+        public static final Distance DriveTrainRadius = Inches.of(18.432785);
+        public static final Distance DriveTrainTrackWidth = Inches.of(24.625);
 
-        public static final double ElevatorTilt = 3.7; // Towards the front
+        public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
 
         public static final Mass RobotWeight = Pounds.of(107.5); // TODO: with climber, 114.5
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
-            Units.inchesToMeters(DriveTrainTrackWidth / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
+            (DriveTrainTrackWidth.in(Meters) / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
             TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with slip current characerization
             DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);

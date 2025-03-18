@@ -12,13 +12,10 @@ import frc.utils.math.Algebra;
 import frc.utils.math.Trig;
 import java.util.HashMap;
 import java.util.Map;
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class OI {
     CommandXboxController controller;
     CommandJoystick numpad;
-
-    private static LoggedNetworkNumber translationStickMult = new LoggedNetworkNumber("OI/translationStickMult", 2.0d);
 
     public enum Bind {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
@@ -29,6 +26,7 @@ public class OI {
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
+    private double realControllerMultiplier = 0.0d;
 
     private static OI instance;
 
@@ -42,6 +40,7 @@ public class OI {
     private OI() {
         controller = new CommandXboxController(0);
         numpad = new CommandJoystick(1);
+        realControllerMultiplier = Robot.isReal() ? 2.0d : 1.0d;
 
         binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
 
@@ -86,9 +85,9 @@ public class OI {
 
     public double[] getXY() {
         double x = MathUtil.applyDeadband(
-            controller.getRawAxis(GulikitButtons.LeftJoystickX) * translationStickMult.get(), Controls.Deadband);
+            controller.getRawAxis(GulikitButtons.LeftJoystickX) * realControllerMultiplier, Controls.Deadband);
         double y = MathUtil.applyDeadband(
-            controller.getRawAxis(GulikitButtons.LeftJoystickY) * translationStickMult.get(), Controls.Deadband);
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) * realControllerMultiplier, Controls.Deadband);
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
@@ -105,8 +104,8 @@ public class OI {
     }
 
     public double[] getRawXY() {
-        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX) * translationStickMult.get(),
-            controller.getRawAxis(GulikitButtons.LeftJoystickY) * translationStickMult.get() };
+        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX) * realControllerMultiplier,
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) * realControllerMultiplier };
     }
 
     public double getRotation() {

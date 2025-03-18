@@ -1,6 +1,5 @@
 package frc.subsystems.drive;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.Seconds;
 
@@ -361,10 +360,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private void startSimThread() {
         mapleSimSwerveDrivetrain = new MapleSimSwerveDrivetrain(Seconds.of(kSimLoopPeriod),
-            RobotMeasurements.RobotWeight, Inches.of(RobotMeasurements.BumperToBumper),
-            Inches.of(RobotMeasurements.BumperToBumper), DCMotor.getKrakenX60Foc(1), DCMotor.getFalcon500(1),
-            RobotMeasurements.SwerveModuleConfig.wheelCOF, getModuleLocations(), getPigeon2(), getModules(),
-            TunerConstants.FrontLeft, TunerConstants.FrontRight, TunerConstants.BackLeft, TunerConstants.BackRight);
+            RobotMeasurements.RobotWeight, RobotMeasurements.BumperToBumper, RobotMeasurements.BumperToBumper,
+            DCMotor.getKrakenX60Foc(1), DCMotor.getFalcon500(1), RobotMeasurements.SwerveModuleConfig.wheelCOF,
+            getModuleLocations(), getPigeon2(), getModules(), TunerConstants.FrontLeft, TunerConstants.FrontRight,
+            TunerConstants.BackLeft, TunerConstants.BackRight);
         /* Run simulation at a faster rate so PID gains behave more reasonably */
         simNotifier = new Notifier(mapleSimSwerveDrivetrain::update);
         simNotifier.startPeriodic(kSimLoopPeriod);

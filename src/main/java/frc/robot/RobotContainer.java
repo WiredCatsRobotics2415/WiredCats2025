@@ -126,7 +126,7 @@ public class RobotContainer {
                 return drive.driveOpenLoopRobotCentricRequest
                     .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
                     .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-                    .withRotationalRate(driveRotationLimiter.calculate(0) * Controls.MaxAngularRadS);
+                    .withRotationalRate(driveRotationLimiter.calculate(0));
             }
             double[] linearInput = oi.getXY();
             double x = linearInput[1], y = linearInput[0];
@@ -134,7 +134,7 @@ public class RobotContainer {
             return drive.driveOpenLoopFieldCentricRequest
                 .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
                 .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-                .withRotationalRate(driveRotationLimiter.calculate(-rotation) * Controls.MaxAngularRadS);
+                .withRotationalRate(driveRotationLimiter.calculate(-rotation * Controls.MaxAngularRadS));
         }).withName("Teleop Default"));
         oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.25, DebounceType.kRising)
             .onTrue(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.MinorAdjustment))

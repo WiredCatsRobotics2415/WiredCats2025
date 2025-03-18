@@ -71,6 +71,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
         inputs.appliedVoltage = appliedVoltage;
         inputs.wirePotentiometer = wirePotentiometer.getVoltage();
+        inputs.inches = Math.pow(19.25064 * inputs.wirePotentiometer, 2) + (-8.32661 * inputs.wirePotentiometer) +
+            1.56748; // TODO: substitute in regression eq
     }
 
     @Override

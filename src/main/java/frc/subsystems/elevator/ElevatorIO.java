@@ -17,6 +17,7 @@ public interface ElevatorIO {
 
         public double appliedVoltage = 0.0d;
         public double wirePotentiometer = 0.0d;
+        public double inches = 0.0d;
     }
 
     public default void updateInputs(ElevatorIOInputs inputs) {};

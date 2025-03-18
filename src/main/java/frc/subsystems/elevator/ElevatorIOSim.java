@@ -1,6 +1,7 @@
 package frc.subsystems.elevator;
 
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import frc.constants.Subsystems.ElevatorConstants;
@@ -32,6 +33,9 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.wirePotentiometer = Algebra.linearMap(simElevator.getPositionMeters(), ElevatorConstants.MinHeight,
             ElevatorConstants.MaxHeight, ElevatorConstants.PotentiometerMinVolt,
             ElevatorConstants.PotentiometerMaxVolt);
+        inputs.inches = Algebra.linearMap(simElevator.getPositionMeters(), 0,
+            Units.inchesToMeters(ElevatorConstants.MaxHeight), ElevatorConstants.MinHeight,
+            ElevatorConstants.MaxHeight);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package frc.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Radians;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -47,7 +48,7 @@ public class SuperStructure extends SubsystemBase {
         EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double lastEEDistanceFromElevator = 0.0d;
 
-    private double elevatorTilt = Units.degreesToRadians(RobotMeasurements.ElevatorTilt);
+    private double elevatorTilt = RobotMeasurements.ElevatorTilt.in(Radians);
     private double eeLength = EndEffectorConstants.EffectiveDistanceFromElevator.in(Inches);
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
