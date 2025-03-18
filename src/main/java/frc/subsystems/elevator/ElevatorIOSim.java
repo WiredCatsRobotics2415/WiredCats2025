@@ -30,9 +30,6 @@ public class ElevatorIOSim implements ElevatorIO {
         inputs.isConnectedRight = true;
         inputs.statorCurrentRight = draw;
 
-        inputs.wirePotentiometer = Algebra.linearMap(simElevator.getPositionMeters(), ElevatorConstants.MinHeight,
-            ElevatorConstants.MaxHeight, ElevatorConstants.PotentiometerMinVolt,
-            ElevatorConstants.PotentiometerMaxVolt);
         inputs.inches = Algebra.linearMap(simElevator.getPositionMeters(), 0,
             Units.inchesToMeters(ElevatorConstants.MaxHeight), ElevatorConstants.MinHeight,
             ElevatorConstants.MaxHeight);

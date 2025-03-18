@@ -7,6 +7,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -158,7 +159,7 @@ public class RobotContainer {
         // Shoot is button B:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
-        oi.binds.get(OI.Bind.StowPreset).onTrue(CommonCommands.stowFromGroundIntake().ignoringDisable(true));
+        oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
         // oi.binds.get(OI.Bind.IntakeFromGround)
         // .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
@@ -188,8 +189,8 @@ public class RobotContainer {
         // superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
         // .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
 
-        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(
-            superstructure.beThereAsap(Presets.ProcessorScore).andThen(Commands.waitUntil(superstructure::allAtGoal)));
+        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
+            .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
 
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runBackward()).onFalse(climber.stop());
@@ -222,15 +223,15 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        // double[] ssLimits = superstructure.recommendedDriveAccelLimits();
-        // driveXLimiter.setRateLimit(ssLimits[0]);
-        // driveYLimiter.setRateLimit(ssLimits[1]);
-        // driveRotationLimiter.setRateLimit(ssLimits[2]);
+        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        driveXLimiter.setRateLimit(ssLimits[0]);
+        driveYLimiter.setRateLimit(ssLimits[1]);
+        driveRotationLimiter.setRateLimit(ssLimits[2]);
 
-        // drive.getDriveToPositionXController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
-        // drive.getDriveToPositionYController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        drive.getDriveToPositionXController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        drive.getDriveToPositionYController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

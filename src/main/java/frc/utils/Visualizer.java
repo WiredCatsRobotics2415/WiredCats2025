@@ -51,13 +51,13 @@ public class Visualizer {
         double offsetOfStage2 = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) * height /
             Units.inchesToMeters(ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage2HeightM);
         Pose3d elevatorStage2 = new Pose3d(offsetOfStage2, 0,
-            height / Units.inchesToMeters(ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage2HeightM),
+            (height / Units.inchesToMeters(ElevatorConstants.MaxHeight)) * ElevatorConstants.Stage2HeightM,
             Rotation3d.kZero);
 
         double offsetOfStage3 = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) * height /
             Units.inchesToMeters(ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage3HeightM);
-        Pose3d elevatorStage3 = new Pose3d(offsetOfStage2 + offsetOfStage3, 0, height / ElevatorConstants.MaxHeight *
-            (ElevatorConstants.Stage2HeightM + (ElevatorConstants.Stage3HeightM)), Rotation3d.kZero);
+        Pose3d elevatorStage3 = new Pose3d(offsetOfStage2 + offsetOfStage3, 0, (height / ElevatorConstants.MaxHeight) *
+            (ElevatorConstants.Stage2HeightM + ElevatorConstants.Stage3HeightM), Rotation3d.kZero);
 
         double carriageOffset = Trig.cosizzle(Units.degreesToRadians(90 - 3.7)) * height /
             (ElevatorConstants.MaxHeight) * (ElevatorConstants.Stage2HeightM);

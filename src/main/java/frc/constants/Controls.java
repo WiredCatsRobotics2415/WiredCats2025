@@ -57,10 +57,10 @@ public class Controls {
     }
 
     public class Presets {
-        public static final TuneableSuperStructureState BumpStow = new TuneableSuperStructureState(Inches.of(34),
-            Degrees.of(100), Degrees.of(CoralIntakeConstants.StowAngle), "BumpStow");
         public static final TuneableSuperStructureState Stow = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(100), Degrees.of(CoralIntakeConstants.StowAngle), "Stow");
+            Degrees.of(100), "Stow");
+        public static final TuneableSuperStructureState AlgaeStow = new TuneableSuperStructureState(Inches.of(0),
+            Degrees.of(75), "AlgaeStow");
 
         // Positive: coral scoring side
         public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(28.5),

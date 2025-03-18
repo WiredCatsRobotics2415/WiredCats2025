@@ -84,6 +84,7 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
+        lastMeasurement = inputs.inches;
         differentiableMeasurementInches.update(inputs.inches);
 
         useOutput(pid.calculate(inputs.inches), new TrapezoidProfile.State(pid.getSetpoint(), 0));

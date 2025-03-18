@@ -1,6 +1,7 @@
 package frc.utils.tuning;
 
 import com.pathplanner.lib.config.PIDConstants;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
@@ -99,5 +100,9 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
      */
     public double goalError() {
         return this.getGoal().position - lastMeasure;
+    }
+
+    public boolean isHere(double here) {
+        return MathUtil.isNear(here, lastMeasure, this.getPositionTolerance());
     }
 }

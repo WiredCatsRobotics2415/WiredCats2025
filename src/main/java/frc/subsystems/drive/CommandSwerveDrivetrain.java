@@ -122,12 +122,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance);
         driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
 
+        TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+            resetPoseFromLimelight().ignoringDisable(true));
+        TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
+            resetRotationFromLimelightMT1().ignoringDisable(true));
+
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
-            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
-                resetPoseFromLimelight().ignoringDisable(true));
-            TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
-                resetRotationFromLimelightMT1().ignoringDisable(true));
 
             DriveConstants.PPTranslationP.addListener(newP -> {
                 DriveConstants.PPTranslationPID = new PIDConstants(newP);
