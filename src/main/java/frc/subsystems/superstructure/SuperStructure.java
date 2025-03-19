@@ -58,7 +58,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(15, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(35, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
@@ -75,6 +75,7 @@ public class SuperStructure extends SubsystemBase {
     private Point2d eeTopTip = new Point2d(0, 0);
 
     private boolean isDone = true;
+    private TuneableSuperStructureState goal;
 
     private static SuperStructure instance;
 
@@ -98,23 +99,23 @@ public class SuperStructure extends SubsystemBase {
     public Command stow() {
         return this.runOnce(() -> {
             if (EndEffector.getInstance().hasAlgae()) {
-                beThereAsap(Presets.AlgaeStow).schedule();
+                beThereAsapNoEnd(Presets.AlgaeStow).schedule();
             } else {
-                beThereAsap(Presets.Stow).schedule();
+                beThereAsapNoEnd(Presets.Stow).schedule();
             }
         });
     }
 
     public void setArmGoalSafely(double newGoal) {
-        if (stateIsValid(elevator.getGoalInches(), newGoal, coralIntake.getGoal())) {
-            arm.setGoal(newGoal);
-        }
+        // if (stateIsValid(elevator.getGoalInches(), newGoal, coralIntake.getGoal())) {
+        arm.setGoal(newGoal);
+        // }
     }
 
     public void setElevatorGoalSafely(double newGoal) {
-        if (stateIsValid(newGoal, arm.getGoalDegrees(), coralIntake.getGoal())) {
-            elevator.setGoal(newGoal);
-        }
+        // if (stateIsValid(newGoal, arm.getGoalDegrees(), coralIntake.getGoal())) {
+        elevator.setGoal(newGoal);
+        // }
     }
 
     /**

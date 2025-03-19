@@ -8,10 +8,8 @@ import frc.constants.Subsystems.VisionConstants;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
-import frc.utils.driver.DashboardManager;
 import frc.utils.Util;
-import lombok.Getter;
-import lombok.Setter;
+import frc.utils.driver.DashboardManager;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
