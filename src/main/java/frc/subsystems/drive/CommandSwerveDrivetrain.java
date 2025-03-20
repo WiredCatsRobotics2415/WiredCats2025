@@ -313,8 +313,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
                 .withVelocityX(velocityX).withVelocityY(velocityY);
         })).until(() -> {
-            System.out.println("xCon: " + driveToPositionXController.getLastCalculation());
-            System.out.println("yCon: " + driveToPositionYController.getLastCalculation());
+            // System.out.println("xCon: " + driveToPositionXController.getLastCalculation());
+            // System.out.println("yCon: " + driveToPositionYController.getLastCalculation());
             // return (driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
             // && driveToPositionHeadingController.atSetpoint())
             // || (Math.abs(driveToPositionXController.getLastCalculation()) < Controls.MaxDriveMeterS * 0.025

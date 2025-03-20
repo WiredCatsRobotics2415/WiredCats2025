@@ -74,7 +74,7 @@ public class GenericAutomation extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        if (currentAutomationMode == AutomationMode.PresetAndAlign) focusCommand.cancel();
+        if (currentAutomationMode == AutomationMode.PresetAndAlign && focusCommand != null) focusCommand.cancel();
         RobotStatus.setRobotState(RobotState.WaitingToDeAlgae);
     }
 }

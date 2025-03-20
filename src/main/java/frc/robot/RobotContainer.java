@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.commands.AutoIntake;
+import frc.commands.AutoCommands.CtoRHPS;
 import frc.commands.Dealgae;
 import frc.commands.GenericAutomation;
 import frc.commands.GenericAutomation.AutomationMode;
@@ -187,12 +187,13 @@ public class RobotContainer {
         }));
         // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
-                .andThen(superstructure.beThereAsap(Presets.GroundIntake))
-                .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
-                .andThen(superstructure.stow())
-                .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
+        // oi.binds.get(OI.Bind.AutoIntakeFromGround)
+        // .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
+        // .andThen(superstructure.beThereAsap(Presets.GroundIntake))
+        // .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
+        // .andThen(superstructure.stow())
+        // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new ScoreCoral(Side.Left, Level.L4));
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
             .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
@@ -238,5 +239,5 @@ public class RobotContainer {
             .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
-    public Command getAutonomousCommand() { return autoChooser.get(); }
+    public Command getAutonomousCommand() { return new CtoRHPS(); /* autoChooser.get(); */ }
 }

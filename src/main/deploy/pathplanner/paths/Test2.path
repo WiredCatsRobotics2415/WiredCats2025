@@ -45,7 +45,7 @@
     "rotation": 180.0
   },
   "reversed": false,
-  "folder": "tests",
+  "folder": "BasicL3",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 125.00000000000001

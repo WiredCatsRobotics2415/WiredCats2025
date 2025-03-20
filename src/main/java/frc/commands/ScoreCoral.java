@@ -99,8 +99,9 @@ public class ScoreCoral extends GenericAutomation {
 
     @Override
     public void end(boolean interrupted) {
-        super.end(interrupted);
-        if (focusCommand != null) focusCommand.cancel();
-        RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
+        /*
+         * super.end(interrupted); if (focusCommand != null) focusCommand.cancel(); RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
+         */
+        System.out.println("score coral ended!");
     }
 }

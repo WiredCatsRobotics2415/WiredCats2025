@@ -3,10 +3,12 @@
   "robotLength": 0.914,
   "holonomicMode": true,
   "pathFolders": [
+    "BasicL3",
     "CenterLGround",
     "LeftSourceSpeaker",
-    "RightSourceSpeaker",
-    "tests"
+    "Taxis",
+    "CustomAutos",
+    "RightSourceSpeaker"
   ],
   "autoFolders": [],
   "defaultMaxVel": 1.25,
