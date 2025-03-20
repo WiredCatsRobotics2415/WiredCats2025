@@ -48,6 +48,8 @@ public class VisionPoseFuser {
     private boolean firstRun = true;
     @Getter
     @Setter private boolean enabled = false;
+    private double robotAngularVelocityDS;
+    private double robotAngularAccelerationDSS;
 
     private Vision vision = Vision.getInstance();
     private CommandSwerveDrivetrain drivetrain;
@@ -68,15 +70,17 @@ public class VisionPoseFuser {
         }
     }
 
-    public void update(SwerveDriveState state) {
+    public void sendLimelightsOrientation(SwerveDriveState state) {
         BaseStatusSignal.refreshAll(pigeonLinearAccelX, pigeonLinearAccelY, pigeonAngularVeloZ);
 
-        double robotAngularVelocityDS = pigeonAngularVeloZ.getValue().in(DegreesPerSecond);
+        robotAngularVelocityDS = pigeonAngularVeloZ.getValue().in(DegreesPerSecond);
         pigeonAngularVeloDDV.update(robotAngularVelocityDS);
-        double robotAngularAccelerationDSS = pigeonAngularVeloDDV.getFirstDerivative();
+        robotAngularAccelerationDSS = pigeonAngularVeloDDV.getFirstDerivative();
 
         vision.sendOrientation(state.Pose.getRotation().getDegrees(), robotAngularVelocityDS);
+    }
 
+    public void update(SwerveDriveState state) {
         if (firstRun) {
             firstRun = false;
             return;

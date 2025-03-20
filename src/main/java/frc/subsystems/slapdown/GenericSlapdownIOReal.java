@@ -1,9 +1,5 @@
 package frc.subsystems.slapdown;
 
-import com.ctre.phoenix6.configs.MotorOutputConfigs;
-import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.InvertedValue;
-import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -16,8 +12,7 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 
 public class GenericSlapdownIOReal implements GenericSlapdownIO {
-    // private SparkMax pivotMotor;
-    private TalonFX pivotMotor;
+    private SparkMax pivotMotor;
     private SparkMax intakeMotor;
     private DutyCycleEncoder throughbore;
     private AnalogInput sensor;
@@ -35,10 +30,9 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     public void updateInputs(GenericSlapdownIOInputsAutoLogged inputs) {
         if (pivotMotor == null || intakeMotor == null) return;
 
-        // inputs.pivotConnected = !pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
-        // inputs.pivotTemp = pivotMotor.getMotorTemperature();
-        // inputs.pivotStatorCurrent = pivotMotor.getOutputCurrent();
-        inputs.pivotConnected = pivotMotor.isConnected();
+        inputs.pivotConnected = !pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
+        inputs.pivotTemp = pivotMotor.getMotorTemperature();
+        inputs.pivotStatorCurrent = pivotMotor.getOutputCurrent();
         inputs.appliedVoltage = appliedVolts;
 
         inputs.intakeConnected = !intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
@@ -55,13 +49,9 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
             .voltageCompensation(12).inverted(false);
 
-        // pivotMotor = new SparkMax(pivotId, MotorType.kBrushless);
-        // pivotMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        // pivotMotor.setCANTimeout(250);
-        pivotMotor = new TalonFX(pivotId);
-        pivotMotor.getConfigurator()
-            .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-        pivotMotor.setNeutralMode(NeutralModeValue.Brake);
+        pivotMotor = new SparkMax(pivotId, MotorType.kBrushless);
+        pivotMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotor.setCANTimeout(250);
 
         intakeMotor = new SparkMax(intakeId, MotorType.kBrushless);
         intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);

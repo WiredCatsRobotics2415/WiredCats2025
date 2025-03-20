@@ -93,7 +93,7 @@ public class Controls {
         public static final TuneableNumber HPSDriveOffset = new TuneableNumber(-2.5, "Presets/IntakeFromHPS");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(153.6), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
+            Degrees.of(200), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
 
         public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(0.5),
             Degrees.of(48.7), "Processor");

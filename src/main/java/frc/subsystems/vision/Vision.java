@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
+import frc.subsystems.arm.Arm;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Util;
@@ -28,6 +29,7 @@ public class Vision extends SubsystemBase {
     private Vision() {
         io = (VisionIO) Util.getIOImplementation(VisionIOReal.class, VisionIOSim.class, new VisionIO() {});
         setEndEffectorPipeline(EndEffectorPipeline.DriverView);
+        setEndEffectorStreamOrientation(Arm.getInstance().getMeasurement() > 90);
 
         DashboardManager.getInstance().addBoolSupplier(true, "Reef ST available", () -> {
             return limelightsCanSeeOneOf(LimelightsForElements.Reef, ReefMeasurements.reefIds);
@@ -162,6 +164,7 @@ public class Vision extends SubsystemBase {
     public int getEndEffectorCameraAveragePixelValue() { return inputs.endEffectorCameraAveragePixelValue; }
 
     public void setEndEffectorPipeline(EndEffectorPipeline pipeline) {
+        System.out.println("Set EE pipeline to: " + pipeline);
         io.setEndEffectorPipeline(pipeline);
     }
 
