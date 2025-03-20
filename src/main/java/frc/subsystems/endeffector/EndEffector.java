@@ -23,7 +23,7 @@ public class EndEffector extends SubsystemBase {
     private EndEffector() {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             new EndEffectorIO() {});
-        
+
         new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
             io.setPower(EndEffectorConstants.HoldCoralSpeed.get());
             intakingCoral = false;

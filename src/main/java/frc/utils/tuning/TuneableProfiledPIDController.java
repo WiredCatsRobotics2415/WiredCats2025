@@ -103,6 +103,7 @@ public class TuneableProfiledPIDController extends ProfiledPIDController {
     }
 
     public boolean isHere(double here) {
+        System.out.println("isHere: " + here + ", " + lastMeasure + ", " + this.getPositionTolerance());
         return MathUtil.isNear(here, lastMeasure, this.getPositionTolerance());
     }
 }

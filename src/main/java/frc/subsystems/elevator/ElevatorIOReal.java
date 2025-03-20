@@ -80,13 +80,14 @@ public class ElevatorIOReal implements ElevatorIO {
 
         inputs.appliedVoltage = appliedVoltage;
         inputs.wirePotentiometer = wirePotentiometer.getVoltage() / RobotController.getVoltage5V();
+        inputs.inches = (inputs.wirePotentiometer * 185.577) - 16.93;
         // Unstandardized:
         // inputs.inches = Math.pow(19.25064 * wirePotentiometer.getVoltage(), 2) + (-8.32661 * wirePotentiometer.getVoltage()) +
         // 1.56748;
 
         // Standardized:
-        inputs.inches = Math.pow(481.26598 * inputs.wirePotentiometer, 2) + (-41.63306 * inputs.wirePotentiometer) +
-            1.56748;
+        // inputs.inches = (481.26598 * Math.pow(inputs.wirePotentiometer, 2)) + (-41.63306 * inputs.wirePotentiometer) +
+        // 0.46748;
 
         // Rotor encoder:
         // inputs.inches = BaseStatusSignal.getLatencyCompensatedValueAsDouble(leftRotorPosition, leftRotorVelocity) * rotorRotationToElevatorHeight;

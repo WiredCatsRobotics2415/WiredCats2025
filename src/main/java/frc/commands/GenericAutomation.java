@@ -67,7 +67,6 @@ public class GenericAutomation extends Command {
     @Override
     public boolean isFinished() {
         if (currentAutomationMode == AutomationMode.PresetOnly) {
-            System.out.println("not done with movement");
             return superStructure.doneWithMovement();
         }
         return driveCommand.isFinished() && superStructure.doneWithMovement();

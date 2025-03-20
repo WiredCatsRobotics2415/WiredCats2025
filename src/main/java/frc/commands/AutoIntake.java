@@ -47,7 +47,6 @@ public class AutoIntake extends Command {
         addRequirements(drive);
         driveBackward = new SwerveRequest.RobotCentric().withVelocityX(-0.4 * Controls.MaxDriveMeterS); // back of robot = intaking side
         RobotStatus.setRobotStateOnce(RobotState.AutoGroundIntaking);
-        vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork);
         endEffector.intakeAndWaitForCoral().schedule();
     }
 

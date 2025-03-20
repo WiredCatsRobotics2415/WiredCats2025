@@ -35,12 +35,12 @@ public class EndEffectorIOSim implements EndEffectorIO {
             Inches.of(11.3), IntakeSide.BACK, 1);
     }
 
-    private void outtakeNote() {
+    private void outtakeCoral() {
         Pose3d carriagePose = Visualizer.getLastCarriagePoint();
         Angle armAngle = Degrees.of(armSubsystem.getMeasurement());
         Angle endEffectorAngle = armAngle.plus(EndEffectorConstants.AngleFromArmWrtCarraige);
 
-        ReefscapeCoralOnFly outtakedNote = new ReefscapeCoralOnFly(
+        ReefscapeCoralOnFly outtakedCoral = new ReefscapeCoralOnFly(
             // Obtain robot position from drive simulation
             CommandSwerveDrivetrain.getInstance().getMapleSimSwerveDrivetrain().mapleSimDrive
                 .getSimulatedDriveTrainPose().getTranslation(),
@@ -57,10 +57,10 @@ public class EndEffectorIOSim implements EndEffectorIO {
             Meters.of(carriagePose.getZ() +
                 EndEffectorConstants.DistanceFromCarriage.in(Meters) * Trig.sizzle(endEffectorAngle)),
             // The initial speed of the coral
-            MetersPerSecond.of(EndEffectorConstants.OuttakeCoralSpeed.get()),
+            MetersPerSecond.of(-EndEffectorConstants.OuttakeCoralSpeed.get()),
             // ejection angle
             armAngle.plus(EndEffectorConstants.AngleFromArmWrtGround));
-        SimulatedArena.getInstance().addGamePieceProjectile(outtakedNote);
+        SimulatedArena.getInstance().addGamePieceProjectile(outtakedCoral);
     }
 
     @Override
@@ -76,16 +76,16 @@ public class EndEffectorIOSim implements EndEffectorIO {
     @Override
     public void setPower(double power) {
         motor.setInputVoltage(power * RobotController.getBatteryVoltage());
-        if (power > 0) {
+        if (power < 0) {
             intakeSimulation.startIntake();
         }
         if (power == 0) {
             intakeSimulation.stopIntake();
         }
-        if (power < 0) {
+        if (power > 0) {
             if (intakeSimulation.getGamePiecesAmount() > 0) {
                 intakeSimulation.obtainGamePieceFromIntake();
-                outtakeNote();
+                outtakeCoral();
             }
         }
     }

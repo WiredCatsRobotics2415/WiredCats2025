@@ -16,6 +16,7 @@ import frc.robot.Robot;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
+import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.vision.Vision;
 import frc.utils.math.Trig;
@@ -118,6 +119,10 @@ public class Visualizer {
             Pose3d[] algaePoses = SimulatedArena.getInstance().getGamePiecesArrayByType("Algae");
             Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
             Logger.recordOutput("FieldSimulation/AlagePositions", algaePoses);
+
+            if (EndEffector.getInstance().irSensorTrigger()) {
+
+            }
         }
 
         visualizePECameraTargets();

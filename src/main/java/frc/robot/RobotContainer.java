@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.commands.AutoIntake;
 import frc.commands.Dealgae;
 import frc.commands.GenericAutomation;
 import frc.commands.GenericAutomation.AutomationMode;
@@ -34,6 +35,7 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
+import frc.utils.driver.DashboardManager;
 import frc.utils.math.AdjustableSLR;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
@@ -162,32 +164,35 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
         // oi.binds.get(OI.Bind.IntakeFromGround)
         // .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS());
-        oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new Dealgae(true));
-        oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new Dealgae(false));
-        oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1));
-        oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2));
-        oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3));
-        oi.binds.get(OI.Bind.AutoScoreLeftL4).onTrue(new ScoreCoral(Side.Left, Level.L4));
-        oi.binds.get(OI.Bind.AutoScoreRightL1).onTrue(new ScoreCoral(Side.Right, Level.L1));
-        oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2));
-        oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3));
-        oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS().withTimeout(4.0));
+        oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new Dealgae(true).withTimeout(4.0));
+        oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new Dealgae(false).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreLeftL4).onTrue(new ScoreCoral(Side.Left, Level.L4).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreRightL1).onTrue(new ScoreCoral(Side.Right, Level.L1).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3).withTimeout(4.0));
+        oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4).withTimeout(4.0));
 
-        // DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
-        // () -> GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign), null);
-        // oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
-        // if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
+        DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
+            () -> GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign));
+        oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
+            if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
+            } else {
+                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
+            }
+        }));
         // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
-        // } else {
-        // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
-        // }
-        // }));
-        GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
 
-        // oi.binds.get(OI.Bind.AutoIntakeFromGround).whileTrue(
-        // superstructure.beThereAsap(Presets.GroundIntake).andThen(Commands.waitUntil(superstructure::allAtGoal))
-        // .andThen(new AutoIntake().withTimeout(5)).andThen(CommonCommands.stowFromGroundIntake()));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround)
+            .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
+                .andThen(superstructure.beThereAsap(Presets.GroundIntake))
+                .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
+                .andThen(superstructure.stow())
+                .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
             .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
@@ -197,8 +202,7 @@ public class RobotContainer {
     }
 
     private void configureTriggers() {
-        // Triggers that interact across multiple subsystems/utils should be defined here
-        // Flip driver camera based on arm angle
+        // If you change this remember to change the start condition in Vision constructor
         new Trigger(() -> {
             return arm.getMeasurement() > 90.0d;
         }).onTrue(new InstantCommand(() -> {

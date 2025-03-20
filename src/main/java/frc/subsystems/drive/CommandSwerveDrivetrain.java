@@ -96,6 +96,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private TuneableNumber headingTolerance = new TuneableNumber(DriveConstants.HeadingTolerance,
         "Drive/HeadingTolerance");
 
+    private Pose2d currentAutoDriveTarget = Pose2d.kZero;
+
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
 
@@ -211,6 +213,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
 
         SwerveDriveState currentState = getState();
+        poseFuser.sendLimelightsOrientation(currentState);
         if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
             PoseEstimate singleTag = vision.getSingleTagPoseEstimate(currentSingleTagLLs, currentSingleTagId);
             if (singleTag != null) {
@@ -230,6 +233,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             mapleSimSwerveDrivetrain.mapleSimDrive.getSimulatedDriveTrainPose());
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
         Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
+        Logger.recordOutput("Drive/AutoDrive", currentAutoDriveTarget);
     }
 
     /**
@@ -292,6 +296,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         double maxSpeedMS = TunerConstants.kSpeedAt12Volts.in(MetersPerSecond);
         return runOnce(() -> {
+            currentAutoDriveTarget = goalPose;
             SwerveDriveState currentState = getState();
             Pose2d currentPose = currentState.Pose;
             ChassisSpeeds speeds = currentState.Speeds;
@@ -316,6 +321,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             // && Math.abs(driveToPositionYController.getLastCalculation()) < Controls.MaxDriveMeterS * 0.025);
             return (driveToPositionXController.atGoal() && driveToPositionYController.atGoal()
                 && driveToPositionHeadingController.atSetpoint());
+        }).finallyDo(() -> {
+            currentAutoDriveTarget = null;
         });
     }
 

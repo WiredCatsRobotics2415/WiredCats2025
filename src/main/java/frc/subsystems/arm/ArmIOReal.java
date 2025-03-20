@@ -49,7 +49,7 @@ public class ArmIOReal implements ArmIO {
         inputs.motorTemp = motorTemp.getValueAsDouble();
 
         inputs.appliedVoltage = appliedVoltage;
-        double tBor = inputs.throughborePosition;
+        double tBor = throughbore.get();
         if (tBor > 0 && tBor < 0.132) {
             tBor += 1;
         }

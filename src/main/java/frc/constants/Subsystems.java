@@ -31,7 +31,7 @@ public class Subsystems {
             BackCenterName };
 
         public enum LimelightsForElements {
-            Reef(new int[] { 0, 1 }), Processor(new int[] { 0, 1 }), HumanPlayerStation(new int[] { 2 });
+            Reef(new int[] { 1 }), Processor(new int[] { 1 }), HumanPlayerStation(new int[] { 2 });
 
             public int[] indexInPEList;
 
@@ -87,7 +87,7 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants DTTranslationPID = new PIDConstants(2, 0, 0.1);
+        public static final PIDConstants DTTranslationPID = new PIDConstants(4, 0, 0.1);
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
@@ -109,11 +109,11 @@ public class Subsystems {
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final double kS = 0.0;
-        public static final double kG = 0.5;
+        public static final double kG = 0.6;
         public static final double kV = 0.001;
         public static final double kA = 1e-4;
-        public static final double kP = 0.1;
-        public static final double kD = 0.01;
+        public static final double kP = 0.2;
+        public static final double kD = 0.03;
 
         public static final TuneableNumber kGForArm = new TuneableNumber(0.1, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
         public static final TuneableNumber kGForArmWithAlgae = new TuneableNumber(0.05, "ElevatorFF/kGForArmWithAlgae");
@@ -136,8 +136,8 @@ public class Subsystems {
         // 180 degrees: the arm rail is parallel with the drive base on the cintake side (back of robot)
         public static final double ThroughboreMin = 1.13;
         public static final double ThroughboreMax = 0.456;
-        public static final double MaxDegreesBack = 210;
-        public static final double MinDegreesFront = -30;
+        public static final double MaxDegreesBack = 200;
+        public static final double MinDegreesFront = -20;
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.12;
@@ -147,9 +147,9 @@ public class Subsystems {
         public static final double kP = 0.05;
         public static final double kD = 0.005;
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");
-        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(720, "Arm/BaseAccelMax");
-        public static final TuneableNumber AlgaeAccelerationMax = new TuneableNumber(540, "Arm/AlgaeAccelMax");
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(540, "Arm/BaseVelocityMax");
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(270, "Arm/BaseAccelMax");
+        public static final TuneableNumber AlgaeAccelerationMax = new TuneableNumber(180, "Arm/AlgaeAccelMax");
         public static final double GoalTolerance = 6;
 
         public static final double ApproximateMassKg = 1.814;
