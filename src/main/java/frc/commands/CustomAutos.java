@@ -16,7 +16,8 @@ public class CustomAutos extends Command {
     protected ArrayList<String> pathNames = new ArrayList<>();
     protected PathPlannerPath currentPath;
     protected CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
-
+    protected boolean atTarget;
+    protected boolean hasCoral;
     protected ArrayList<PathPlannerPath> paths = new ArrayList<>();
 
     protected void addAutos() {
@@ -42,9 +43,9 @@ public class CustomAutos extends Command {
         Pose2d current = drive.getState().Pose;
         if (path != null) {
             Pose2d target = path.getPathPoses().get(path.getPathPoses().size() - 1);
-            if (current.getTranslation().getDistance(target.getTranslation()) < 0.3) {
-                System.out.println("was close enough");
+            if (current.getTranslation().getDistance(target.getTranslation()) < 0.1) {
                 return true;
+
             }
         }
         return false;
