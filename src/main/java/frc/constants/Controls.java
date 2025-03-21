@@ -63,29 +63,29 @@ public class Controls {
             Degrees.of(75), "AlgaeStow");
 
         // Positive: coral scoring side
-        public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(28.5),
-            Degrees.of(6.5), "Level1");
-        public static final TuneableNumber Level1DriveOffset = new TuneableNumber(0, // These should be negative because they back away
+        public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(28),
+            Degrees.of(-20), "Level1");
+        public static final TuneableNumber Level1DriveOffset = new TuneableNumber(2.5, // These should be negative because they back away
             "Presets/L1Offset");
 
-        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(45.64),
-            Degrees.of(1.33), "Level2");
-        public static final TuneableNumber Level2DriveOffset = new TuneableNumber(0, "Presets/L2Offset");
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(31.6),
+            Degrees.of(-15), "Level2");
+        public static final TuneableNumber Level2DriveOffset = new TuneableNumber(2.5, "Presets/L2Offset");
 
-        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(63.4),
-            Degrees.of(-0.02), "Level3");
-        public static final TuneableNumber Level3DriveOffset = new TuneableNumber(0, "Presets/L3Offset");
+        public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(49.5),
+            Degrees.of(-19), "Level3");
+        public static final TuneableNumber Level3DriveOffset = new TuneableNumber(6, "Presets/L3Offset");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(78),
-            Degrees.of(-20.6), "Level4");
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77.9),
+            Degrees.of(-18.9), "Level4");
         public static final TuneableNumber Level4DriveOffset = new TuneableNumber(0, "Presets/L4Offset");
 
-        public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(57.8),
-            Degrees.of(3.4), "BottomDeAlgae");
+        public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(30),
+            Degrees.of(45), "BottomDeAlgae");
         public static final TuneableNumber BottomDADriveOffset = new TuneableNumber(-6, "Presets/BottomDADriveOffset");
 
-        public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(66),
-            Degrees.of(17.1d), "TopDeAlgae");
+        public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(51.6),
+            Degrees.of(15), "TopDeAlgae");
         public static final TuneableNumber TopDADriveOffset = new TuneableNumber(-6, "Presets/TopDADriveOffset");
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(

@@ -162,8 +162,6 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        // oi.binds.get(OI.Bind.IntakeFromGround)
-        // .onTrue(superstructure.beThereAsap(Presets.GroundIntake).andThen(endEffector.intakeAndWaitForCoral()));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS().withTimeout(4.0));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new Dealgae(true).withTimeout(4.0));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new Dealgae(false).withTimeout(4.0));

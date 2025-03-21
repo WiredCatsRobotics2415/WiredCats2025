@@ -147,9 +147,9 @@ public class Subsystems {
         public static final double kP = 0.05;
         public static final double kD = 0.005;
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(540, "Arm/BaseVelocityMax");
-        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(270, "Arm/BaseAccelMax");
-        public static final TuneableNumber AlgaeAccelerationMax = new TuneableNumber(180, "Arm/AlgaeAccelMax");
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(540, "Arm/BaseAccelMax");
+        public static final TuneableNumber AlgaeAccelerationMax = new TuneableNumber(360, "Arm/AlgaeAccelMax");
         public static final double GoalTolerance = 6;
 
         public static final double ApproximateMassKg = 1.814;
@@ -159,7 +159,7 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final int MotorID = 12;
-        public static final int IRSensorPort = NavxMXPPorts.Analog3;
+        public static final int IRSensorPort = 1;
 
         public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(-0.3, "EndEffector/IntakeCoralSpeed");
         public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeSpeed");

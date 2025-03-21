@@ -15,7 +15,7 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.utils.tuning.TuneableNumber;
 
 public class IntakeFromHPS extends GenericAutomation {
-    private static final Transform2d Offset = new Transform2d(Inches.of(GenericAutomation.CenterToBumper), Inches.of(0),
+    private static final Transform2d Offset = new Transform2d(GenericAutomation.CenterToBumper, Inches.of(0),
         Rotation2d.kZero);
     private static final TuneableNumber DriveTolerance = new TuneableNumber(3, "IntakeFromHPS/DriveTolerance");
 

@@ -93,7 +93,7 @@ public class Measurements {
     }
 
     public class ReefMeasurements {
-        public static final Pose2d blueReefABApriltag = new Pose2d(new Translation2d(3.2576, 4.0259),
+        public static final Pose2d blueReefABApriltag = new Pose2d(new Translation2d(3.6576, 4.0259),
             Rotation2d.fromDegrees(0)); // ID 18
         public static final Pose2d blueReefCDApriltag = new Pose2d(new Translation2d(4.073906, 3.306318),
             Rotation2d.fromDegrees(60)); // ID 17
