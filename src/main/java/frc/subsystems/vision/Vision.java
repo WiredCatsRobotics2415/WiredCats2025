@@ -3,14 +3,13 @@ package frc.subsystems.vision;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.constants.Measurements.ReefMeasurements;
+import frc.constants.Measurements;
 import frc.constants.Subsystems.VisionConstants;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.subsystems.arm.Arm;
-import frc.utils.AllianceDependent;
+import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.utils.LimelightHelpers.PoseEstimate;
 import frc.utils.Util;
-import frc.utils.driver.DashboardManager;
 import org.littletonrobotics.junction.Logger;
 
 public class Vision extends SubsystemBase {
@@ -31,9 +30,10 @@ public class Vision extends SubsystemBase {
         setEndEffectorPipeline(EndEffectorPipeline.DriverView);
         setEndEffectorStreamOrientation(Arm.getInstance().getMeasurement() > 90);
 
-        DashboardManager.getInstance().addBoolSupplier(true, "Reef ST available", () -> {
-            return limelightsCanSeeOneOf(LimelightsForElements.Reef, ReefMeasurements.reefIds);
-        });
+        // Note: this is a pretty costly function to be running on the rio constantly
+        // DashboardManager.getInstance().addBoolSupplier(true, "Reef ST available", () -> {
+        // return aLimelightCanSeeOneOf(LimelightsForElements.Reef, ReefMeasurements.reefIds.get());
+        // });
     }
 
     public static Vision getInstance() {
@@ -96,9 +96,9 @@ public class Vision extends SubsystemBase {
     }
 
     /**
-     * Finds the nearest apriltag id to each limelight. Returns -1 if both limelights do not see the same tag.
+     * Finds the nearest apriltag id to each limelight. If neither can see a tag: -1. If one can see a tag: return that tag. If both can see different tags: returns tag that robot is currently closer to If both can see the same tag: return that tag. Assumes the limelights index list is either 1 or 2 elements long.
      */
-    public int nearestTagToLimelights(LimelightsForElements limelights) {
+    public int nearestTagToAtLeastOneOf(LimelightsForElements limelights) {
         int[] nearestTagToEach = new int[limelights.indexInPEList.length];
         int llCounter = 0;
         for (int indexInPE : limelights.indexInPEList) {
@@ -106,32 +106,42 @@ public class Vision extends SubsystemBase {
             llCounter += 1;
         }
 
-        boolean allEqual = true;
-        int lastTag = -1;
-        for (int tagId : nearestTagToEach) {
-            if (lastTag == -1) {
-                lastTag = tagId;
-                continue;
-            }
-            if (tagId != lastTag) {
-                allEqual = false;
-                break;
-            }
+        if (nearestTagToEach.length == 1) {
+            return nearestTagToEach[0];
         }
-        return allEqual ? nearestTagToEach[0] : -1;
+
+        System.out.println("nearestTagToAtLeastOneOf: " + nearestTagToEach[0] + ", " + nearestTagToEach[1]);
+        if (nearestTagToEach[0] == -1 || nearestTagToEach[1] == -1) {
+            if (nearestTagToEach[0] == nearestTagToEach[1]) {
+                return -1;
+            }
+            return nearestTagToEach[0] == -1 ? nearestTagToEach[1] : nearestTagToEach[0];
+        } else {
+            if (nearestTagToEach[0] == nearestTagToEach[1]) return nearestTagToEach[0];
+            System.out.println(
+                "nearestTagToAtLeastOneOf: debating between " + nearestTagToEach[0] + " and " + nearestTagToEach[1]);
+            return whichTagCloserToCurrentRobotPosition(nearestTagToEach[0], nearestTagToEach[1]) ? nearestTagToEach[0]
+                : nearestTagToEach[1];
+        }
     }
 
-    public boolean limelightsCanSeeOneOf(LimelightsForElements limelights, int[] tagSet) {
-        int nearestTagToEach = nearestTagToLimelights(limelights);
+    /**
+     * True if tag 1 is closer to the current robot position, false if tag 2 is closer
+     */
+    private boolean whichTagCloserToCurrentRobotPosition(int tag1, int tag2) {
+        Pose2d tag1Pose = Measurements.ApriltagFieldLayout.getTagPose(tag1).get().toPose2d();
+        Pose2d tag2Pose = Measurements.ApriltagFieldLayout.getTagPose(tag2).get().toPose2d();
+        Pose2d currentRobotPose = CommandSwerveDrivetrain.getInstance().getState().Pose;
+        return tag1Pose.getTranslation().getDistance(currentRobotPose.getTranslation()) < tag2Pose.getTranslation()
+            .getDistance(currentRobotPose.getTranslation());
+    }
+
+    /**
+     * True if one of the limelights can see one of the tags
+     */
+    public boolean aLimelightCanSeeOneOf(LimelightsForElements limelights, int[] tagSet) {
+        int nearestTagToEach = nearestTagToAtLeastOneOf(limelights);
         for (int tagId : tagSet) {
-            if (nearestTagToEach == tagId) return true;
-        }
-        return false;
-    }
-
-    public boolean limelightsCanSeeOneOf(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
-        int nearestTagToEach = nearestTagToLimelights(limelights);
-        for (int tagId : tagSet.get()) {
             if (nearestTagToEach == tagId) return true;
         }
         return false;

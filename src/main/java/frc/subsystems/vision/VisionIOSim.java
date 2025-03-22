@@ -80,13 +80,6 @@ public class VisionIOSim implements VisionIO {
         poseEstimationCameras = new PhotonCamera[] { frontLeftCam, frontRightCam, backCam };
     }
 
-    // TODO: Maybe don't need to make this realisitic
-    // focus on getting the simulation good enough to follow paths and test placement options
-    // vision should have a command to track apriltag sightings until it is interrupted and return a result
-    // and this class should offer a method like goToNextOption, which updates an internal state
-    // that keeps track of height, side, angle, etc
-    // then we should have one tuning command in a new visioncharacterization class that runs
-    // paths in sim, adjust options, goes again and again
     @Override
     public void updateInputs(VisionIOInputs inputs) {
         Pose2d currentRobotPose = CommandSwerveDrivetrain.getInstance().getMapleSimSwerveDrivetrain().mapleSimDrive
@@ -133,9 +126,7 @@ public class VisionIOSim implements VisionIO {
             inputs.poseTagDistances = new double[VisionConstants.PoseEstimationLLNames.length];
         }
 
-        Pose2d currentEndEffectorPosition = CommandSwerveDrivetrain.getInstance()
-            .getMapleSimSwerveDrivetrain().mapleSimDrive.getSimulatedDriveTrainPose()
-                .plus(RobotMeasurements.EECamOnGround);
+        Pose2d currentEndEffectorPosition = currentRobotPose.plus(RobotMeasurements.EECamOnGround);
         if (currentPipeline == EndEffectorPipeline.DriverView) {
             Logger.recordOutput("Visualization/VisionIOSim/EETriangle", new Translation2d[] {});
             inputs.endEffectorCameraAveragePixelValue = 255;

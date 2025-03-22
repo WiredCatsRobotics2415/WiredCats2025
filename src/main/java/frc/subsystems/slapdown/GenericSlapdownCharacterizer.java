@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.units.VoltageUnit;
 import edu.wpi.first.units.measure.Velocity;
-import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.constants.Subsystems.CoralIntakeConstants;
@@ -33,14 +32,10 @@ public class GenericSlapdownCharacterizer extends Characterizer {
                 state -> Logger.recordOutput("SysID" + name + "State", state.toString())),
             new SysIdRoutine.Mechanism(output -> slapdown.getIo().setPivotVoltage(output.in(Volts)), null, slapdown));
 
-        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).withName(name + ": Dynamic Forward")
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).withName(name + ": Dynamic Backward")
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).withName(name + ": Quasi Forward")
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
-        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).withName(name + ": Quasi Backward")
-            .withInterruptBehavior(InterruptionBehavior.kCancelIncoming));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kForward).withName(name + ": Dynamic Forward"));
+        commands.add(sysIDRoutineArm.dynamic(Direction.kReverse).withName(name + ": Dynamic Backward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kForward).withName(name + ": Quasi Forward"));
+        commands.add(sysIDRoutineArm.quasistatic(Direction.kReverse).withName(name + ": Quasi Backward"));
 
         TuningModeTab.getInstance().addCharacterizer(name, this);
     }

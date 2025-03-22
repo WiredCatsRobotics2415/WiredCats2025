@@ -11,6 +11,7 @@ public interface EndEffectorIO {
         public double motorSupplyCurrent = 0.0d;
 
         public int sensorValue = 0;
+        public double appliedPower;
     }
 
     public default void updateInputs(EndEffectorIOInputs inputs) {}

@@ -1,6 +1,7 @@
 package frc.subsystems.elevator;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
@@ -12,7 +13,7 @@ import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableNumber;
-import frc.utils.tuning.TuneablePIDController;
+import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -26,8 +27,9 @@ public class Elevator extends SubsystemBase {
 
     private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
         ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
-    @Getter private TuneablePIDController pid = new TuneablePIDController(ElevatorConstants.kP, 0.0d,
-        ElevatorConstants.kD, "ElevatorPID");
+    @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
+        ElevatorConstants.kD, new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseVelocityMax),
+        "ElevatorPID");
 
     private TuneableNumber noVoltDeadbandHeight = new TuneableNumber(1.5, "Elevator/noVoltDeadbandHeight");
 
@@ -65,17 +67,17 @@ public class Elevator extends SubsystemBase {
     public void setGoal(double setGoal) {
         if (setGoal > ElevatorConstants.MaxHeight || setGoal < ElevatorConstants.MinHeight) return;
         this.goalInches = setGoal;
-        pid.setSetpoint(setGoal);
+        pid.setGoal(setGoal);
     }
 
     public boolean atGoal() {
-        return pid.atSetpoint();
+        return pid.atGoal();
     }
 
     public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
-        if (getMeasurement() < noVoltDeadbandHeight.get() && pid.atSetpoint()) {
+        if (getMeasurement() < noVoltDeadbandHeight.get() && pid.atGoal()) {
             io.setVoltage(0.0d);
             return;
         }
@@ -97,11 +99,11 @@ public class Elevator extends SubsystemBase {
         lastMeasurement = inputs.inches;
         differentiableMeasurementInches.update(inputs.inches);
 
-        useOutput(pid.calculate(inputs.inches), new TrapezoidProfile.State(pid.getSetpoint(), 0));
+        useOutput(pid.calculate(inputs.inches), pid.getSetpoint());
 
         Logger.recordOutput("Elevator/Actual", inputs.inches);
         Logger.recordOutput("Elevator/Goal", goalInches);
-        Logger.recordOutput("Elevator/Error", pid.getError());
+        Logger.recordOutput("Elevator/Error", pid.goalError());
         Logger.recordOutput("Elevator/ActualVelocity", differentiableMeasurementInches.getFirstDerivative());
         Logger.recordOutput("Elevator/ActualAcceleration", differentiableMeasurementInches.getSecondDerivative());
     }

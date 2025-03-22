@@ -122,10 +122,10 @@ public class Arm extends SubsystemBase {
         if (elevatorVelocity > 0) {
             double toAdd = (elevatorVelocityMultiplier.get() * elevatorVelocity *
                 Trig.cosizzle(Units.degreesToRadians(setpoint.position)));
-            if (measurementDegrees < 90 && pid.getPositionError() > 0) {
+            if (measurementDegrees < 90 && pid.goalError() > 0) {
                 voltOut += toAdd;
             }
-            if (measurementDegrees > 90 && pid.getPositionError() < 0) {
+            if (measurementDegrees > 90 && pid.goalError() < 0) {
                 voltOut -= toAdd;
             }
         }

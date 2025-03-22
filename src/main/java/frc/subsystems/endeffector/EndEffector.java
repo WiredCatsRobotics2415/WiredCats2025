@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.vision.Vision;
+import frc.utils.TorqueMonitor;
 import frc.utils.Util;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -20,10 +21,14 @@ public class EndEffector extends SubsystemBase {
     @Getter private boolean outtakingCoral = false;
     @Getter private boolean outtakingAlgae = false;
 
+    private TorqueMonitor coralIntakingTorqueMonitor;
+
     private EndEffector() {
         io = (EndEffectorIO) Util.getIOImplementation(EndEffectorIOReal.class, EndEffectorIOSim.class,
             new EndEffectorIO() {});
 
+        coralIntakingTorqueMonitor = new TorqueMonitor(EndEffectorConstants.TorqueMonitorJumpThreshold,
+            EndEffectorConstants.TorqueMonitorJumpMagnitude, EndEffectorConstants.TorqueMonitorTripTime);
         new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
             io.setPower(EndEffectorConstants.HoldCoralSpeed.get());
             intakingCoral = false;
@@ -84,13 +89,14 @@ public class EndEffector extends SubsystemBase {
      */
     public Command toggleOuttake() {
         return runOnce(() -> {
+            coralIntakingTorqueMonitor.reset();
             if (outtakingAlgae || outtakingCoral) {
                 io.setPower(0);
                 outtakingAlgae = false;
                 outtakingCoral = false;
                 return;
             }
-            if (cameraTrigger()) {
+            if (algaeSensorTrigger()) {
                 io.setPower(EndEffectorConstants.OuttakeAlageSpeed.get());
                 intakingCoral = false;
                 intakingAlgae = false;
@@ -114,26 +120,30 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
-    public boolean irSensorTrigger() {
-        return inputs.sensorValue >= EndEffectorConstants.IRThreshold.get();
+    public boolean coralSensorTrigger() {
+        return coralIntakingTorqueMonitor.isTripped();
+        // TODO: uncomment when ir sensor is replaced
+        // return inputs.sensorValue >= EndEffectorConstants.IRThreshold.get();
     }
 
-    public boolean cameraTrigger() {
+    public boolean algaeSensorTrigger() {
         return Vision.getInstance()
             .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold.get();
     }
 
     public boolean hasCoral() {
-        return irSensorTrigger() && intakingCoral;
+        return coralSensorTrigger() && intakingCoral;
     }
 
     public boolean hasAlgae() {
-        return cameraTrigger() && intakingAlgae;
+        return algaeSensorTrigger() && intakingAlgae;
     }
 
     @Override
     public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs("EndEffector", inputs);
+
+        coralIntakingTorqueMonitor.update(inputs.motorStatorCurrent);
     }
 }

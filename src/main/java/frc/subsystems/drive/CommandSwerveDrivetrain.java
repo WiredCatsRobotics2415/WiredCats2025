@@ -122,6 +122,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         configureAutoBuilder();
 
         driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance);
+        driveToPositionHeadingController.enableContinuousInput(-Math.PI, Math.PI);
         driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
 
         TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
@@ -221,7 +222,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     singleTagDistanceFromCurrent.get() *
                         currentState.Pose.getTranslation().getDistance(singleTag.pose.getTranslation()) +
                     singleTagDistanceFromTag.get() * singleTag.avgTagDist;
-                addVisionMeasurement(singleTag.pose, singleTag.timestampSeconds,
+                System.out.println(
+                    "Fusing singletag measurement w/ distrust: " + distrust + " and ts: " + singleTag.timestampSeconds);
+                addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
                     VecBuilder.fill(distrust, distrust, 999999));
             }
         } else {
@@ -240,23 +243,27 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      * Sets the pose estimator to fuse only this tag seen by this limelights until you interrupt this command. You MUST interrupt this command, otherwise the pose estimator will stay this way until you the switchPoseEstimator command is run.
      */
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int tag) {
-        return new WaitUntilCommand(() -> vision.nearestTagToLimelights(limelights) == tag).andThen(Commands.run(() -> {
-            currentPoseEstimationType = PoseEstimationType.SingleTag;
-            currentSingleTagLLs = limelights;
-            currentSingleTagId = tag;
-        })).finallyDo(() -> {
-            currentPoseEstimationType = PoseEstimationType.Global;
-        });
+        return new WaitUntilCommand(() -> vision.nearestTagToAtLeastOneOf(limelights) == tag)
+            .andThen(Commands.run(() ->
+            {
+                currentPoseEstimationType = PoseEstimationType.SingleTag;
+                currentSingleTagLLs = limelights;
+                currentSingleTagId = tag;
+            })).finallyDo(() -> {
+                currentPoseEstimationType = PoseEstimationType.Global;
+            });
     }
 
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
-        return new WaitUntilCommand(() -> vision.limelightsCanSeeOneOf(limelights, tagSet)).andThen(Commands.run(() -> {
-            currentPoseEstimationType = PoseEstimationType.SingleTag;
-            currentSingleTagLLs = limelights;
-            currentSingleTagId = vision.nearestTagToLimelights(limelights);
-        })).finallyDo(() -> {
-            currentPoseEstimationType = PoseEstimationType.Global;
-        });
+        return new WaitUntilCommand(() -> vision.aLimelightCanSeeOneOf(limelights, tagSet.get()))
+            .andThen(Commands.run(() ->
+            {
+                currentPoseEstimationType = PoseEstimationType.SingleTag;
+                currentSingleTagLLs = limelights;
+                currentSingleTagId = vision.nearestTagToAtLeastOneOf(limelights);
+            })).finallyDo(() -> {
+                currentPoseEstimationType = PoseEstimationType.Global;
+            });
     }
 
     public Command switchPoseEstimator(PoseEstimationType poseEstimationType) {

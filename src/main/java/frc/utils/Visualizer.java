@@ -120,7 +120,7 @@ public class Visualizer {
             Logger.recordOutput("FieldSimulation/CoralPositions", coralPoses);
             Logger.recordOutput("FieldSimulation/AlagePositions", algaePoses);
 
-            if (EndEffector.getInstance().irSensorTrigger()) {
+            if (EndEffector.getInstance().coralSensorTrigger()) {
 
             }
         }

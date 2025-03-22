@@ -11,15 +11,17 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.commands.AlignToHPS;
+import frc.commands.AlignToHPS.HPSSide;
+import frc.commands.AlignToReef;
+import frc.commands.AlignToReef.Side;
 import frc.commands.AutoCommands.CtoRHPS;
-import frc.commands.Dealgae;
-import frc.commands.GenericAutomation;
-import frc.commands.GenericAutomation.AutomationMode;
-import frc.commands.IntakeFromHPS;
-import frc.commands.ScoreCoral;
-import frc.commands.ScoreCoral.Level;
-import frc.commands.ScoreCoral.Side;
+import frc.commands.AutoIntake;
+import frc.commands.DealgaePresetTo;
+import frc.commands.ReefPresetTo;
+import frc.commands.ReefPresetTo.Level;
 import frc.constants.Controls;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
@@ -35,7 +37,6 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
-import frc.utils.driver.DashboardManager;
 import frc.utils.math.AdjustableSLR;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
@@ -60,13 +61,24 @@ public class RobotContainer {
         Normal, MinorAdjustment
     }
 
+    public enum AligningTo {
+        Reef, HPS, CenterReefForDealgae
+    }
+
     @Getter private TeleopDriveMode currentTeleopDriveMode = TeleopDriveMode.Normal;
+    @Getter private AligningTo currentlyAligningTo = AligningTo.Reef;
 
     private AdjustableSLR driveXLimiter = new AdjustableSLR(DriveConstants.BaseXAccelerationMax.get());
     private AdjustableSLR driveYLimiter = new AdjustableSLR(DriveConstants.BaseYAccelerationMax.get());
     private AdjustableSLR driveRotationLimiter = new AdjustableSLR(DriveConstants.BaseRotationAccelMax.get());
     private TuneableNumber minorAdjXPct = new TuneableNumber(0.2, "Drive/minorAdjXPct");
     private TuneableNumber minorAdjYPct = new TuneableNumber(0.2, "Drive/minorAdjYPct");
+
+    private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(3);
+    private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(3);
+    private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(3);
+    private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(3);
+    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(3);
 
     private RobotContainer() {
         setupAuto();
@@ -83,10 +95,10 @@ public class RobotContainer {
 
     private void setupAuto() {
         // Put Auto named commands here
-        NamedCommands.registerCommand("L4", new ScoreCoral(Side.Left, Level.L4));
-        NamedCommands.registerCommand("L3", new ScoreCoral(Side.Left, Level.L3));
-        NamedCommands.registerCommand("L2", new ScoreCoral(Side.Left, Level.L2));
-        NamedCommands.registerCommand("L1", new ScoreCoral(Side.Left, Level.L1));
+        NamedCommands.registerCommand("L4", new ReefPresetTo(Level.L4));
+        NamedCommands.registerCommand("L3", new ReefPresetTo(Level.L3));
+        NamedCommands.registerCommand("L2", new ReefPresetTo(Level.L2));
+        NamedCommands.registerCommand("L1", new ReefPresetTo(Level.L1));
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
         NamedCommands.registerCommand("GroundIntake",
             superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
@@ -162,42 +174,65 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(new IntakeFromHPS().withTimeout(4.0));
-        oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new Dealgae(true).withTimeout(4.0));
-        oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new Dealgae(false).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreLeftL1).onTrue(new ScoreCoral(Side.Left, Level.L1).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreLeftL2).onTrue(new ScoreCoral(Side.Left, Level.L2).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreLeftL3).onTrue(new ScoreCoral(Side.Left, Level.L3).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreLeftL4).onTrue(new ScoreCoral(Side.Left, Level.L4).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreRightL1).onTrue(new ScoreCoral(Side.Right, Level.L1).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreRightL2).onTrue(new ScoreCoral(Side.Right, Level.L2).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreRightL3).onTrue(new ScoreCoral(Side.Right, Level.L3).withTimeout(4.0));
-        oi.binds.get(OI.Bind.AutoScoreRightL4).onTrue(new ScoreCoral(Side.Right, Level.L4).withTimeout(4.0));
-
-        DashboardManager.getInstance().addBoolSupplier(true, "Auto drive",
-            () -> GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign));
-        oi.binds.get(OI.Bind.ToggleScorePresetsAlignDrive).onTrue(new InstantCommand(() -> {
-            if (GenericAutomation.getCurrentAutomationMode().equals(AutomationMode.PresetAndAlign)) {
-                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
-            } else {
-                GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetAndAlign);
+        oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
+            .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
+        oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
+            .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));;
+        oi.binds.get(OI.Bind.L1).onTrue(new ReefPresetTo(Level.L1).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.L2).onTrue(new ReefPresetTo(Level.L2).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.L3).onTrue(new ReefPresetTo(Level.L3).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.L4).onTrue(new ReefPresetTo(Level.L4).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.AutoAlignLeft).onTrue(Commands.runOnce(() -> {
+            switch (currentlyAligningTo) {
+                case Reef:
+                    alignToReefLeft.schedule();
+                    break;
+                case HPS:
+                    alignToHPSLeft.schedule();
+                    break;
+                case CenterReefForDealgae:
+                    alignToReefDealgae.schedule();
+                    break;
+                default:
+                    alignToReefLeft.schedule();
+                    break;
             }
         }));
-        // GenericAutomation.setCurrentAutomationMode(AutomationMode.PresetOnly);
+        oi.binds.get(OI.Bind.AutoAlignRight).onTrue(Commands.runOnce(() -> {
+            switch (currentlyAligningTo) {
+                case Reef:
+                    alignToReefRight.schedule();
+                    break;
+                case HPS:
+                    alignToHPSRight.schedule();
+                    break;
+                case CenterReefForDealgae:
+                    alignToReefDealgae.schedule();
+                    break;
+                default:
+                    alignToReefRight.schedule();
+                    break;
+            }
+        }));
 
-        // oi.binds.get(OI.Bind.AutoIntakeFromGround)
-        // .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
-        // .andThen(superstructure.beThereAsap(Presets.GroundIntake))
-        // .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
-        // .andThen(superstructure.stow())
-        // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(new ScoreCoral(Side.Left, Level.L4));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround)
+            .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
+                .andThen(superstructure.beThereAsap(Presets.GroundIntake))
+                .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
+                .andThen(superstructure.stow())
+                .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
             .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
 
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runBackward()).onFalse(climber.stop());
+    }
+
+    private Command changeAlignTarget(AligningTo target) {
+        return Commands.runOnce(() -> {
+            this.currentlyAligningTo = target;
+        });
     }
 
     private void configureTriggers() {

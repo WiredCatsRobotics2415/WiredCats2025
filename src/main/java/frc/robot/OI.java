@@ -18,11 +18,10 @@ public class OI {
     CommandJoystick numpad;
 
     public enum Bind {
-        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround,
-        AutoScoreLeftL1, AutoScoreLeftL2, AutoScoreLeftL3, AutoScoreLeftL4, AutoScoreRightL1, AutoScoreRightL2,
-        AutoScoreRightL3, AutoScoreRightL4, DealgaePresetTop, SeedFieldCentric, StowPreset,
-        ToggleScorePresetsAlignDrive, AutoIntakeFromGround, ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot,
-        DeAlgae, ManualIntake, DealgaePresetBottom, ClimberForward, ClimberBackward
+        ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround, L1, L2,
+        L3, L4, AutoAlignLeft, AutoAlignRight, DealgaePresetTop, SeedFieldCentric, StowPreset, AutoIntakeFromGround,
+        ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae, ManualIntake, DealgaePresetBottom,
+        ClimberForward, ClimberBackward
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -57,19 +56,15 @@ public class OI {
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.B));
 
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
-        binds.put(Bind.ToggleScorePresetsAlignDrive, numpad.button(NumpadButtons.Dot));
-        // binds.put(Bind.IntakeFromGround, numpad.button(NumpadButtons.NumberOne));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
         binds.put(Bind.DealgaePresetTop, numpad.button(NumpadButtons.NumberSeven));
         binds.put(Bind.DealgaePresetBottom, numpad.button(NumpadButtons.NumberOne));
-        binds.put(Bind.AutoScoreLeftL1, numpad.button(NumpadButtons.NumberTwo));
-        binds.put(Bind.AutoScoreLeftL2, numpad.button(NumpadButtons.NumberFive));
-        binds.put(Bind.AutoScoreLeftL3, numpad.button(NumpadButtons.NumberEight));
-        binds.put(Bind.AutoScoreLeftL4, numpad.button(NumpadButtons.ForwardSlash));
-        binds.put(Bind.AutoScoreRightL1, numpad.button(NumpadButtons.NumberThree));
-        binds.put(Bind.AutoScoreRightL2, numpad.button(NumpadButtons.NumberSix));
-        binds.put(Bind.AutoScoreRightL3, numpad.button(NumpadButtons.NumberNine));
-        binds.put(Bind.AutoScoreRightL4, numpad.button(NumpadButtons.Asterisk));
+        binds.put(Bind.L1, numpad.button(NumpadButtons.Dot));
+        binds.put(Bind.L2, numpad.button(NumpadButtons.NumberFive));
+        binds.put(Bind.L3, numpad.button(NumpadButtons.NumberEight));
+        binds.put(Bind.L4, numpad.button(NumpadButtons.ForwardSlash));
+        binds.put(Bind.AutoAlignLeft, numpad.button(NumpadButtons.NumberTwo));
+        binds.put(Bind.AutoAlignRight, numpad.button(NumpadButtons.NumberThree));
         binds.put(Bind.ProcessorPreset, numpad.button(NumpadButtons.NumberNine));
         binds.put(Bind.BargePreset, numpad.button(NumpadButtons.Asterisk));
         binds.put(Bind.ClimberForward, controller.povUp());

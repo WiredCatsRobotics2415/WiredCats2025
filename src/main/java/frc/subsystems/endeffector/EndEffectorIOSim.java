@@ -26,6 +26,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
     private DCMotorSim motor = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getNeo550(1), 1, 1),
         DCMotor.getNeo550(1));
     private final Arm armSubsystem = Arm.getInstance();
+    double appliedPower;
 
     private final IntakeSimulation intakeSimulation;
 
@@ -69,12 +70,16 @@ public class EndEffectorIOSim implements EndEffectorIO {
             : 0;
 
         inputs.motorConnected = true;
-        inputs.motorStatorCurrent = motor.getCurrentDrawAmps();
+        inputs.motorStatorCurrent = intakeSimulation.getGamePiecesAmount() != 0
+            ? EndEffectorConstants.TorqueMonitorJumpThreshold + 1
+            : 0;
         inputs.motorSupplyCurrent = 0.0d;
+        inputs.appliedPower = appliedPower;
     }
 
     @Override
     public void setPower(double power) {
+        appliedPower = power;
         motor.setInputVoltage(power * RobotController.getBatteryVoltage());
         if (power < 0) {
             intakeSimulation.startIntake();

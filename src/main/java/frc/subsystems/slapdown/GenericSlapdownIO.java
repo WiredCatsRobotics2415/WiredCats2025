@@ -17,6 +17,7 @@ public interface GenericSlapdownIO {
         public boolean intakeConnected = true;
         public double intakeTemp = 0.0d;
         public double intakeStatorCurrent = 0.0d;
+        public double appliedPower = 0.0d;
 
         public double throughborePosition = 0.0d;
         public double sensorValue = 0.0d;

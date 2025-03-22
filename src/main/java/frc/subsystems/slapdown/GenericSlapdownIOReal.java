@@ -21,6 +21,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     private double tBorMax;
 
     private double appliedVolts;
+    private double appliedPower;
 
     public GenericSlapdownIOReal() {
 
@@ -38,6 +39,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         inputs.intakeConnected = !intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.intakeTemp = intakeMotor.getMotorTemperature();
         inputs.intakeStatorCurrent = intakeMotor.getOutputCurrent();
+        inputs.appliedPower = appliedPower;
 
         inputs.throughborePosition = throughbore.get();
         if (sensor != null) inputs.sensorValue = sensor.getValue();
@@ -65,6 +67,7 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
 
     @Override
     public void setIntakePower(double power) {
+        appliedPower = power;
         intakeMotor.set(power);
     }
 

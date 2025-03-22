@@ -31,7 +31,7 @@ public class Subsystems {
             BackCenterName };
 
         public enum LimelightsForElements {
-            Reef(new int[] { 1 }), Processor(new int[] { 1 }), HumanPlayerStation(new int[] { 2 });
+            Reef(new int[] { 0, 1 }), Processor(new int[] { 0, 1 }), HumanPlayerStation(new int[] { 2 });
 
             public int[] indexInPEList;
 
@@ -118,8 +118,8 @@ public class Subsystems {
         public static final TuneableNumber kGForArm = new TuneableNumber(0.1, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
         public static final TuneableNumber kGForArmWithAlgae = new TuneableNumber(0.05, "ElevatorFF/kGForArmWithAlgae");
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(39.5d, "Elevator/BaseVelocityMax");
-        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(79d, "Elevator/BaseAccelMax");
+        public static final double BaseVelocityMax = 158d;
+        public static final double BaseAccelerationMax = 316d;
         public static final double BaseGoalTolerance = 3d;
 
         public static final float RotorToArmGearRatio = 5 / 1;
@@ -147,8 +147,8 @@ public class Subsystems {
         public static final double kP = 0.05;
         public static final double kD = 0.005;
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "Arm/BaseVelocityMax");
-        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(540, "Arm/BaseAccelMax");
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(540, "Arm/BaseVelocityMax");
+        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(1080, "Arm/BaseAccelMax");
         public static final TuneableNumber AlgaeAccelerationMax = new TuneableNumber(360, "Arm/AlgaeAccelMax");
         public static final double GoalTolerance = 6;
 
@@ -163,8 +163,8 @@ public class Subsystems {
 
         public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(-0.3, "EndEffector/IntakeCoralSpeed");
         public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeSpeed");
-        public static final TuneableNumber HoldCoralSpeed = new TuneableNumber(-0.1, "EndEffector/IntakeCoralSpeed");
-        public static final TuneableNumber HoldAlgaeSpeed = new TuneableNumber(0.2, "EndEffector/IntakeAlgaeSpeed");
+        public static final TuneableNumber HoldCoralSpeed = new TuneableNumber(-0.225, "EndEffector/IntakeCoralSpeed");
+        public static final TuneableNumber HoldAlgaeSpeed = new TuneableNumber(0.6, "EndEffector/IntakeAlgaeSpeed");
         public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(0.65,
             "EndEffector/OuttakeCoralSpeed");
         public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(-1, "EndEffector/OuttakeAlageSpeed");
@@ -172,6 +172,10 @@ public class Subsystems {
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
         public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(200,
             "EndEffector/AlgaeIntookCameraThreshold");
+
+        public static final double TorqueMonitorJumpThreshold = 17;
+        public static final double TorqueMonitorJumpMagnitude = 8;
+        public static final double TorqueMonitorTripTime = 0.325;
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(26);
         // end of end effector to carriage
@@ -198,12 +202,12 @@ public class Subsystems {
         public static final Distance EffectiveLength = Inches.of(23);
 
         // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2.3%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=70&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A15%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kS = 0.01;
-        public static final double kG = 0.55;
-        public static final double kV = 0.01;
-        public static final double kA = 0.04;
-        public static final double kP = 1.2;
-        public static final double kD = 0.12;
+        public static final double kS = 0.0;
+        public static final double kG = 0.0;
+        public static final double kV = 0.0;
+        public static final double kA = 0.0;
+        public static final double kP = 0.0;
+        public static final double kD = 0.0;
 
         public static final double BaseGoalTolerance = 5;
 

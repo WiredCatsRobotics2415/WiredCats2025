@@ -22,7 +22,6 @@ import frc.subsystems.elevator.Elevator;
 import frc.subsystems.endeffector.EndEffector;
 import frc.utils.math.Point2d;
 import frc.utils.math.Trig;
-import frc.utils.tuning.TuneableBoolean;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
 
@@ -56,15 +55,15 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(35, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(10, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber rightBeforeHitCintake = new TuneableNumber(135, "SuperStructure/rightBeforeHitCintake");
-    private TuneableNumber hasCoralMinHeightBeforeSwing = new TuneableNumber(135,
+    private TuneableNumber hasCoralMinHeightBeforeSwing = new TuneableNumber(4,
         "SuperStructure/hasCoralMinHeightBeforeSwing");
-    private TuneableBoolean considerCintake = new TuneableBoolean(true, "SuperStructure/considerCintake");
+    private boolean considerCintake = false;
 
     private Point2d carriagePoint = new Point2d(0, 0);
     private Point2d endEffector = new Point2d(0, 0);
@@ -158,8 +157,7 @@ public class SuperStructure extends SubsystemBase {
             isDone = false;
             armSwitchingToFrontSide = arm.getMeasurement() > 90 && goal.getArm().get() < 90;
             armSwitchingToBackSide = arm.getMeasurement() < 90 && goal.getArm().get() > 90;
-            boolean isMovingCoralIntake = considerCintake.get()
-                ? !coralIntake.getPid().isHere(goal.getCoralIntake().get())
+            boolean isMovingCoralIntake = considerCintake ? !coralIntake.getPid().isHere(goal.getCoralIntake().get())
                 : false;
             System.out.println("isMovingCoralIntake: " + isMovingCoralIntake);
             // if the arm does not need to switch sides, then we can just run it
@@ -205,6 +203,7 @@ public class SuperStructure extends SubsystemBase {
                         System.out
                             .println("swang: " + this.armPastSwingThrough() + ", pivot: " + coralIntake.pivotAtGoal());
                         if (!isMovingCoralIntake) {
+                            System.out.println("    not caring about cintake");
                             return this.armPastSwingThrough();
                         } else {
                             return this.armPastSwingThrough() && coralIntake.pivotAtGoal();
@@ -231,7 +230,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     private boolean allAtGoal() {
-        return arm.atGoal() && elevator.atGoal() && coralIntake.pivotAtGoal();
+        return arm.atGoal() && elevator.atGoal() && (considerCintake ? coralIntake.pivotAtGoal() : true);
     }
 
     private void updateCurrentStateCollisions() {

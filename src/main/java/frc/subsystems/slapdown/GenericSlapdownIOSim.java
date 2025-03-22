@@ -33,6 +33,7 @@ public class GenericSlapdownIOSim implements GenericSlapdownIO {
 
     private boolean down;
     private double appliedVolts;
+    private double appliedPower;
 
     public GenericSlapdownIOSim() {}
 
@@ -76,6 +77,7 @@ public class GenericSlapdownIOSim implements GenericSlapdownIO {
 
     @Override
     public void setIntakePower(double power) {
+        appliedPower = power;
         intakeMotor.setInputVoltage(power * RoboRioSim.getVInVoltage());
         if (intakeSim == null) return;
         if (power > 0 && down) {
