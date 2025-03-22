@@ -79,10 +79,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
 
     @Getter private TuneableProfiledPIDController driveToPositionXController = new TuneableProfiledPIDController(
-        DriveConstants.DTTranslationPID,
+        DriveConstants.XTranslationPID,
         new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseXAccelerationMax.get()), "DriveToX");
     @Getter private TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
-        DriveConstants.DTTranslationPID,
+        DriveConstants.YTranslationPID,
         new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseYAccelerationMax.get()), "DriveToY");
     private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveConstants.HeadingkP,
         DriveConstants.HeadingkI, DriveConstants.HeadingkD);

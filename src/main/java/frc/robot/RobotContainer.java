@@ -7,7 +7,6 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -74,8 +73,8 @@ public class RobotContainer {
     private TuneableNumber minorAdjXPct = new TuneableNumber(0.2, "Drive/minorAdjXPct");
     private TuneableNumber minorAdjYPct = new TuneableNumber(0.2, "Drive/minorAdjYPct");
 
-    private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(3);
-    private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(3);
+    private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(10);
+    private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);
     private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(3);
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(3);
     private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(3);
@@ -174,6 +173,8 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
+        oi.binds.get(OI.Bind.IntakeFromHPS)
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).until(superstructure::doneWithMovement));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
             .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
@@ -261,15 +262,15 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
-        driveXLimiter.setRateLimit(ssLimits[0]);
-        driveYLimiter.setRateLimit(ssLimits[1]);
-        driveRotationLimiter.setRateLimit(ssLimits[2]);
+        // double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        // driveXLimiter.setRateLimit(ssLimits[0]);
+        // driveYLimiter.setRateLimit(ssLimits[1]);
+        // driveRotationLimiter.setRateLimit(ssLimits[2]);
 
-        drive.getDriveToPositionXController()
-            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
-        drive.getDriveToPositionYController()
-            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        // drive.getDriveToPositionXController()
+        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        // drive.getDriveToPositionYController()
+        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
     }
 
     public Command getAutonomousCommand() { return new CtoRHPS(); /* autoChooser.get(); */ }

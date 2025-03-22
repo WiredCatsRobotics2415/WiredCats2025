@@ -24,7 +24,7 @@ public class Subsystems {
     public class VisionConstants {
         public static final String FrontLeftName = "limelight-left";
         public static final String FrontRightName = "limelight-right";
-        public static final String BackCenterName = "limelight-back";
+        public static final String BackCenterName = "limelight";
         public static final String EndEffectorName = "limelight-end";
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
@@ -72,12 +72,12 @@ public class Subsystems {
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(Controls.MaxDriveMeterS,
             "Drive/BaseVelocityMax");
-        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(
-            (1 / 0.25) * Controls.MaxDriveMeterS, "Drive/BaseXAccelerationMax");
-        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(
-            (1 / 0.125) * Controls.MaxDriveMeterS, "Drive/BaseYAccelerationMax");
-        public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(
-            (1 / 0.125) * Controls.MaxDriveMeterS, "Drive/BaseRotationAccelMax");
+        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+            "Drive/BaseXAccelerationMax");
+        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+            "Drive/BaseYAccelerationMax");
+        public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+            "Drive/BaseRotationAccelMax");
 
         public static PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
         public static PIDConstants RotationPID = new PIDConstants(RotationP.get(), 0, 0);
@@ -87,14 +87,15 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants DTTranslationPID = new PIDConstants(4, 0, 0.1);
+        public static final PIDConstants XTranslationPID = new PIDConstants(2.5, 0, 0.1);
+        public static final PIDConstants YTranslationPID = new PIDConstants(5, 0, 0.1);
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
-        public static final double HeadingkP = 3;
+        public static final double HeadingkP = 4;
         public static final double HeadingkI = 0;
-        public static final double HeadingkD = 0.3;
-        public static final double HeadingTolerance = 4;
+        public static final double HeadingkD = 0.4;
+        public static final double HeadingTolerance = 2;
     }
 
     public class ElevatorConstants {
@@ -109,11 +110,11 @@ public class Subsystems {
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final double kS = 0.0;
-        public static final double kG = 0.6;
+        public static final double kG = 1.75;
         public static final double kV = 0.001;
         public static final double kA = 1e-4;
-        public static final double kP = 0.2;
-        public static final double kD = 0.03;
+        public static final double kP = 0.25;
+        public static final double kD = 0.01;
 
         public static final TuneableNumber kGForArm = new TuneableNumber(0.1, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
         public static final TuneableNumber kGForArmWithAlgae = new TuneableNumber(0.05, "ElevatorFF/kGForArmWithAlgae");
@@ -134,10 +135,10 @@ public class Subsystems {
 
         // 0 degrees: the arm rail is parallel with the drivebase on the scoring side (front of robot)
         // 180 degrees: the arm rail is parallel with the drive base on the cintake side (back of robot)
-        public static final double ThroughboreMin = 1.13;
-        public static final double ThroughboreMax = 0.456;
-        public static final double MaxDegreesBack = 200;
-        public static final double MinDegreesFront = -20;
+        public static final double ThroughboreMin = 1.128;
+        public static final double ThroughboreMax = 0.452;
+        public static final double MaxDegreesBack = 192.5;
+        public static final double MinDegreesFront = -27.5;
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.12;
@@ -195,19 +196,19 @@ public class Subsystems {
         public static final int IntakeMotorID = 14;
 
         public static final int ThroughborePort = 1;
-        public static final double ThroughboreMin = 0.228;
-        public static final double ThroughboreMax = 0.52;
+        public static final double ThroughboreMin = 0.887;
+        public static final double ThroughboreMax = 1.153;
 
         public static final double RotorToArmRatio = 15;
         public static final Distance EffectiveLength = Inches.of(23);
 
         // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2.3%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=70&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A15%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kS = 0.0;
-        public static final double kG = 0.0;
-        public static final double kV = 0.0;
-        public static final double kA = 0.0;
-        public static final double kP = 0.0;
-        public static final double kD = 0.0;
+        public static final double kS = 0.01;
+        public static final double kG = 0.4;
+        public static final double kV = 0.01;
+        public static final double kA = 0.04;
+        public static final double kP = 0.5;
+        public static final double kD = 0.05;
 
         public static final double BaseGoalTolerance = 5;
 

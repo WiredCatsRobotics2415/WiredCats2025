@@ -82,10 +82,9 @@ public class Elevator extends SubsystemBase {
             return;
         }
 
-        double feedforward = ff.calculate(setpoint.velocity);
-
         double cosArm = Trig.cosizzle(Arm.getInstance().getMeasurement());
-        double voltOut = output + feedforward + cosArm * ElevatorConstants.kGForArm.get();
+        double voltOut = output + (getMeasurement() / 78) * ElevatorConstants.kG +
+            cosArm * ElevatorConstants.kGForArm.get();
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
         io.setVoltage(voltOut);

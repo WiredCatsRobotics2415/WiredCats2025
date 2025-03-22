@@ -76,8 +76,8 @@ public class Controls {
             Degrees.of(-19), "Level3");
         public static final TuneableNumber Level3DriveOffset = new TuneableNumber(6, "Presets/L3Offset");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77.9),
-            Degrees.of(-18.9), "Level4");
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(78),
+            Degrees.of(-20), "Level4");
         public static final TuneableNumber Level4DriveOffset = new TuneableNumber(0, "Presets/L4Offset");
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(30),

@@ -80,7 +80,7 @@ public class ElevatorIOReal implements ElevatorIO {
 
         inputs.appliedVoltage = appliedVoltage;
         inputs.wirePotentiometer = wirePotentiometer.getVoltage() / RobotController.getVoltage5V();
-        inputs.inches = (inputs.wirePotentiometer * 185.577) - 16.93;
+        inputs.inches = (inputs.wirePotentiometer * 241.25) - 16.93;
         // Unstandardized:
         // inputs.inches = Math.pow(19.25064 * wirePotentiometer.getVoltage(), 2) + (-8.32661 * wirePotentiometer.getVoltage()) +
         // 1.56748;

@@ -1,5 +1,7 @@
 package frc.commands;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,9 +27,9 @@ public class AlignToReef extends Command {
 
     @Getter private static Pose2d lastApriltagAlignedTo;
 
-    private static final TuneableNumber LeftOffset = new TuneableNumber(5, "AlignToReef/LeftOffset");
-    private static final TuneableNumber RightOffset = new TuneableNumber(8, "AlignToReef/RightOffset");
-    private static final TuneableNumber DriveTolerance = new TuneableNumber(3, "AlignToReef/DriveTolerance");
+    private static final TuneableNumber LeftOffset = new TuneableNumber(8, "AlignToReef/LeftOffset");
+    private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
+    private static final TuneableNumber DriveTolerance = new TuneableNumber(2, "AlignToReef/DriveTolerance");
 
     private TuneableNumber goalDriveOffset;
     private Side side;
@@ -122,23 +124,26 @@ public class AlignToReef extends Command {
             }
         }
         Transform2d leftOffset = new Transform2d(
-            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1), LeftOffset.distance(),
+            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters), LeftOffset.meters(),
             Rotation2d.kZero);
         Transform2d rightOffset = new Transform2d(
-            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1),
-            RightOffset.distance().times(-1), Rotation2d.kZero);
+            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
+            -RightOffset.meters(), Rotation2d.kZero);
         Transform2d offset;
         switch (side) {
             case Left:
+                System.out.println("align to reef using left offset");
                 offset = leftOffset;
                 break;
             case Center:
                 offset = Transform2d.kZero;
                 break;
             case Right:
+                System.out.println("align to reef using right offset");
                 offset = rightOffset;
                 break;
             default:
+                System.out.println("align to reef using left offset (default case)");
                 offset = leftOffset;
                 break;
         }

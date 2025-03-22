@@ -15,14 +15,14 @@ import frc.utils.tuning.TuningModeTab;
 public class ElevatorCharacterization extends Characterizer {
     private static ElevatorCharacterization instance;
     private Elevator elevator;
-    private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.3).div(Second.of(1));
+    private final Velocity<VoltageUnit> quasiSpeed = Volts.of(0.5).div(Second.of(1));
     private final double TestSafetyThreshold = 3;
 
     private ElevatorCharacterization(Elevator elevator) {
         this.elevator = elevator;
 
         SysIdRoutine sysIDRoutineElevator = new SysIdRoutine(new SysIdRoutine.Config(quasiSpeed, // (1 V/s)
-            Volts.of(1), // Prevent brownout
+            Volts.of(2.5), // Prevent brownout
             null, // (10 s)
             state -> SignalLogger.writeString("SysIDElevatorState", state.toString())),
             new SysIdRoutine.Mechanism(output -> elevator.getIo().setVoltage(output.in(Volts)), null, elevator));

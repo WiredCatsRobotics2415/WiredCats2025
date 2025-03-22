@@ -1,7 +1,6 @@
 package frc.subsystems.drive;
 
 import static edu.wpi.first.units.Units.DegreesPerSecond;
-import static edu.wpi.first.units.Units.Meters;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -27,11 +26,11 @@ import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class VisionPoseFuser {
-    private final TuneableNumber BaseDistrustConstant = new TuneableNumber(0.7, "VPF/BaseDistrustConstant");
+    private final TuneableNumber BaseDistrustConstant = new TuneableNumber(0.5, "VPF/BaseDistrustConstant");
     private final TuneableNumber DistanceFromTagScalar = new TuneableNumber(1, "VPF/DistanceFromTagScalar");
     private final TuneableNumber DistanceFromCurrentPoseScalar = new TuneableNumber(1,
         "VPF/DistanceFromCurrentPoseScalar");
-    private final TuneableNumber LinearVelocityOfRobot = new TuneableNumber(2, "VPF/LinearVelocityOfRobot");
+    private final TuneableNumber LinearVelocityOfRobot = new TuneableNumber(1, "VPF/LinearVelocityOfRobot");
     private final TuneableNumber LinearAccelerationOfRobot = new TuneableNumber(4, "VPF/LinearAccelerationOfRobot");
     private final TuneableNumber AngularVelocityOfRobot = new TuneableNumber(3, "VPF/AngularVelocityOfRobot");
     private final TuneableNumber AngularAccelerationOfRobot = new TuneableNumber(6, "VPF/AngularAccelerationOfRobot");
@@ -47,7 +46,7 @@ public class VisionPoseFuser {
 
     private boolean firstRun = true;
     @Getter
-    @Setter private boolean enabled = false;
+    @Setter private boolean enabled = true;
     private double robotAngularVelocityDS;
     private double robotAngularAccelerationDSS;
 
@@ -97,7 +96,7 @@ public class VisionPoseFuser {
 
             double distanceFromCurrent = state.Pose.getTranslation().getDistance(estimate.pose.getTranslation());
 
-            if (distanceFromCurrent > DistanceFromCurrentPoseCutoffThreshold.in(Meters)) continue;
+            // if (distanceFromCurrent > DistanceFromCurrentPoseCutoffThreshold.in(Meters)) continue;
 
             double baseStdDev = BaseDistrustConstant.get() + DistanceFromTagScalar.get() * estimate.avgTagDist +
                 DistanceFromCurrentPoseScalar.get() * distanceFromCurrent +

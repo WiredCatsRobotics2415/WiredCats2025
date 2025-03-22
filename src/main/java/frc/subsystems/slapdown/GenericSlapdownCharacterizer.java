@@ -28,7 +28,7 @@ public class GenericSlapdownCharacterizer extends Characterizer {
         testMinAngle = min;
 
         SysIdRoutine sysIDRoutineArm = new SysIdRoutine(
-            new SysIdRoutine.Config(quasiSpeed, Volts.of(7), null,
+            new SysIdRoutine.Config(quasiSpeed, Volts.of(4), null,
                 state -> Logger.recordOutput("SysID" + name + "State", state.toString())),
             new SysIdRoutine.Mechanism(output -> slapdown.getIo().setPivotVoltage(output.in(Volts)), null, slapdown));
 

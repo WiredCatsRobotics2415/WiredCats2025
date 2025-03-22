@@ -63,7 +63,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber rightBeforeHitCintake = new TuneableNumber(135, "SuperStructure/rightBeforeHitCintake");
     private TuneableNumber hasCoralMinHeightBeforeSwing = new TuneableNumber(4,
         "SuperStructure/hasCoralMinHeightBeforeSwing");
-    private boolean considerCintake = false;
+    private boolean considerCintake = true;
 
     private Point2d carriagePoint = new Point2d(0, 0);
     private Point2d endEffector = new Point2d(0, 0);

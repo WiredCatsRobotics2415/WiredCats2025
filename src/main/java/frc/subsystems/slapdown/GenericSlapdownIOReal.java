@@ -41,7 +41,11 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
         inputs.intakeStatorCurrent = intakeMotor.getOutputCurrent();
         inputs.appliedPower = appliedPower;
 
-        inputs.throughborePosition = throughbore.get();
+        double tBor = throughbore.get();
+        if (tBor > 0 && tBor < 0.153) {
+            tBor += 1;
+        }
+        inputs.throughborePosition = tBor;
         if (sensor != null) inputs.sensorValue = sensor.getValue();
     }
 
@@ -74,6 +78,6 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     @Override
     public void setPivotVoltage(double voltage) {
         appliedVolts = voltage;
-        pivotMotor.setVoltage(voltage);
+        pivotMotor.setVoltage(-voltage);
     }
 }
