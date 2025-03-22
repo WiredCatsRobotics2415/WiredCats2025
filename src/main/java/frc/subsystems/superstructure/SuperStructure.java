@@ -157,8 +157,8 @@ public class SuperStructure extends SubsystemBase {
             isDone = false;
             armSwitchingToFrontSide = arm.getMeasurement() > 90 && goal.getArm().get() < 90;
             armSwitchingToBackSide = arm.getMeasurement() < 90 && goal.getArm().get() > 90;
-            boolean isMovingCoralIntake = considerCintake ? !coralIntake.getPid().isHere(goal.getCoralIntake().get())
-                : false;
+            coralIntake.setPivotGoal(goal.getCoralIntake().get());
+            boolean isMovingCoralIntake = considerCintake ? !coralIntake.pivotAtGoal() : false;
             System.out.println("isMovingCoralIntake: " + isMovingCoralIntake);
             // if the arm does not need to switch sides, then we can just run it
             if (!armSwitchingToFrontSide && !armSwitchingToBackSide) {
@@ -166,7 +166,6 @@ public class SuperStructure extends SubsystemBase {
                 plannedCommand = Commands.runOnce(() -> {
                     elevator.setGoal(goal.getHeight().get());
                     arm.setGoal(goal.getArm().get());
-                    coralIntake.setPivotGoal(goal.getCoralIntake().get());
                 });
             } else {
                 // if the arm does have to switch sides
@@ -185,7 +184,6 @@ public class SuperStructure extends SubsystemBase {
                         System.out.println("final up goal set");
                         elevator.setGoal(goal.getHeight().get());
                         arm.setGoal(goal.getArm().get());
-                        if (isMovingCoralIntake) coralIntake.setPivotGoal(goal.getCoralIntake().get());
                     }));
                 } else {
                     elevator.setGoal(swingThroughMinHeight.get());
@@ -194,7 +192,6 @@ public class SuperStructure extends SubsystemBase {
                     if (isMovingCoralIntake) {
                         System.out.println("we are moving the cintake");
                         arm.setGoal(armGoal > rightBeforeHitCintake.get() ? rightBeforeHitCintake.get() : armGoal);
-                        coralIntake.setPivotGoal(goal.getCoralIntake().get());
                     } else {
                         arm.setGoal(armGoal);
                     }

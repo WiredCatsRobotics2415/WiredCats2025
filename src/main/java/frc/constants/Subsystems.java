@@ -218,9 +218,10 @@ public class Subsystems {
         public static final TuneableNumber IntakeSpeed = new TuneableNumber(0.6, "CoralIntake/IntakeSpeed");
         public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");
 
-        public static final TuneableNumber MaxAngle = new TuneableNumber(100, "CoralIntake/MaxAngle");
-        public static final double StowAngle = 70;
+        public static final TuneableNumber StowAngle = new TuneableNumber(90, "CoralIntake/StowAngle");
         public static final TuneableNumber GroundAngle = new TuneableNumber(0, "CoralIntake/GroundAngle");
+        public static final double BlindMoveVoltage = 10;
+        public static final double BlindMoveTime = 0.75;
 
         public static final Mass Weight = Pounds.of(2.3);
     }

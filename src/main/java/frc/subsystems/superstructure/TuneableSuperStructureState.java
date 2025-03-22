@@ -23,6 +23,6 @@ public class TuneableSuperStructureState {
     public TuneableSuperStructureState(Distance height, Angle arm, String name) {
         this.height = new TuneableNumber(height, "SSState/" + name + "/height");
         this.arm = new TuneableNumber(arm, "SSState/" + name + "/arm");
-        this.coralIntake = new TuneableNumber(CoralIntakeConstants.StowAngle, "SSState/" + name + "/cIntake");
+        this.coralIntake = new TuneableNumber(CoralIntakeConstants.StowAngle.angle(), "SSState/" + name + "/cIntake");
     }
 }

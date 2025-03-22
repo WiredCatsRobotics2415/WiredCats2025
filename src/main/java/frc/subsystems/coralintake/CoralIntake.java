@@ -1,17 +1,14 @@
 package frc.subsystems.coralintake;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
-import frc.subsystems.slapdown.GenericSlapdown;
-import frc.subsystems.slapdown.GenericSlapdownCharacterizer;
-import frc.subsystems.slapdown.GenericSlapdownIO;
-import frc.subsystems.slapdown.GenericSlapdownIOInputsAutoLogged;
-import frc.subsystems.slapdown.GenericSlapdownIOReal;
-import frc.subsystems.slapdown.GenericSlapdownIOSim;
 import frc.utils.Util;
 import frc.utils.math.Algebra;
 import frc.utils.math.DoubleDifferentiableValue;
@@ -20,9 +17,9 @@ import frc.utils.tuning.TuneableProfiledPIDController;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
-public class CoralIntake extends GenericSlapdown {
-    private GenericSlapdownIO io;
-    private GenericSlapdownIOInputsAutoLogged inputs = new GenericSlapdownIOInputsAutoLogged();
+public class CoralIntake extends SubsystemBase {
+    private CoralIntakeIO io;
+    private CoralIntakeIOInputsAutoLogged inputs = new CoralIntakeIOInputsAutoLogged();
     private static CoralIntake instance;
 
     private TuneableArmFF ff = new TuneableArmFF(CoralIntakeConstants.kS, CoralIntakeConstants.kG,
@@ -40,20 +37,12 @@ public class CoralIntake extends GenericSlapdown {
     private boolean hasResetPidController = false;
 
     private CoralIntake() {
-        io = (GenericSlapdownIO) Util.getIOImplementation(GenericSlapdownIOReal.class, GenericSlapdownIOSim.class,
-            new GenericSlapdownIO() {});
+        io = (CoralIntakeIO) Util.getIOImplementation(CoralIntakeIOReal.class, CoralIntakeIOSim.class,
+            new CoralIntakeIO() {});
         pid.setTolerance(CoralIntakeConstants.BaseGoalTolerance);
-        io.configureHardware(CoralIntakeConstants.PivotMotorID, CoralIntakeConstants.IntakeMotorID,
-            CoralIntakeConstants.ThroughborePort, CoralIntakeConstants.ThroughboreMin,
-            CoralIntakeConstants.ThroughboreMax, -1);
-        io.configureSim("", null, null, null, CoralIntakeConstants.RotorToArmRatio,
-            CoralIntakeConstants.EffectiveLength, CoralIntakeConstants.MaxAngle.angle(),
-            CoralIntakeConstants.GroundAngle.angle(), CoralIntakeConstants.ThroughboreMin,
-            CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.Weight);
 
         if (RuntimeConstants.TuningMode) {
-            GenericSlapdownCharacterizer.createInstance(this, "CoralIntake", CoralIntakeConstants.GroundAngle,
-                CoralIntakeConstants.MaxAngle);
+            CoralIntakeCharacterizer.createInstance(this);
         }
     }
 
@@ -62,31 +51,45 @@ public class CoralIntake extends GenericSlapdown {
         return instance;
     }
 
-    @Override
     public Command slapdown() {
         return runOnce(() -> {
-            pid.setGoal(CoralIntakeConstants.GroundAngle.get());
-        });
+            this.goal = 0;
+            pid.setGoal(0);
+            io.setPivotVoltage(-CoralIntakeConstants.BlindMoveVoltage);
+        }).andThen(Commands.waitSeconds(CoralIntakeConstants.BlindMoveTime)).andThen(runOnce(() -> {
+            io.setPivotVoltage(0);
+        }));
     }
 
-    @Override
     public Command stow() {
         return runOnce(() -> {
-            pid.setGoal(CoralIntakeConstants.StowAngle);
-        });
+            this.goal = CoralIntakeConstants.StowAngle.get();
+            pid.setGoal(CoralIntakeConstants.StowAngle.get());
+            io.setPivotVoltage(CoralIntakeConstants.BlindMoveVoltage);
+        }).andThen(Commands.waitSeconds(CoralIntakeConstants.BlindMoveTime)).andThen(runOnce(() -> {
+            io.setPivotVoltage(0);
+        }));
     }
 
+    // public void setPivotGoal(double goal) {
+    // if (goal <= CoralIntakeConstants.MaxAngle.get() && goal >= CoralIntakeConstants.GroundAngle.get()) {
+    // this.goal = goal;
+    // pid.setGoal(goal);
+    // }
+    // }
+
     public void setPivotGoal(double goal) {
-        if (goal <= CoralIntakeConstants.MaxAngle.get() && goal >= CoralIntakeConstants.GroundAngle.get()) {
-            this.goal = goal;
-            pid.setGoal(goal);
+        this.goal = goal;
+        pid.setGoal(goal);
+        if (goal > 45) {
+            stow().schedule();
+        } else {
+            slapdown().schedule();
         }
     }
 
-    @Override
     public double getPivotAngle() { return lastMeasurement; }
 
-    @Override
     public Command toggleIntake() {
         return runOnce(() -> {
             if (!intaking) {
@@ -100,7 +103,6 @@ public class CoralIntake extends GenericSlapdown {
         });
     }
 
-    @Override
     public Command toggleOuttake() {
         return runOnce(() -> {
             if (!outtaking) {
@@ -114,7 +116,6 @@ public class CoralIntake extends GenericSlapdown {
         });
     }
 
-    @Override
     public Command turnOffRollers() {
         return runOnce(() -> {
             io.setIntakePower(0);
@@ -124,7 +125,7 @@ public class CoralIntake extends GenericSlapdown {
     }
 
     public boolean pivotAtGoal() {
-        return pid.atGoal();
+        return MathUtil.isNear(goal, lastMeasurement, pid.getPositionTolerance());
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
@@ -141,14 +142,14 @@ public class CoralIntake extends GenericSlapdown {
 
         lastMeasurement = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
             CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
-            CoralIntakeConstants.MaxAngle.get());
+            CoralIntakeConstants.StowAngle.get());
         differentiableMeasurementDegrees.update(lastMeasurement);
 
         if (!hasResetPidController) {
             pid.reset(new TrapezoidProfile.State(lastMeasurement, 0));
             hasResetPidController = true;
         }
-        useOutput(pid.calculate(lastMeasurement), pid.getSetpoint());
+        // useOutput(pid.calculate(lastMeasurement), pid.getSetpoint());
 
         Logger.recordOutput("CoralIntake/Actual", lastMeasurement);
         Logger.recordOutput("CoralIntake/Goal", goal);
@@ -157,6 +158,5 @@ public class CoralIntake extends GenericSlapdown {
         Logger.recordOutput("CoralIntake/ActualAcceleration", differentiableMeasurementDegrees.getSecondDerivative());
     }
 
-    @Override
-    public GenericSlapdownIO getIo() { return io; }
+    public CoralIntakeIO getIo() { return io; }
 }

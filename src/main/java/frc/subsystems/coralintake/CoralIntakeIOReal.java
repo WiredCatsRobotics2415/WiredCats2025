@@ -1,4 +1,4 @@
-package frc.subsystems.slapdown;
+package frc.subsystems.coralintake;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -8,27 +8,34 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
+import frc.constants.Subsystems.CoralIntakeConstants;
 
-public class GenericSlapdownIOReal implements GenericSlapdownIO {
+public class CoralIntakeIOReal implements CoralIntakeIO {
     private SparkMax pivotMotor;
     private SparkMax intakeMotor;
     private DutyCycleEncoder throughbore;
-    private AnalogInput sensor;
-
-    private double tBorMin;
-    private double tBorMax;
 
     private double appliedVolts;
     private double appliedPower;
 
-    public GenericSlapdownIOReal() {
+    public CoralIntakeIOReal() {
+        SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
+            .voltageCompensation(12).inverted(true);
 
+        pivotMotor = new SparkMax(CoralIntakeConstants.PivotMotorID, MotorType.kBrushless);
+        pivotMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        pivotMotor.setCANTimeout(250);
+
+        intakeMotor = new SparkMax(CoralIntakeConstants.IntakeMotorID, MotorType.kBrushless);
+        intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor.setCANTimeout(250);
+
+        throughbore = new DutyCycleEncoder(CoralIntakeConstants.ThroughborePort);
     }
 
     @Override
-    public void updateInputs(GenericSlapdownIOInputsAutoLogged inputs) {
+    public void updateInputs(CoralIntakeIOInputsAutoLogged inputs) {
         if (pivotMotor == null || intakeMotor == null) return;
 
         inputs.pivotConnected = !pivotMotor.getLastError().equals(REVLibError.kCANDisconnected);
@@ -46,27 +53,6 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
             tBor += 1;
         }
         inputs.throughborePosition = tBor;
-        if (sensor != null) inputs.sensorValue = sensor.getValue();
-    }
-
-    @Override
-    public void configureHardware(int pivotId, int intakeId, int throughborePort, double tBorMin, double tBorMax,
-        int sensorAnalogPort) {
-        SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
-            .voltageCompensation(12).inverted(false);
-
-        pivotMotor = new SparkMax(pivotId, MotorType.kBrushless);
-        pivotMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        pivotMotor.setCANTimeout(250);
-
-        intakeMotor = new SparkMax(intakeId, MotorType.kBrushless);
-        intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        intakeMotor.setCANTimeout(250);
-
-        throughbore = new DutyCycleEncoder(throughborePort);
-        this.tBorMin = tBorMin;
-        this.tBorMax = tBorMax;
-        if (sensorAnalogPort > 0) sensor = new AnalogInput(sensorAnalogPort);
     }
 
     @Override
@@ -78,6 +64,6 @@ public class GenericSlapdownIOReal implements GenericSlapdownIO {
     @Override
     public void setPivotVoltage(double voltage) {
         appliedVolts = voltage;
-        pivotMotor.setVoltage(-voltage);
+        pivotMotor.setVoltage(voltage);
     }
 }
