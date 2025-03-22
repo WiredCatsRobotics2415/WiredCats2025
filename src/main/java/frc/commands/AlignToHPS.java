@@ -78,8 +78,9 @@ public class AlignToHPS extends Command {
                     break;
             }
         }
+        System.out.println("Align to HPS: using offset " + side.toString());
         Pose2d driveToPose = apriltagPose.plus(Offset).plus(new Transform2d(Presets.HPSDriveOffset.meters(),
-            side == HPSSide.Left ? LeftOffset.meters() : RightOffset.meters(), Rotation2d.kZero));
+            side == HPSSide.Left ? -LeftOffset.meters() : RightOffset.meters(), Rotation2d.kZero));
         driveCommand = AlignmentHelpers.drive.driveTo(driveToPose, DriveTolerance.meters());
         driveCommand.schedule();
 

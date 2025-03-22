@@ -48,10 +48,11 @@ public class ReefPresetTo extends Command {
     }
 
     @Override
-    public boolean isFinished() { return superStructure.doneWithMovement(); }
+    public boolean isFinished() { return superStructure.doneWithMovement() || superStructureCommand.isScheduled(); }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("ReefPresetTo is finished");
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
 }

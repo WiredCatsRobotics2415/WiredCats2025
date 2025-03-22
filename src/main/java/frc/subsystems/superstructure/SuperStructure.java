@@ -178,7 +178,6 @@ public class SuperStructure extends SubsystemBase {
                     elevator.setGoal(swingThroughMinHeight.get());
                     setArmGoalToRightBeforeSwingThrough();
                     plannedCommand = Commands.waitUntil(() -> {
-                        System.out.println("ee has coral and below min swing height");
                         if (EndEffector.getInstance().hasCoral()
                             && elevator.getMeasurement() < hasCoralMinHeightBeforeSwing.get()) return false;
                         return elevator.atGoal();

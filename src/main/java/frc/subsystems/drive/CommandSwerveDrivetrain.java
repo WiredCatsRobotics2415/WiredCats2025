@@ -20,6 +20,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -77,6 +78,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         .withDriveRequestType(DriveRequestType.OpenLoopVoltage).withSteerRequestType(SteerRequestType.MotionMagicExpo);
     public final SwerveRequest.FieldCentricFacingAngle driveToPositionFacingAngleRequest = new SwerveRequest.FieldCentricFacingAngle()
         .withDriveRequestType(DriveRequestType.Velocity).withSteerRequestType(SteerRequestType.MotionMagicExpo);
+
+    public static final Transform2d redDriveToGoalCompensation = new Transform2d(0, 0, kRedAlliancePerspectiveRotation);
 
     @Getter private TuneableProfiledPIDController driveToPositionXController = new TuneableProfiledPIDController(
         DriveConstants.XTranslationPID,
@@ -311,14 +314,20 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             driveToPositionYController.reset(new State(currentPose.getY(), speeds.vyMetersPerSecond));
             driveToPositionHeadingController.reset();
         }).andThen(applyRequest(() -> {
-            Pose2d currentPose = getState().Pose;
-            double velocityX = MathUtil.clamp(driveToPositionXController.calculate(currentPose.getX(), goalPose.getX()),
-                -maxSpeedMS, maxSpeedMS);
-            double velocityY = MathUtil.clamp(driveToPositionYController.calculate(currentPose.getY(), goalPose.getY()),
-                -maxSpeedMS, maxSpeedMS);
+            boolean isBlue = AllianceDependent.isCurrentlyBlue();
 
-            return driveToPositionFacingAngleRequest.withTargetDirection(goalPose.getRotation())
-                .withVelocityX(velocityX).withVelocityY(velocityY);
+            Pose2d currentPose = getState().Pose;
+            Pose2d allianceCompensatedGoal = isBlue ? goalPose : goalPose.plus(redDriveToGoalCompensation);
+            double velocityX = MathUtil.clamp(
+                driveToPositionXController.calculate(currentPose.getX(), allianceCompensatedGoal.getX()), -maxSpeedMS,
+                maxSpeedMS);
+            double velocityY = MathUtil.clamp(
+                driveToPositionYController.calculate(currentPose.getY(), allianceCompensatedGoal.getY()), -maxSpeedMS,
+                maxSpeedMS);
+            double allianceCompensation = isBlue ? 1 : -1;
+
+            return driveToPositionFacingAngleRequest.withTargetDirection(allianceCompensatedGoal.getRotation())
+                .withVelocityX(velocityX * allianceCompensation).withVelocityY(velocityY * allianceCompensation);
         })).until(() -> {
             // System.out.println("xCon: " + driveToPositionXController.getLastCalculation());
             // System.out.println("yCon: " + driveToPositionYController.getLastCalculation());

@@ -110,7 +110,6 @@ public class Vision extends SubsystemBase {
             return nearestTagToEach[0];
         }
 
-        System.out.println("nearestTagToAtLeastOneOf: " + nearestTagToEach[0] + ", " + nearestTagToEach[1]);
         if (nearestTagToEach[0] == -1 || nearestTagToEach[1] == -1) {
             if (nearestTagToEach[0] == nearestTagToEach[1]) {
                 return -1;
@@ -118,8 +117,6 @@ public class Vision extends SubsystemBase {
             return nearestTagToEach[0] == -1 ? nearestTagToEach[1] : nearestTagToEach[0];
         } else {
             if (nearestTagToEach[0] == nearestTagToEach[1]) return nearestTagToEach[0];
-            System.out.println(
-                "nearestTagToAtLeastOneOf: debating between " + nearestTagToEach[0] + " and " + nearestTagToEach[1]);
             return whichTagCloserToCurrentRobotPosition(nearestTagToEach[0], nearestTagToEach[1]) ? nearestTagToEach[0]
                 : nearestTagToEach[1];
         }

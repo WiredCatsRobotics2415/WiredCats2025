@@ -90,7 +90,7 @@ public class Controls {
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(
             Inches.of(44.57), Degrees.of(165), "IntakeFromHPS");
-        public static final TuneableNumber HPSDriveOffset = new TuneableNumber(2.5, "Presets/IntakeFromHPS");
+        public static final TuneableNumber HPSDriveOffset = new TuneableNumber(6, "Presets/IntakeFromHPS");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(200), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");

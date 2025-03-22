@@ -107,17 +107,17 @@ public class Measurements {
             Rotation2d.fromDegrees(300)); // ID 19
 
         public static final Pose2d redReefABApriltag = new Pose2d(new Translation2d(13.890498, 4.0259),
-            Rotation2d.fromDegrees(0)); // ID 7
+            Rotation2d.fromDegrees(180)); // ID 7
         public static final Pose2d redReefCDApriltag = new Pose2d(new Translation2d(13.474446, 4.745482),
-            Rotation2d.fromDegrees(60)); // ID 8
+            Rotation2d.fromDegrees(240)); // ID 8
         public static final Pose2d redReefEFApriltag = new Pose2d(new Translation2d(12.643358, 4.745482),
-            Rotation2d.fromDegrees(120)); // ID 9
+            Rotation2d.fromDegrees(300)); // ID 9
         public static final Pose2d redReefGHApriltag = new Pose2d(new Translation2d(12.227306, 4.0259),
-            Rotation2d.fromDegrees(180)); // ID 10
+            Rotation2d.fromDegrees(0)); // ID 10
         public static final Pose2d redReefIJApriltag = new Pose2d(new Translation2d(12.643358, 3.306318),
-            Rotation2d.fromDegrees(240)); // ID 11
+            Rotation2d.fromDegrees(60)); // ID 11
         public static final Pose2d redReefKLApriltag = new Pose2d(new Translation2d(13.474446, 3.306318),
-            Rotation2d.fromDegrees(300)); // ID 6
+            Rotation2d.fromDegrees(120)); // ID 6
 
         public static final int blueReefABId = 18;
         public static final int blueReefCDId = 17;
@@ -164,13 +164,13 @@ public class Measurements {
 
     public class HumanPlayerStation {
         public static final Pose2d blueLeftHPS = new Pose2d(new Translation2d(0.8613139999999999, 7.414259999999999),
-            Rotation2d.fromDegrees(-36));
+            Rotation2d.fromDegrees(-54));
         public static final Pose2d blueRightHPS = new Pose2d(new Translation2d(0.8613139999999999, 0.628142),
-            Rotation2d.fromDegrees(36));
+            Rotation2d.fromDegrees(54));
         public static final Pose2d redLeftHPS = new Pose2d(new Translation2d(16.687292, 0.628142),
-            Rotation2d.fromDegrees(-36));
+            Rotation2d.fromDegrees(-234));
         public static final Pose2d redRightHPS = new Pose2d(new Translation2d(16.687292, 7.414259999999999),
-            Rotation2d.fromDegrees(36));
+            Rotation2d.fromDegrees(234));
 
         public static final int blueLeftId = 13;
         public static final int blueRightId = 12;

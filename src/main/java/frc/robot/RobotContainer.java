@@ -173,8 +173,8 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromHPS)
-            .onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).until(superstructure::doneWithMovement));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS)
+            .until(superstructure::doneWithMovement).alongWith(changeAlignTarget(AligningTo.HPS)));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
             .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
@@ -184,6 +184,7 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.L3).onTrue(new ReefPresetTo(Level.L3).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.L4).onTrue(new ReefPresetTo(Level.L4).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.AutoAlignLeft).onTrue(Commands.runOnce(() -> {
+            System.out.println("Left auto align is aligning to: " + currentlyAligningTo);
             switch (currentlyAligningTo) {
                 case Reef:
                     alignToReefLeft.schedule();
@@ -232,6 +233,7 @@ public class RobotContainer {
 
     private Command changeAlignTarget(AligningTo target) {
         return Commands.runOnce(() -> {
+            System.out.println("Changed align target to: " + target.toString());
             this.currentlyAligningTo = target;
         });
     }
