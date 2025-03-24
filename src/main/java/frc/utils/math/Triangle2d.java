@@ -51,7 +51,7 @@ public class Triangle2d {
     }
 
     public boolean isInside(Translation2d point) {
-        double A = area < 0 ? areaInMeters() : area; //used cached area
+        double A = area < 0 ? areaInMeters() : area; // used cached area
 
         double A1 = triangleArea(point.getX(), point.getY(), b.getX(), b.getY(), c.getX(), c.getY());
         double A2 = triangleArea(a.getX(), a.getY(), point.getX(), point.getY(), c.getX(), c.getY());

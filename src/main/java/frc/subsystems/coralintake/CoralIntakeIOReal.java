@@ -49,7 +49,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
         inputs.appliedPower = appliedPower;
 
         double tBor = throughbore.get();
-        if (tBor > 0 && tBor < 0.153) {
+        if (tBor < 0.8 && tBor > 0) {
             tBor += 1;
         }
         inputs.throughborePosition = tBor;
