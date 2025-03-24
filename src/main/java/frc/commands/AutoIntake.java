@@ -11,6 +11,7 @@ import frc.constants.Controls;
 import frc.constants.Subsystems.DriveConstants;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
+import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.vision.Vision;
@@ -47,6 +48,7 @@ public class AutoIntake extends Command {
         driveBackward = new SwerveRequest.RobotCentric().withVelocityX(-0.4 * Controls.MaxDriveMeterS); // back of robot = intaking side
         RobotStatus.setRobotStateOnce(RobotState.AutoGroundIntaking);
         endEffector.intakeAndWaitForCoral().schedule();
+        CoralIntake.getInstance().toggleIntake().schedule();
     }
 
     @Override
@@ -67,6 +69,7 @@ public class AutoIntake extends Command {
                 drive.setControl(driveHeading
                     .withTargetDirection(drive.getState().Pose.getRotation().minus(Rotation2d.fromDegrees(-tx))));
             } else {
+                System.out.println("driving backward");
                 drive.setControl(driveBackward);
             }
         } else {
@@ -74,6 +77,8 @@ public class AutoIntake extends Command {
                 System.out.println("lost sight of coral");
                 countSinceLastSeenCoral.start();
                 hasSeenCoral = false;
+            } else {
+                System.out.println("has not seen coral");
             }
         }
     }
@@ -83,6 +88,7 @@ public class AutoIntake extends Command {
         countSinceLastSeenCoral.reset();
         countSinceLastSeenCoral.stop();
         vision.setEndEffectorPipeline(EndEffectorPipeline.DriverView);
+        CoralIntake.getInstance().turnOffRollers();
         System.out.println("ended" + interrupted);
     }
 

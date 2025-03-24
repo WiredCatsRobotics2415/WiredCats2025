@@ -1,6 +1,5 @@
 package frc.subsystems.coralintake;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
@@ -71,22 +70,22 @@ public class CoralIntake extends SubsystemBase {
         }));
     }
 
-    // public void setPivotGoal(double goal) {
-    // if (goal <= CoralIntakeConstants.MaxAngle.get() && goal >= CoralIntakeConstants.GroundAngle.get()) {
-    // this.goal = goal;
-    // pid.setGoal(goal);
-    // }
-    // }
-
     public void setPivotGoal(double goal) {
-        this.goal = goal;
-        pid.setGoal(goal);
-        if (goal > 45) {
-            stow().schedule();
-        } else {
-            slapdown().schedule();
+        if (goal <= CoralIntakeConstants.MaxAngle.get() && goal >= CoralIntakeConstants.GroundAngle.get()) {
+            this.goal = goal;
+            pid.setGoal(goal);
         }
     }
+
+    // public void setPivotGoal(double goal) {
+    // this.goal = goal;
+    // pid.setGoal(goal);
+    // if (goal > 45) {
+    // stow().schedule();
+    // } else {
+    // slapdown().schedule();
+    // }
+    // }
 
     public double getPivotAngle() { return lastMeasurement; }
 
@@ -125,7 +124,8 @@ public class CoralIntake extends SubsystemBase {
     }
 
     public boolean pivotAtGoal() {
-        return MathUtil.isNear(goal, lastMeasurement, pid.getPositionTolerance());
+        return pid.atGoal();
+        // return MathUtil.isNear(goal, lastMeasurement, pid.getPositionTolerance());
     }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
@@ -142,14 +142,14 @@ public class CoralIntake extends SubsystemBase {
 
         lastMeasurement = Algebra.linearMap(inputs.throughborePosition, CoralIntakeConstants.ThroughboreMin,
             CoralIntakeConstants.ThroughboreMax, CoralIntakeConstants.GroundAngle.get(),
-            CoralIntakeConstants.StowAngle.get());
+            CoralIntakeConstants.MaxAngle.get());
         differentiableMeasurementDegrees.update(lastMeasurement);
 
         if (!hasResetPidController) {
             pid.reset(new TrapezoidProfile.State(lastMeasurement, 0));
             hasResetPidController = true;
         }
-        // useOutput(pid.calculate(lastMeasurement), pid.getSetpoint());
+        useOutput(pid.calculate(lastMeasurement), pid.getSetpoint());
 
         Logger.recordOutput("CoralIntake/Actual", lastMeasurement);
         Logger.recordOutput("CoralIntake/Goal", goal);

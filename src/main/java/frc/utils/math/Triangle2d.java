@@ -14,6 +14,7 @@ public class Triangle2d {
     private @Getter Translation2d a;
     private @Getter Translation2d b;
     private @Getter Translation2d c;
+    private double area = -1;
 
     public Triangle2d(Translation2d a, Translation2d b, Translation2d c) {
         this.a = a;
@@ -45,11 +46,12 @@ public class Triangle2d {
     }
 
     public double areaInMeters() {
-        return triangleArea(a.getX(), a.getY(), b.getX(), b.getY(), c.getX(), c.getY());
+        area = triangleArea(a.getX(), a.getY(), b.getX(), b.getY(), c.getX(), c.getY());
+        return area;
     }
 
     public boolean isInside(Translation2d point) {
-        double A = areaInMeters();
+        double A = area < 0 ? areaInMeters() : area; //used cached area
 
         double A1 = triangleArea(point.getX(), point.getY(), b.getX(), b.getY(), c.getX(), c.getY());
         double A2 = triangleArea(a.getX(), a.getY(), point.getX(), point.getY(), c.getX(), c.getY());
