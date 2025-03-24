@@ -11,7 +11,6 @@ import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.Util;
 import frc.utils.math.DoubleDifferentiableValue;
 import frc.utils.math.Trig;
-import frc.utils.tuning.TuneableElevatorFF;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
@@ -21,12 +20,11 @@ import org.littletonrobotics.junction.Logger;
 public class Elevator extends SubsystemBase {
     private boolean coasting;
     @Getter private double goalInches;
+    double voltOut;
 
     private double lastMeasurement = 0.0;
     @Getter private DoubleDifferentiableValue differentiableMeasurementInches = new DoubleDifferentiableValue();
 
-    private TuneableElevatorFF ff = new TuneableElevatorFF(ElevatorConstants.kS, ElevatorConstants.kV,
-        ElevatorConstants.kG, ElevatorConstants.kA, "ElevatorFF");
     @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(ElevatorConstants.kP, 0.0d,
         ElevatorConstants.kD, new Constraints(ElevatorConstants.BaseVelocityMax, ElevatorConstants.BaseVelocityMax),
         "ElevatorPID");
@@ -83,8 +81,12 @@ public class Elevator extends SubsystemBase {
         }
 
         double cosArm = Trig.cosizzle(Arm.getInstance().getMeasurement());
-        double voltOut = output + (getMeasurement() / 78) * ElevatorConstants.kG +
-            cosArm * ElevatorConstants.kGForArm.get();
+        if (getMeasurement() > 40) {
+            voltOut = output + ((getMeasurement() - 40) / 38) * ElevatorConstants.MultConstant +
+                (cosArm * ElevatorConstants.kGForArm.get());
+        } else {
+            voltOut = output + (cosArm * ElevatorConstants.kGForArm.get());;
+        }
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
         io.setVoltage(voltOut);
