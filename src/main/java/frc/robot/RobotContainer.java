@@ -29,6 +29,7 @@ import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.climb.Climb;
+import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.drive.CommandSwerveDrivetrain.PoseEstimationType;
 import frc.subsystems.elevator.Elevator;
@@ -83,6 +84,7 @@ public class RobotContainer {
         setupAuto();
         configureControls();
         configureTriggers();
+        neutralizeSubsystems();
     }
 
     public static RobotContainer getInstance() {
@@ -173,8 +175,8 @@ public class RobotContainer {
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS)
-            .until(superstructure::doneWithMovement).alongWith(changeAlignTarget(AligningTo.HPS)));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(
+            superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).alongWith(changeAlignTarget(AligningTo.HPS)));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
             .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
@@ -218,10 +220,10 @@ public class RobotContainer {
         }));
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .whileTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
-                .andThen(superstructure.beThereAsap(Presets.GroundIntake))
-                .andThen(Commands.waitUntil(superstructure::doneWithMovement)).andThen(new AutoIntake().withTimeout(4))
-                .andThen(superstructure.stow())
+            .onTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
+                .alongWith(superstructure.beThereAsapNoEnd(Presets.GroundIntake))
+                .alongWith(Commands.waitSeconds(1.5).andThen(new AutoIntake())))
+            .onFalse(superstructure.stow()
                 .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
@@ -276,4 +278,10 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() { return new CtoRHPS(); /* autoChooser.get(); */ }
+
+    public void neutralizeSubsystems() {
+        arm.setGoal(arm.getMeasurement());
+        elevator.setGoal(elevator.getMeasurement());
+        CoralIntake.getInstance().setPivotGoal(CoralIntake.getInstance().getPivotAngle());
+    }
 }

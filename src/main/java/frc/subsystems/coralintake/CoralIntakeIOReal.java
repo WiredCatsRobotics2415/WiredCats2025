@@ -28,7 +28,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
         pivotMotor.setCANTimeout(250);
 
         intakeMotor = new SparkMax(CoralIntakeConstants.IntakeMotorID, MotorType.kBrushless);
-        intakeMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        intakeMotor.configure(config.inverted(true), ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
         intakeMotor.setCANTimeout(250);
 
         throughbore = new DutyCycleEncoder(CoralIntakeConstants.ThroughborePort);

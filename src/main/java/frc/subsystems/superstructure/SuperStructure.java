@@ -165,6 +165,7 @@ public class SuperStructure extends SubsystemBase {
                 System.out.println("arm does not need to switch sides so just running it");
                 plannedCommand = Commands.runOnce(() -> {
                     elevator.setGoal(goal.getHeight().get());
+                    System.out.println("arm goal: " + goal.getArm().get());
                     arm.setGoal(goal.getArm().get());
                 });
             } else {

@@ -58,7 +58,7 @@ public class Controls {
 
     public class Presets {
         public static final TuneableSuperStructureState Stow = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(100), "Stow");
+            Degrees.of(95), Degrees.of(84), "Stow");
         public static final TuneableSuperStructureState AlgaeStow = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(75), "AlgaeStow");
 
@@ -93,7 +93,7 @@ public class Controls {
         public static final TuneableNumber HPSDriveOffset = new TuneableNumber(6, "Presets/IntakeFromHPS");
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
-            Degrees.of(200), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
+            Degrees.of(179), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
 
         public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(0.5),
             Degrees.of(48.7), "Processor");

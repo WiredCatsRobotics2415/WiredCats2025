@@ -1,5 +1,6 @@
 package frc.subsystems.elevator;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -89,6 +90,7 @@ public class Elevator extends SubsystemBase {
         }
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
+        voltOut = MathUtil.clamp(voltOut, -1, 3);
         io.setVoltage(voltOut);
     }
 

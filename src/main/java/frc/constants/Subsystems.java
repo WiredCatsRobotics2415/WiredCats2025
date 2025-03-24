@@ -142,8 +142,8 @@ public class Subsystems {
         public static final double kG = 0.58;
         public static final double kV = 0.004;
         public static final double kA = 0.002;
-        public static final double kP = 0.05;
-        public static final double kD = 0.005;
+        public static final double kP = 0.12;
+        public static final double kD = 0.012;
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(540, "Arm/BaseVelocityMax");
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(1080, "Arm/BaseAccelMax");
@@ -194,7 +194,7 @@ public class Subsystems {
 
         public static final int ThroughborePort = 1;
         public static final double ThroughboreMin = 0.887;
-        public static final double ThroughboreMax = 1.153;
+        public static final double ThroughboreMax = 1.18;
 
         public static final double RotorToArmRatio = 15;
         public static final Distance EffectiveLength = Inches.of(23);
@@ -202,10 +202,10 @@ public class Subsystems {
         // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A6%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A138%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
         public static final double kS = 0.0;
         public static final double kG = 0.03;
-        public static final double kV = 0.05;
+        public static final double kV = 0.025;
         public static final double kA = 0.00;
-        public static final double kP = 0.25;
-        public static final double kD = 0.025;
+        public static final double kP = 0.025;
+        public static final double kD = 0.001;
 
         public static final double BaseGoalTolerance = 5;
 
@@ -216,7 +216,7 @@ public class Subsystems {
         public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");
 
         public static final TuneableNumber MaxAngle = new TuneableNumber(90, "CoralIntake/StowAngle");
-        public static final TuneableNumber StowAngle = new TuneableNumber(70, "CoralIntake/StowAngle");
+        public static final TuneableNumber StowAngle = new TuneableNumber(84, "CoralIntake/StowAngle");
         public static final TuneableNumber GroundAngle = new TuneableNumber(0, "CoralIntake/GroundAngle");
         public static final double BlindMoveVoltage = 10;
         public static final double BlindMoveTime = 0.75;
