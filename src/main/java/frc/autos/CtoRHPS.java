@@ -1,4 +1,4 @@
-package frc.commands.AutoCommands;
+package frc.autos;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -7,12 +7,11 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.commands.AlignToReef;
 import frc.commands.AlignToReef.Side;
-import frc.commands.CustomAutos;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
 import frc.robot.Robot;
 
-public class CtoRHPS extends CustomAutos {
+public class CtoRHPS extends GenericAuto {
     private PathPlannerPath followPath;
 
     @Override

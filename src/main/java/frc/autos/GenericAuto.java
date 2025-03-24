@@ -1,4 +1,4 @@
-package frc.commands;
+package frc.autos;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import org.json.simple.parser.ParseException;
 
-public class CustomAutos extends Command {
+public class GenericAuto extends Command {
     protected EndEffector endEffector = EndEffector.getInstance();
     protected ArrayList<String> pathNames = new ArrayList<>();
     protected PathPlannerPath currentPath;
