@@ -1,7 +1,6 @@
 package frc.subsystems.coralintake;
 
 import static edu.wpi.first.units.Units.Kilograms;
-import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
@@ -16,10 +15,9 @@ import frc.utils.math.Algebra;
 public class CoralIntakeIOSim implements CoralIntakeIO {
     private SingleJointedArmSim pivotSim = new SingleJointedArmSim(DCMotor.getNeo550(1),
         CoralIntakeConstants.RotorToArmRatio,
-        SingleJointedArmSim.estimateMOI(CoralIntakeConstants.EffectiveLength.in(Meters),
-            CoralIntakeConstants.Weight.in(Kilograms)),
-        CoralIntakeConstants.EffectiveLength.in(Meters), CoralIntakeConstants.GroundAngle.radians(),
-        CoralIntakeConstants.StowAngle.radians(), true, Math.PI / 2);
+        SingleJointedArmSim.estimateMOI(Units.inchesToMeters(6), CoralIntakeConstants.Weight.in(Kilograms)),
+        Units.inchesToMeters(6), CoralIntakeConstants.GroundAngle.radians(), CoralIntakeConstants.StowAngle.radians(),
+        true, Math.PI / 2);
     private DCMotorSim intakeMotor = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getNeo550(1), 1, 1),
         DCMotor.getNeo550(1));
 

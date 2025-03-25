@@ -24,8 +24,8 @@ public class CoralIntake extends SubsystemBase {
     private TuneableArmFF ff = new TuneableArmFF(CoralIntakeConstants.kS, CoralIntakeConstants.kG,
         CoralIntakeConstants.kV, CoralIntakeConstants.kA, "CoralIntakeFF");
     @Getter private TuneableProfiledPIDController pid = new TuneableProfiledPIDController(CoralIntakeConstants.kP, 0,
-        CoralIntakeConstants.kD,
-        new Constraints(CoralIntakeConstants.BaseVelocityMax.get(), CoralIntakeConstants.BaseAccelerationMax.get()),
+        CoralIntakeConstants.kD, new Constraints(CoralIntakeConstants.SlapdownVelocityMax.get(),
+            CoralIntakeConstants.SlapdownAccelerationMax.get()),
         "CoralIntakePID");
 
     @Getter private double goal = 0.0;

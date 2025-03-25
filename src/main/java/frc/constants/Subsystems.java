@@ -185,7 +185,7 @@ public class Subsystems {
     }
 
     public class ClimberConstants {
-        public static int MotorID = 15;
+        public final static int MotorID = 15;
     }
 
     public class CoralIntakeConstants {
@@ -196,7 +196,7 @@ public class Subsystems {
         public static final double ThroughboreMin = 0.887;
         public static final double ThroughboreMax = 1.18;
 
-        public static final double RotorToArmRatio = 15;
+        public static final double RotorToArmRatio = 138; // idk what the 2 big gears ratio
         public static final Distance EffectiveLength = Inches.of(23);
 
         // recalc: https://www.reca.lc/arm?armMass=%7B%22s%22%3A2%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A6%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22NEO%22%7D&ratio=%7B%22magnitude%22%3A138%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
@@ -209,8 +209,13 @@ public class Subsystems {
 
         public static final double BaseGoalTolerance = 5;
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "CoralIntake/BaseVelocityMax");;
-        public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "CoralIntake/BaseAccelMax");;
+        public static final TuneableNumber SlapdownVelocityMax = new TuneableNumber(360,
+            "CoralIntake/SlapdownVelocityMax");
+        public static final TuneableNumber SlapdownAccelerationMax = new TuneableNumber(720,
+            "CoralIntake/SlapdownAccelerationMax");
+        public static final TuneableNumber StowVelocityMax = new TuneableNumber(180, "CoralIntake/StowVelocityMax");
+        public static final TuneableNumber StowAccelerationMax = new TuneableNumber(360,
+            "CoralIntake/StowAccelerationMax");
 
         public static final TuneableNumber IntakeSpeed = new TuneableNumber(-0.6, "CoralIntake/IntakeSpeed");
         public static final TuneableNumber OuttakeSpeed = new TuneableNumber(0.35, "CoralIntake/OuttakeSpeed");
@@ -221,6 +226,6 @@ public class Subsystems {
         public static final double BlindMoveVoltage = 10;
         public static final double BlindMoveTime = 0.75;
 
-        public static final Mass Weight = Pounds.of(2.3);
+        public static final Mass Weight = Pounds.of(2);
     }
 }

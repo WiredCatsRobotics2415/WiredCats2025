@@ -160,6 +160,17 @@ public class SuperStructure extends SubsystemBase {
             coralIntake.setPivotGoal(goal.getCoralIntake().get());
             boolean isMovingCoralIntake = considerCintake ? !coralIntake.pivotAtGoal() : false;
             System.out.println("isMovingCoralIntake: " + isMovingCoralIntake);
+            if (isMovingCoralIntake) {
+                if (coralIntake.getPid().goalError() >= 0) { // rasing cintake
+                    System.out.println("Cintake stowing");
+                    coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.StowVelocityMax.get(),
+                        CoralIntakeConstants.StowAccelerationMax.get()));
+                } else {
+                    System.out.println("Cintake slapping down");
+                    coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.SlapdownVelocityMax.get(),
+                        CoralIntakeConstants.SlapdownAccelerationMax.get()));
+                }
+            }
             // if the arm does not need to switch sides, then we can just run it
             if (!armSwitchingToFrontSide && !armSwitchingToBackSide) {
                 System.out.println("arm does not need to switch sides so just running it");
