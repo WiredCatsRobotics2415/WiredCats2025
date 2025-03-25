@@ -212,8 +212,8 @@ public class Subsystems {
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(180, "CoralIntake/BaseVelocityMax");;
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(360, "CoralIntake/BaseAccelMax");;
 
-        public static final TuneableNumber IntakeSpeed = new TuneableNumber(0.6, "CoralIntake/IntakeSpeed");
-        public static final TuneableNumber OuttakeSpeed = new TuneableNumber(-0.35, "CoralIntake/OuttakeSpeed");
+        public static final TuneableNumber IntakeSpeed = new TuneableNumber(-0.6, "CoralIntake/IntakeSpeed");
+        public static final TuneableNumber OuttakeSpeed = new TuneableNumber(0.35, "CoralIntake/OuttakeSpeed");
 
         public static final TuneableNumber MaxAngle = new TuneableNumber(90, "CoralIntake/StowAngle");
         public static final TuneableNumber StowAngle = new TuneableNumber(84, "CoralIntake/StowAngle");

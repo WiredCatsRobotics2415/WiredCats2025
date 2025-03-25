@@ -117,6 +117,11 @@ public class Robot extends LoggedRobot {
     }
 
     @Override
+    public void teleopInit() {
+        RobotContainer.getInstance().teleopEnable();
+    }
+
+    @Override
     public void autonomousInit() {
         RobotContainer.getInstance().getAutonomousCommand().schedule();
     }

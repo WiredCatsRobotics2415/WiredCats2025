@@ -80,6 +80,8 @@ public class RobotContainer {
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(3);
     private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(3);
 
+    private boolean manualGroundInakeOnGround = false;
+
     private RobotContainer() {
         setupAuto();
         configureControls();
@@ -125,6 +127,10 @@ public class RobotContainer {
         PathPlannerLogging.setLogCurrentPoseCallback((currentPose) -> {
             Logger.recordOutput("Pathplanner/CurrentPose", currentPose);
         });
+    }
+
+    public void teleopEnable() {
+        neutralizeSubsystems();
     }
 
     private void configureControls() {
@@ -223,8 +229,13 @@ public class RobotContainer {
             .onTrue(Commands.runOnce(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.NeuralNetwork))
                 .alongWith(superstructure.beThereAsapNoEnd(Presets.GroundIntake))
                 .alongWith(Commands.waitSeconds(1.5).andThen(new AutoIntake())))
-            .onFalse(superstructure.stow()
+            .onFalse(superstructure.stow().andThen(CoralIntake.getInstance().turnOffRollers())
                 .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
+
+        // oi.binds.get(OI.Bind.AutoIntakeFromGround)
+        // .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake).alongWith(Commands.waitSeconds(1))
+        // .andThen(CoralIntake.getInstance().toggleIntake()).alongWith(endEffector.toggleIntakeCoral()))
+        // .onFalse(superstructure.stow());
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
             .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
