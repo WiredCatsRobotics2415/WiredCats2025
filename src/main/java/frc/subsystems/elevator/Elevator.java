@@ -83,10 +83,10 @@ public class Elevator extends SubsystemBase {
 
         double cosArm = Trig.cosizzle(Arm.getInstance().getMeasurement());
         if (getMeasurement() > 40) {
-            voltOut = output + ((getMeasurement() - 40) / 38) * ElevatorConstants.MultConstant +
+            voltOut = output + ((getMeasurement() - 40) / 38) * ElevatorConstants.MultConstant.get() +
                 (cosArm * ElevatorConstants.kGForArm.get());
         } else {
-            voltOut = output + (cosArm * ElevatorConstants.kGForArm.get());;
+            voltOut = output + ElevatorConstants.BottomConstant.get() + (cosArm * ElevatorConstants.kGForArm.get());;
         }
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 

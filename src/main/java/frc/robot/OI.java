@@ -53,7 +53,7 @@ public class OI {
         binds.put(Bind.Shoot, controller.button(GulikitButtons.X));
         binds.put(Bind.DeAlgae, controller.button(GulikitButtons.A));
         binds.put(Bind.ManualIntake, controller.button(GulikitButtons.Y));
-        binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.B));
+        binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.RightPaddle));
 
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));

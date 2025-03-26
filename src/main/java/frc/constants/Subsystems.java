@@ -109,10 +109,11 @@ public class Subsystems {
         public static final double MaxHeight = 78.0d;
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
-        public static final double MultConstant = 1.75;
-        public static final double kP = 0.25;
+        public static final TuneableNumber MultConstant = new TuneableNumber(1.4, "ElevatorFF/MultConstant");
+        public static final double kP = 0.4;
         public static final double kD = 0.01;
 
+        public static final TuneableNumber BottomConstant = new TuneableNumber(0.4, "ElevatorFF/BottomConstant");
         public static final TuneableNumber kGForArm = new TuneableNumber(0.0, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
         public static final TuneableNumber kGForArmWithAlgae = new TuneableNumber(0.0, "ElevatorFF/kGForArmWithAlgae");
 
@@ -138,12 +139,12 @@ public class Subsystems {
         public static final double MinDegreesFront = -27.5;
 
         // Prelim gains: https://www.reca.lc/arm?armMass=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&comLength=%7B%22s%22%3A12.5%2C%22u%22%3A%22in%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&endAngle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&iterationLimit=10000&motor=%7B%22quantity%22%3A1%2C%22name%22%3A%22Kraken%20X60%2A%22%7D&ratio=%7B%22magnitude%22%3A25%2C%22ratioType%22%3A%22Reduction%22%7D&startAngle=%7B%22s%22%3A0%2C%22u%22%3A%22deg%22%7D
-        public static final double kS = 0.12;
-        public static final double kG = 0.58;
-        public static final double kV = 0.004;
+        public static final double kS = 0.0;
+        public static final double kG = 0.35;
+        public static final double kV = 0.006;
         public static final double kA = 0.002;
-        public static final double kP = 0.12;
-        public static final double kD = 0.012;
+        public static final double kP = 0.15;
+        public static final double kD = 0.01;
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(540, "Arm/BaseVelocityMax");
         public static final TuneableNumber BaseAccelerationMax = new TuneableNumber(1080, "Arm/BaseAccelMax");

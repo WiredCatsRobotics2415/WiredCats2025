@@ -94,9 +94,11 @@ public class CoralIntake extends SubsystemBase {
             if (!intaking) {
                 io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
                 intaking = true;
+                System.out.println("CI: set intake coral to true!");
             } else {
                 io.setIntakePower(0);
                 intaking = false;
+                System.out.println("CI: set intake coral to false!");
             }
             outtaking = false;
         });

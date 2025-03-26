@@ -49,9 +49,11 @@ public class EndEffector extends SubsystemBase {
             if (!intakingCoral) {
                 io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
                 intakingCoral = true;
+                System.out.println("EE: set intake coral to true!");
             } else {
                 io.setPower(0);
                 intakingCoral = false;
+                System.out.println("EE: set intake coral to false!");
             }
             intakingAlgae = false;
             outtakingCoral = false;

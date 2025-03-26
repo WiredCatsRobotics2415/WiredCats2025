@@ -55,7 +55,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(10, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(39, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
@@ -133,10 +133,12 @@ public class SuperStructure extends SubsystemBase {
      * Depending on the side of the robot that the arm is on, set its goal to right before it would hit the igus chain
      */
     private void setArmGoalToRightBeforeSwingThrough() {
-        if (arm.getMeasurement() <= 90) {
+        if (arm.getMeasurement() <= 85) {
             arm.setGoal(frontSideRightBeforeSwingThrough.get());
+            System.out.print("set goal to" + frontSideRightBeforeSwingThrough.get());
         } else {
             arm.setGoal(backSideRightBeforeSwingThrough.get());
+            System.out.print("set goal to" + backSideRightBeforeSwingThrough.get());
         }
     }
 
@@ -176,7 +178,6 @@ public class SuperStructure extends SubsystemBase {
                 System.out.println("arm does not need to switch sides so just running it");
                 plannedCommand = Commands.runOnce(() -> {
                     elevator.setGoal(goal.getHeight().get());
-                    System.out.println("arm goal: " + goal.getArm().get());
                     arm.setGoal(goal.getArm().get());
                 });
             } else {
@@ -187,7 +188,7 @@ public class SuperStructure extends SubsystemBase {
                 if (elevator.getPid().goalError() >= 0) {
                     System.out.println("elevator moving up");
                     elevator.setGoal(swingThroughMinHeight.get());
-                    setArmGoalToRightBeforeSwingThrough();
+                    // setArmGoalToRightBeforeSwingThrough();
                     plannedCommand = Commands.waitUntil(() -> {
                         if (EndEffector.getInstance().hasCoral()
                             && elevator.getMeasurement() < hasCoralMinHeightBeforeSwing.get()) return false;

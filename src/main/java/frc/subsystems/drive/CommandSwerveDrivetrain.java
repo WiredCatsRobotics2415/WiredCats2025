@@ -240,6 +240,10 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Logger.recordOutput("Drive/ModuleStates", currentState.ModuleStates);
         Logger.recordOutput("Drive/ModuleTargets", currentState.ModuleTargets);
         Logger.recordOutput("Drive/AutoDrive", currentAutoDriveTarget);
+
+        Logger.recordOutput("Drive/DriveXError", driveToPositionXController.goalError());
+        Logger.recordOutput("Drive/DriveYError", driveToPositionYController.goalError());
+        Logger.recordOutput("Drive/DriveRotationError", driveToPositionHeadingController.getPositionError());
     }
 
     /**
