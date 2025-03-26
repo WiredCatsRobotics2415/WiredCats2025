@@ -104,6 +104,14 @@ public class CoralIntake extends SubsystemBase {
         });
     }
 
+    public Command intake() {
+        return runOnce(() -> {
+            io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
+            intaking = true;
+            outtaking = false;
+        });
+    }
+
     public Command toggleOuttake() {
         return runOnce(() -> {
             if (!outtaking) {

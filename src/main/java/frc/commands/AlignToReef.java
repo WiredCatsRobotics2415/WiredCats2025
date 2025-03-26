@@ -1,11 +1,13 @@
 package frc.commands;
 
+import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
@@ -27,8 +29,8 @@ public class AlignToReef extends Command {
 
     @Getter private static Pose2d lastApriltagAlignedTo;
 
-    private static final TuneableNumber LeftOffset = new TuneableNumber(8, "AlignToReef/LeftOffset");
-    private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
+    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(8, "AlignToReef/LeftOffset");
+    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
     private static final TuneableNumber DriveTolerance = new TuneableNumber(2, "AlignToReef/DriveTolerance");
 
     private TuneableNumber goalDriveOffset;
@@ -104,31 +106,42 @@ public class AlignToReef extends Command {
             }
         }
         lastApriltagAlignedTo = apriltagPose;
+        Distance leftOffsetMeters = Inches.of(0), rightOffsetMeters = Inches.of(0);
         if (goalDriveOffset == null) {
             switch (ReefPresetTo.getLastLevelSet()) {
                 case L1:
                     goalDriveOffset = Presets.Level1DriveOffset;
+                    leftOffsetMeters = Presets.Level1OffsetLeft.distance();
+                    rightOffsetMeters = Presets.Level1OffsetRight.distance();
                     break;
                 case L2:
                     goalDriveOffset = Presets.Level2DriveOffset;
+                    leftOffsetMeters = Presets.Level2OffsetLeft.distance();
+                    rightOffsetMeters = Presets.Level2OffsetRight.distance();
                     break;
                 case L3:
                     goalDriveOffset = Presets.Level3DriveOffset;
+                    leftOffsetMeters = Presets.Level3OffsetLeft.distance();
+                    rightOffsetMeters = Presets.Level3OffsetRight.distance();
                     break;
                 case L4:
                     goalDriveOffset = Presets.Level4DriveOffset;
+                    leftOffsetMeters = Presets.Level4OffsetLeft.distance();
+                    rightOffsetMeters = Presets.Level4OffsetRight.distance();
                     break;
                 default:
                     goalDriveOffset = Presets.Level1DriveOffset;
+                    leftOffsetMeters = Presets.Level1OffsetLeft.distance();
+                    rightOffsetMeters = Presets.Level1OffsetRight.distance();
                     break;
             }
         }
         Transform2d leftOffset = new Transform2d(
-            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters), LeftOffset.meters(),
-            Rotation2d.kZero);
+            AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
+            leftOffsetMeters.in(Meters), Rotation2d.kZero);
         Transform2d rightOffset = new Transform2d(
             AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
-            -RightOffset.meters(), Rotation2d.kZero);
+            -rightOffsetMeters.in(Meters), Rotation2d.kZero);
         Transform2d offset;
         switch (side) {
             case Left:

@@ -121,6 +121,8 @@ public class Subsystems {
         public static final double BaseAccelerationMax = 316d;
         public static final double BaseGoalTolerance = 3d;
 
+        public static final double SimGoalTolerance = 4.5;
+
         public static final float RotorToArmGearRatio = 5 / 1;
         public static final double BaseHeightM = Units.inchesToMeters(25.75 + 0.5833333333);
         public static final double Stage2HeightM = Units.inchesToMeters(25.75 + 0.5833333333);

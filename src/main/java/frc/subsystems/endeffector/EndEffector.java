@@ -61,6 +61,16 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
+    public Command intakeCoral() {
+        return runOnce(() -> {
+            io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
+            intakingCoral = true;
+            intakingAlgae = false;
+            outtakingAlgae = false;
+            outtakingCoral = false;
+        });
+    }
+
     public Command intakeAndWaitForCoral() {
         return run(() -> {
             io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
@@ -147,5 +157,8 @@ public class EndEffector extends SubsystemBase {
         Logger.processInputs("EndEffector", inputs);
 
         coralIntakingTorqueMonitor.update(inputs.motorStatorCurrent);
+
+        Logger.recordOutput("EndEffector/containingCoral", coralSensorTrigger());
+        Logger.recordOutput("EndEffector/containingAlgae", algaeSensorTrigger());
     }
 }

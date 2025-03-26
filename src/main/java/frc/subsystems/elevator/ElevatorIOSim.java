@@ -10,7 +10,7 @@ import frc.utils.math.Algebra;
 public class ElevatorIOSim implements ElevatorIO {
     private double appliedVoltage;
 
-    private final ElevatorSim simElevator = new ElevatorSim(0.01, 0.02, DCMotor.getFalcon500(2),
+    private final ElevatorSim simElevator = new ElevatorSim(0.005, 0.02, DCMotor.getFalcon500(2),
         ElevatorConstants.MinHeight, ElevatorConstants.MaxHeight, true, ElevatorConstants.MinHeight);
 
     public ElevatorIOSim() {

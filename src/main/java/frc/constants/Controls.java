@@ -3,6 +3,7 @@ package frc.constants;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.commands.AlignToReef;
 import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.subsystems.superstructure.TuneableSuperStructureState;
 import frc.utils.tuning.TuneableNumber;
@@ -67,20 +68,35 @@ public class Controls {
         // Positive: coral scoring side
         public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(28),
             Degrees.of(-20), "Level1");
-        public static final TuneableNumber Level1DriveOffset = new TuneableNumber(13, // These should be negative because they back away
-            "Presets/L1Offset");
+        public static final TuneableNumber Level1DriveOffset = new TuneableNumber(13, "Presets/L1Offset");
+        public static final TuneableNumber Level1OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
+            "Presets/L1OffsetLeft");
+        public static final TuneableNumber Level1OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
+            "Presets/L1OffsetRight");
 
         public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(46.7),
             Degrees.of(-2), "Level2");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(13, "Presets/L2Offset");
+        public static final TuneableNumber Level2OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
+            "Presets/L2OffsetLeft");
+        public static final TuneableNumber Level2OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
+            "Presets/L2OffsetRight");
 
         public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(62),
             Degrees.of(-1), "Level3");
         public static final TuneableNumber Level3DriveOffset = new TuneableNumber(13, "Presets/L3Offset");
+        public static final TuneableNumber Level3OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
+            "Presets/L3OffsetLeft");
+        public static final TuneableNumber Level3OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
+            "Presets/L3OffsetRight");
 
         public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77.8),
             Degrees.of(-20), "Level4");
         public static final TuneableNumber Level4DriveOffset = new TuneableNumber(13, "Presets/L4Offset");
+        public static final TuneableNumber Level4OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
+            "Presets/L4OffsetLeft");
+        public static final TuneableNumber Level4OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
+            "Presets/L4OffsetRight");
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(37.5),
             Degrees.of(41), "BottomDeAlgae");

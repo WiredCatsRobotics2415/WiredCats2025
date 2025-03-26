@@ -61,6 +61,8 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber rightBeforeHitCintake = new TuneableNumber(135, "SuperStructure/rightBeforeHitCintake");
+    private TuneableNumber rightBeforeHitCintakeElevatorHeight = new TuneableNumber(5,
+        "SuperStructure/rightBeforeHitCintakeElevatorHeight");
     private TuneableNumber hasCoralMinHeightBeforeSwing = new TuneableNumber(4,
         "SuperStructure/hasCoralMinHeightBeforeSwing");
     private boolean considerCintake = true;
@@ -184,28 +186,36 @@ public class SuperStructure extends SubsystemBase {
                 // if the arm does have to switch sides
                 // if the elevator has to move up, set its goal to the swingthrough height, set arm goal to right before swing through, once elevator is there, set arm and elevator goal to thier true values
                 // if the elevator has to move down, set its goal to the swingthrough height and set arm goal to goal right before it would hit the cintake, then once the arm is past swingthrough then set elevator to its true goal
-                elevator.setGoal(goal.getHeight().get()); // NOTE - this might not work, setting the goal then getting the error in the next call
+                elevator.setGoal(goal.getHeight().get());
                 if (elevator.getPid().goalError() >= 0) {
                     System.out.println("elevator moving up");
-                    elevator.setGoal(swingThroughMinHeight.get());
-                    // setArmGoalToRightBeforeSwingThrough();
-                    plannedCommand = Commands.waitUntil(() -> {
-                        if (EndEffector.getInstance().hasCoral()
-                            && elevator.getMeasurement() < hasCoralMinHeightBeforeSwing.get()) return false;
-                        return elevator.atGoal();
-                    }).andThen(Commands.runOnce(() -> {
-                        System.out.println("final up goal set");
+                    if (elevator.getMeasurement() < swingThroughMinHeight.get()) { // if it needs to wait for the arm to swing through...
+                        elevator.setGoal(swingThroughMinHeight.get());
+                        plannedCommand = Commands.waitUntil(() -> elevator.atGoal()).andThen(Commands.runOnce(() -> {
+                            System.out.println("final up goal set");
+                            elevator.setGoal(goal.getHeight().get());
+                            arm.setGoal(goal.getArm().get());
+                        }));
+                    } else { // it can just be set
+                        plannedCommand = Commands.none();
                         elevator.setGoal(goal.getHeight().get());
                         arm.setGoal(goal.getArm().get());
-                    }));
+                    }
                 } else {
-                    elevator.setGoal(swingThroughMinHeight.get());
-                    double armGoal = goal.getArm().get();
                     System.out.println("elevator moving down");
-                    if (isMovingCoralIntake) {
-                        System.out.println("we are moving the cintake");
+                    if (goal.getHeight().get() < swingThroughMinHeight.get()) {
+                        System.out.println("Elevator set to swing through");
+                        elevator.setGoal(swingThroughMinHeight.get());
+                    } else {
+                        System.out.println("Elevator going straight to goal");
+                        elevator.setGoal(goal.getHeight().get());
+                    }
+                    double armGoal = goal.getArm().get();
+                    if (isMovingCoralIntake && elevator.getMeasurement() <= rightBeforeHitCintakeElevatorHeight.get()) {
+                        System.out.println("setting arm goal to rightBeforeHitCintake");
                         arm.setGoal(armGoal > rightBeforeHitCintake.get() ? rightBeforeHitCintake.get() : armGoal);
                     } else {
+                        System.out.println("arm going straight to goal");
                         arm.setGoal(armGoal);
                     }
                     plannedCommand = Commands.waitUntil(() -> {
@@ -215,6 +225,7 @@ public class SuperStructure extends SubsystemBase {
                             System.out.println("    not caring about cintake");
                             return this.armPastSwingThrough();
                         } else {
+                            System.out.println("    caring about cintake");
                             return this.armPastSwingThrough() && coralIntake.pivotAtGoal();
                         }
                     }).andThen(Commands.runOnce(() -> {
@@ -224,7 +235,13 @@ public class SuperStructure extends SubsystemBase {
                 }
             }
             plannedCommand = plannedCommand.andThen(Commands.waitUntil(this::allAtGoal))
-                .andThen(Commands.runOnce(() -> isDone = true));
+                .andThen(Commands.runOnce(() ->
+                {
+                    isDone = true;
+                })).finallyDo((boolean interrupted) -> {
+                    // Do not remove this finallyDo, even though it does nothing
+                    // Ask Liam before deleting
+                });
             plannedCommand.addRequirements(elevator, arm, coralIntake);
             plannedCommand.schedule();
         });

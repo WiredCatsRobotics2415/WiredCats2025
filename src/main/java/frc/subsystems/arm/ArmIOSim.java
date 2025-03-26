@@ -6,6 +6,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.constants.Controls;
 import frc.constants.Subsystems.ArmConstants;
 import frc.utils.math.Algebra;
 
@@ -18,7 +19,7 @@ public class ArmIOSim implements ArmIO {
     private final SingleJointedArmSim simArm = new SingleJointedArmSim(DCMotor.getKrakenX60(1),
         ArmConstants.RotorToArmGearRatio, moi, ArmConstants.EffectiveLength.in(Meters),
         Units.degreesToRadians(ArmConstants.MinDegreesFront), Units.degreesToRadians(ArmConstants.MaxDegreesBack), true,
-        Math.PI / 2);
+        Controls.Presets.Stow.getArm().radians());
 
     public ArmIOSim() {
         System.out.println("Arm MOI: " + moi);

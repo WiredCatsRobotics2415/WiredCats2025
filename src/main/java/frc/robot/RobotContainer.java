@@ -75,9 +75,12 @@ public class RobotContainer {
 
     private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(10);
     private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);
-    private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(3);
-    private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(3);
-    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(3);
+    private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(10);
+    private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(10);
+    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(10);
+    private boolean runningAutoAlign = false;
+    private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.25,
+        "RobotContainer/rawJoyAboveThresholdToCancelAutoAlign");
 
     private boolean manualGroundInakeOnGround = false;
 
@@ -206,6 +209,7 @@ public class RobotContainer {
                     alignToReefLeft.schedule();
                     break;
             }
+            runningAutoAlign = true;
         }));
         oi.binds.get(OI.Bind.AutoAlignRight).onTrue(Commands.runOnce(() -> {
             switch (currentlyAligningTo) {
@@ -222,6 +226,7 @@ public class RobotContainer {
                     alignToReefRight.schedule();
                     break;
             }
+            runningAutoAlign = true;
         }));
 
         // oi.binds.get(OI.Bind.AutoIntakeFromGround)
@@ -253,6 +258,14 @@ public class RobotContainer {
             System.out.println("Changed align target to: " + target.toString());
             this.currentlyAligningTo = target;
         });
+    }
+
+    private void cancelAutoAlignment() {
+        alignToHPSLeft.cancel();
+        alignToHPSRight.cancel();
+        alignToReefLeft.cancel();
+        alignToReefRight.cancel();
+        alignToReefDealgae.cancel();
     }
 
     private void configureTriggers() {
@@ -290,6 +303,16 @@ public class RobotContainer {
         // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
         // drive.getDriveToPositionYController()
         // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+
+        if (runningAutoAlign) {
+            double[] input = oi.getRawXY();
+            if (input[0] > rawJoyAboveThresholdToCancelAutoAlign.get()
+                || input[1] > rawJoyAboveThresholdToCancelAutoAlign.get()) {
+                System.out.println("Robot container: canceled auto input");
+                cancelAutoAlignment();
+                runningAutoAlign = false;
+            }
+        }
     }
 
     public Command getAutonomousCommand() { return new CtoRHPS(); /* autoChooser.get(); */ }
