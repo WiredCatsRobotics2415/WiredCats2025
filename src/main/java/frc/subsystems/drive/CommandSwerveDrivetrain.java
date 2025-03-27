@@ -45,7 +45,6 @@ import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
-import frc.utils.driver.DashboardManager;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuneableNumber;
@@ -160,9 +159,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
              * @Override public StatusCode apply(SwerveControlParameters parameters, SwerveModule<?, ?, ?>... modulesToApply) { for (SwerveModule<?, ?, ?> m : modulesToApply) { if (!sentMotorConfigs) ((TalonFX) m.getDriveMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getDriveMotor()).set(0); if (!sentMotorConfigs) ((TalonFX) m.getSteerMotor()).setNeutralMode(NeutralModeValue.Coast); ((TalonFX) m.getSteerMotor()).set(0); } sentMotorConfigs = true; return StatusCode.OK; } }; String[] names = new String[] { "Front Left", "Front Right", "Back Left", "Back Right" }; int i = 0; for (SwerveModule<TalonFX, TalonFX, CANcoder> m : getModules()) { TorqueSafety.getInstance().addMotor(m.getDriveMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Drive")); TorqueSafety.getInstance().addMotor(m.getSteerMotor().getSupplyCurrent().asSupplier(), applyRequest(() -> coastAllSwerve).withName(names[i] + " Steer")); i++; }
              */
         }
-
-        DashboardManager.getInstance().addBoolSupplier(true, "Using ST",
-            () -> currentPoseEstimationType == PoseEstimationType.SingleTag);
     }
 
     public static CommandSwerveDrivetrain getInstance() {
@@ -242,6 +238,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Logger.recordOutput("Drive/DriveXError", driveToPositionXController.goalError());
         Logger.recordOutput("Drive/DriveYError", driveToPositionYController.goalError());
         Logger.recordOutput("Drive/DriveRotationError", driveToPositionHeadingController.getPositionError());
+
+        Logger.recordOutput("Drive/SingleTagActive", currentPoseEstimationType == PoseEstimationType.SingleTag);
+        Logger.recordOutput("Drive/SingleTagId", currentSingleTagId);
     }
 
     /**

@@ -32,8 +32,8 @@ public class VisionPoseFuser {
         "VPF/DistanceFromCurrentPoseScalar");
     private final TuneableNumber LinearVelocityOfRobot = new TuneableNumber(1, "VPF/LinearVelocityOfRobot");
     private final TuneableNumber LinearAccelerationOfRobot = new TuneableNumber(4, "VPF/LinearAccelerationOfRobot");
-    private final TuneableNumber AngularVelocityOfRobot = new TuneableNumber(3, "VPF/AngularVelocityOfRobot");
-    private final TuneableNumber AngularAccelerationOfRobot = new TuneableNumber(6, "VPF/AngularAccelerationOfRobot");
+    private final TuneableNumber AngularVelocityOfRobot = new TuneableNumber(2, "VPF/AngularVelocityOfRobot");
+    private final TuneableNumber AngularAccelerationOfRobot = new TuneableNumber(0, "VPF/AngularAccelerationOfRobot");
     private final TuneableNumber PoseLatencyScalar = new TuneableNumber(0.075, "VPF/PoseLatencyScalar");
     // To disable vision pose fusing: set this to 0
     private final Distance DistanceFromCurrentPoseCutoffThreshold = RobotMeasurements.CenterToFrameRadius;

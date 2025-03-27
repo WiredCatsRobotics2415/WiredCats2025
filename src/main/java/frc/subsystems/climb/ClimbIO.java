@@ -10,9 +10,11 @@ public interface ClimbIO {
         public double motorStatorCurrent = 0.0d;
         public double motorSupplyCurrent = 0.0d;
         public double motorTemp = 0.0d;
+        public double appliedVolts = 0.0d;
+        public double motorRotations = 0.0d;
     }
 
     public default void updateInputs(ClimbIOInputs inputs) {}
 
-    public default void setPower(double power) {};
+    public default void setVoltage(double volts) {};
 }

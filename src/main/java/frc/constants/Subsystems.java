@@ -162,13 +162,13 @@ public class Subsystems {
         public static final int MotorID = 12;
         public static final int IRSensorPort = 1;
 
-        public static final TuneableNumber IntakeCoralSpeed = new TuneableNumber(-0.3, "EndEffector/IntakeCoralSpeed");
-        public static final TuneableNumber IntakeAlgaeSpeed = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeSpeed");
-        public static final TuneableNumber HoldCoralSpeed = new TuneableNumber(-0.225, "EndEffector/IntakeCoralSpeed");
-        public static final TuneableNumber HoldAlgaeSpeed = new TuneableNumber(0.6, "EndEffector/IntakeAlgaeSpeed");
-        public static final TuneableNumber OuttakeCoralSpeed = new TuneableNumber(0.65,
-            "EndEffector/OuttakeCoralSpeed");
-        public static final TuneableNumber OuttakeAlageSpeed = new TuneableNumber(-1, "EndEffector/OuttakeAlageSpeed");
+        public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(5, "EndEffector/IntakeCoralVolts");
+        public static final TuneableNumber IntakeAlgaeVolts = new TuneableNumber(0.8, "EndEffector/IntakeAlgaeVolts");
+        public static final TuneableNumber HoldCoralVolts = new TuneableNumber(-0.225, "EndEffector/IntakeCoralVolts");
+        public static final TuneableNumber HoldAlgaeVolts = new TuneableNumber(0.6, "EndEffector/IntakeAlgaeVolts");
+        public static final TuneableNumber OuttakeCoralVolts = new TuneableNumber(0.65,
+            "EndEffector/OuttakeCoralVolts");
+        public static final TuneableNumber OuttakeAlageVolts = new TuneableNumber(-1, "EndEffector/OuttakeAlageVolts");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
         public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(200,
@@ -189,6 +189,8 @@ public class Subsystems {
 
     public class ClimberConstants {
         public final static int MotorID = 15;
+        public final static TuneableNumber ForwardVolts = new TuneableNumber(10, "Climber/ForwardVolts");
+        public final static TuneableNumber BackwardVolts = new TuneableNumber(-10, "Climber/BackwardVolts");
     }
 
     public class CoralIntakeConstants {
@@ -214,14 +216,14 @@ public class Subsystems {
 
         public static final TuneableNumber SlapdownVelocityMax = new TuneableNumber(360,
             "CoralIntake/SlapdownVelocityMax");
-        public static final TuneableNumber SlapdownAccelerationMax = new TuneableNumber(720,
+        public static final TuneableNumber SlapdownAccelerationMax = new TuneableNumber(1440,
             "CoralIntake/SlapdownAccelerationMax");
         public static final TuneableNumber StowVelocityMax = new TuneableNumber(180, "CoralIntake/StowVelocityMax");
         public static final TuneableNumber StowAccelerationMax = new TuneableNumber(360,
             "CoralIntake/StowAccelerationMax");
 
-        public static final TuneableNumber IntakeSpeed = new TuneableNumber(-0.8, "CoralIntake/IntakeSpeed");
-        public static final TuneableNumber OuttakeSpeed = new TuneableNumber(0.35, "CoralIntake/OuttakeSpeed");
+        public static final TuneableNumber IntakeVolts = new TuneableNumber(-10, "CoralIntake/IntakeVolts");
+        public static final TuneableNumber OuttakeVolts = new TuneableNumber(10, "CoralIntake/OuttakeVolts");
 
         public static final TuneableNumber MaxAngle = new TuneableNumber(90, "CoralIntake/StowAngle");
         public static final TuneableNumber StowAngle = new TuneableNumber(84, "CoralIntake/StowAngle");

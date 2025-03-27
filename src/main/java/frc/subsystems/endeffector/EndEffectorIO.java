@@ -11,10 +11,10 @@ public interface EndEffectorIO {
         public double motorSupplyCurrent = 0.0d;
 
         public int sensorValue = 0;
-        public double appliedPower;
+        public double appliedVolts;
     }
 
     public default void updateInputs(EndEffectorIOInputs inputs) {}
 
-    public default void setPower(double power) {};
+    public default void setVoltage(double volts) {};
 }

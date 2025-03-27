@@ -1,5 +1,6 @@
 package frc.subsystems.climb;
 
+import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -28,6 +29,8 @@ public class ClimbIOReal implements ClimbIO {
         motorStator = motor.getStatorCurrent();
         motorSupply = motor.getSupplyCurrent();
         motorTemp = motor.getDeviceTemp();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(50, motorStator, motorSupply, motorTemp, motor.getRotorPosition());
     }
 
     @Override
@@ -36,10 +39,11 @@ public class ClimbIOReal implements ClimbIO {
         inputs.motorStatorCurrent = motorStator.getValueAsDouble();
         inputs.motorSupplyCurrent = motorSupply.getValueAsDouble();
         inputs.motorTemp = motorTemp.getValueAsDouble();
+        inputs.motorRotations = motor.getRotorPosition().getValueAsDouble();
     }
 
     @Override
-    public void setPower(double power) {
-        motor.set(power);
+    public void setVoltage(double volts) {
+        motor.setVoltage(volts);
     }
 }

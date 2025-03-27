@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.RobotMeasurements;
-import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ArmConstants;
 import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.constants.Subsystems.DriveConstants;
@@ -23,7 +22,7 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.utils.math.Point2d;
 import frc.utils.math.Trig;
 import frc.utils.tuning.TuneableNumber;
-import frc.utils.tuning.TuningModeTab;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Helper class to sit between commands and the arm and elevator, to ensure no internal collisions happen. All commands that use the arm or elevator should interact with this class instead of directly with arm or elevator.
@@ -65,7 +64,6 @@ public class SuperStructure extends SubsystemBase {
         "SuperStructure/rightBeforeHitCintakeElevatorHeight");
     private TuneableNumber hasCoralMinHeightBeforeSwing = new TuneableNumber(4,
         "SuperStructure/hasCoralMinHeightBeforeSwing");
-    private boolean considerCintake = true;
 
     private Point2d carriagePoint = new Point2d(0, 0);
     private Point2d endEffector = new Point2d(0, 0);
@@ -74,19 +72,11 @@ public class SuperStructure extends SubsystemBase {
     private Point2d eeTopTip = new Point2d(0, 0);
 
     private boolean isDone = true;
-    private TuneableSuperStructureState goal;
+    private boolean isMovingCoralIntake;
 
     private static SuperStructure instance;
 
     private SuperStructure() {
-        if (RuntimeConstants.TuningMode) {
-            TuningModeTab.getInstance().addBoolSupplier("Arm & Drivebase", () -> armWillCollideWithDrivebase);
-            TuningModeTab.getInstance().addBoolSupplier("Arm & cIntake", () -> armWillCollideWithCoralIntake);
-            TuningModeTab.getInstance().addBoolSupplier("Front Switch", () -> armSwitchingToFrontSide);
-            TuningModeTab.getInstance().addBoolSupplier("Back Switch", () -> armSwitchingToBackSide);
-            TuningModeTab.getInstance().addDoubleSupplier("last EE height", () -> lastEEHeight);
-            TuningModeTab.getInstance().addDoubleSupplier("last EE distance", () -> lastEEDistanceFromElevator);
-        }
         setDefaultCommand(stow());
     }
 
@@ -162,8 +152,7 @@ public class SuperStructure extends SubsystemBase {
             armSwitchingToFrontSide = arm.getMeasurement() > 90 && goal.getArm().get() < 90;
             armSwitchingToBackSide = arm.getMeasurement() < 90 && goal.getArm().get() > 90;
             coralIntake.setPivotGoal(goal.getCoralIntake().get());
-            boolean isMovingCoralIntake = considerCintake ? !coralIntake.pivotAtGoal() : false;
-            System.out.println("isMovingCoralIntake: " + isMovingCoralIntake);
+            isMovingCoralIntake = !coralIntake.pivotAtGoal();
             if (isMovingCoralIntake) {
                 if (coralIntake.getPid().goalError() >= 0) { // rasing cintake
                     System.out.println("Cintake stowing");
@@ -256,7 +245,7 @@ public class SuperStructure extends SubsystemBase {
     }
 
     private boolean allAtGoal() {
-        return arm.atGoal() && elevator.atGoal() && (considerCintake ? coralIntake.pivotAtGoal() : true);
+        return arm.atGoal() && elevator.atGoal() && coralIntake.pivotAtGoal();
     }
 
     private void updateCurrentStateCollisions() {
@@ -332,5 +321,13 @@ public class SuperStructure extends SubsystemBase {
                 ArmConstants.BaseVelocityMax.get());
 
         arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
+
+        Logger.recordOutput("SuperStructure/Arm&DriveCollision", armWillCollideWithDrivebase);
+        Logger.recordOutput("SuperStructure/Arm&cIntakeCollision", armWillCollideWithCoralIntake);
+        Logger.recordOutput("SuperStructure/FrontSwitch", armSwitchingToFrontSide);
+        Logger.recordOutput("SuperStructure/FackSwitch", armSwitchingToBackSide);
+        Logger.recordOutput("SuperStructure/IsDone", isDone);
+        Logger.recordOutput("SuperStructure/MovingCintake", isMovingCoralIntake);
+        Logger.recordOutput("SuperStructure/AllAtGoal", allAtGoal());
     }
 }

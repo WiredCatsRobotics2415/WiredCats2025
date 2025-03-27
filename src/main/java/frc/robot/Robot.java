@@ -4,6 +4,7 @@ import com.ctre.phoenix6.HootReplay;
 import com.ctre.phoenix6.SignalLogger;
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
 import frc.robot.RobotStatus.RobotState;
@@ -14,6 +15,9 @@ import frc.utils.simulation.SimulationTab;
 import frc.utils.tuning.TuneableBoolean;
 import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuningModeTab;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 import org.ironmaple.simulation.SimulatedArena;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -92,6 +96,21 @@ public class Robot extends LoggedRobot {
         }
         Notifier allianceUpdater = new Notifier(AllianceDependent::updateCurrentAlliance);
         allianceUpdater.startPeriodic(1);
+
+        // From 6328, log active commands
+        Map<String, Integer> commandCounts = new HashMap<>();
+        BiConsumer<Command, Boolean> logCommandFunction = (Command command, Boolean active) -> {
+            String name = command.getName();
+            int count = commandCounts.getOrDefault(name, 0) + (active ? 1 : -1);
+            commandCounts.put(name, count);
+            Logger.recordOutput("CommandsUnique/" + name + "_" + Integer.toHexString(command.hashCode()), active);
+            Logger.recordOutput("CommandsAll/" + name, count > 0);
+        };
+        CommandScheduler.getInstance()
+            .onCommandInitialize((Command command) -> logCommandFunction.accept(command, true));
+        CommandScheduler.getInstance().onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
+        CommandScheduler.getInstance()
+            .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
     }
 
     @Override
@@ -123,6 +142,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void autonomousInit() {
+        if (Robot.isSimulation()) SimulatedArena.getInstance().placeGamePiecesOnField();
         RobotContainer.getInstance().getAutonomousCommand().schedule();
     }
 

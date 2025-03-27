@@ -13,7 +13,7 @@ public interface CoralIntakeIO {
         public boolean intakeConnected = true;
         public double intakeTemp = 0.0d;
         public double intakeStatorCurrent = 0.0d;
-        public double appliedPower = 0.0d;
+        public double appliedIntakeVolts = 0.0d;
 
         public double throughborePosition = 0.0d;
     }
@@ -22,5 +22,5 @@ public interface CoralIntakeIO {
 
     public default void setPivotVoltage(double voltage) {};
 
-    public default void setIntakePower(double power) {};
+    public default void setIntakeVoltage(double volts) {};
 }
