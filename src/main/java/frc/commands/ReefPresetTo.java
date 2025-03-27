@@ -52,7 +52,7 @@ public class ReefPresetTo extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        System.out.println("ReefPresetTo is finished");
+        System.out.println("ReefPresetTo is finished, interrupted: " + interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
 }

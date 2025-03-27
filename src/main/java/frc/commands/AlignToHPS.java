@@ -93,6 +93,7 @@ public class AlignToHPS extends Command {
 
     @Override
     public void end(boolean interrupted) {
+        driveCommand.cancel();
         focusCommand.cancel();
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }

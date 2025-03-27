@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.autos.CtoRGround;
+import frc.autos.CtoRHPS;
 import frc.autos.L4;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
@@ -132,7 +134,8 @@ public class RobotContainer {
         });
 
         autoChooser.addOption("CustomL4", new L4());
-        autoChooser.addOption("CustomCtoRHPS", new L4());
+        autoChooser.addOption("CustomCtoRHPS", new CtoRHPS());
+        autoChooser.addOption("CtoRGround", new CtoRGround());
     }
 
     public void teleopEnable() {

@@ -4,14 +4,19 @@ import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
+import frc.subsystems.superstructure.SuperStructure;
+import frc.utils.AllianceDependent;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.json.simple.parser.ParseException;
 
 public class GenericAuto extends Command {
     protected EndEffector endEffector = EndEffector.getInstance();
+    protected CoralIntake coralIntake = CoralIntake.getInstance();
+    protected SuperStructure superstructure = SuperStructure.getInstance();
     protected ArrayList<String> pathNames = new ArrayList<>();
     protected PathPlannerPath currentPath;
     protected CommandSwerveDrivetrain drive = CommandSwerveDrivetrain.getInstance();
@@ -40,6 +45,10 @@ public class GenericAuto extends Command {
     protected boolean isAtTarget(PathPlannerPath path) {
         Pose2d current = drive.getState().Pose;
         if (path != null) {
+            if (AllianceDependent.isCurrentlyBlue() != true) {
+                path = path.flipPath();
+            }
+
             Pose2d target = path.getPathPoses().get(path.getPathPoses().size() - 1);
             if (current.getTranslation().getDistance(target.getTranslation()) < 0.5) {
                 return true;
