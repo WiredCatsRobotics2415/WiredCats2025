@@ -17,7 +17,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     private DutyCycleEncoder throughbore;
 
     private double appliedVolts;
-    private double appliedPower;
+    private double appliedIntakeVolts;
 
     public CoralIntakeIOReal() {
         SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
@@ -46,7 +46,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
         inputs.intakeConnected = !intakeMotor.getLastError().equals(REVLibError.kCANDisconnected);
         inputs.intakeTemp = intakeMotor.getMotorTemperature();
         inputs.intakeStatorCurrent = intakeMotor.getOutputCurrent();
-        inputs.appliedPower = appliedPower;
+        inputs.appliedIntakeVolts = appliedIntakeVolts;
 
         double tBor = throughbore.get();
         if (tBor < 0.8 && tBor > 0) {
@@ -56,9 +56,9 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     }
 
     @Override
-    public void setIntakePower(double power) {
-        appliedPower = power;
-        intakeMotor.set(power);
+    public void setIntakeVoltage(double volts) {
+        appliedIntakeVolts = volts;
+        intakeMotor.set(volts);
     }
 
     @Override

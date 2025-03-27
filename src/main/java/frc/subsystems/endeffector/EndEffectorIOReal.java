@@ -12,7 +12,7 @@ import frc.constants.Subsystems.EndEffectorConstants;
 public class EndEffectorIOReal implements EndEffectorIO {
     private SparkMax motor = new SparkMax(EndEffectorConstants.MotorID, MotorType.kBrushless);
     private AnalogInput irSensor = new AnalogInput(EndEffectorConstants.IRSensorPort);
-    double appliedPower;
+    double appliedVolts;
 
     public EndEffectorIOReal() {
         configureMotor();
@@ -31,12 +31,12 @@ public class EndEffectorIOReal implements EndEffectorIO {
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = motor.getOutputCurrent();
         inputs.motorTemp = motor.getMotorTemperature();
-        inputs.appliedPower = appliedPower;
+        inputs.appliedVolts = appliedVolts;
     }
 
     @Override
-    public void setPower(double power) {
-        appliedPower = power;
-        motor.set(power);
+    public void setVoltage(double volts) {
+        appliedVolts = volts;
+        motor.set(volts);
     }
 }

@@ -73,8 +73,8 @@ public class RobotContainer {
     private AdjustableSLR driveXLimiter = new AdjustableSLR(DriveConstants.BaseXAccelerationMax.get());
     private AdjustableSLR driveYLimiter = new AdjustableSLR(DriveConstants.BaseYAccelerationMax.get());
     private AdjustableSLR driveRotationLimiter = new AdjustableSLR(DriveConstants.BaseRotationAccelMax.get());
-    private TuneableNumber minorAdjXPct = new TuneableNumber(0.2, "Drive/minorAdjXPct");
-    private TuneableNumber minorAdjYPct = new TuneableNumber(0.2, "Drive/minorAdjYPct");
+    private TuneableNumber minorAdjXPct = new TuneableNumber(0.6, "Drive/minorAdjXPct");
+    private TuneableNumber minorAdjYPct = new TuneableNumber(0.6, "Drive/minorAdjYPct");
 
     private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(10);
     private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);

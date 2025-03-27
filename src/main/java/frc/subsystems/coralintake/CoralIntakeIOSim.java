@@ -7,7 +7,6 @@ import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
-import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.utils.math.Algebra;
@@ -22,7 +21,7 @@ public class CoralIntakeIOSim implements CoralIntakeIO {
         DCMotor.getNeo550(1));
 
     private double appliedVolts;
-    private double appliedPower;
+    private double appliedIntakeVolts;
 
     public CoralIntakeIOSim() {
 
@@ -37,7 +36,7 @@ public class CoralIntakeIOSim implements CoralIntakeIO {
         inputs.appliedVoltage = appliedVolts;
 
         inputs.intakeConnected = true;
-        inputs.appliedPower = appliedPower;
+        inputs.appliedIntakeVolts = appliedIntakeVolts;
 
         inputs.throughborePosition = Algebra.linearMap(Units.radiansToDegrees(pivotSim.getAngleRads()),
             CoralIntakeConstants.GroundAngle.get(), CoralIntakeConstants.StowAngle.get(),
@@ -45,9 +44,9 @@ public class CoralIntakeIOSim implements CoralIntakeIO {
     }
 
     @Override
-    public void setIntakePower(double power) {
-        appliedPower = power;
-        intakeMotor.setInputVoltage(power * RoboRioSim.getVInVoltage());
+    public void setIntakeVoltage(double volts) {
+        appliedIntakeVolts = volts;
+        intakeMotor.setInputVoltage(volts);
     }
 
     @Override

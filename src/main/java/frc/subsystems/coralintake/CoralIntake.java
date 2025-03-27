@@ -92,11 +92,11 @@ public class CoralIntake extends SubsystemBase {
     public Command toggleIntake() {
         return runOnce(() -> {
             if (!intaking) {
-                io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
+                io.setIntakeVoltage(CoralIntakeConstants.IntakeVolts.get());
                 intaking = true;
                 System.out.println("CI: set intake coral to true!");
             } else {
-                io.setIntakePower(0);
+                io.setIntakeVoltage(0);
                 intaking = false;
                 System.out.println("CI: set intake coral to false!");
             }
@@ -106,7 +106,7 @@ public class CoralIntake extends SubsystemBase {
 
     public Command intake() {
         return runOnce(() -> {
-            io.setIntakePower(CoralIntakeConstants.IntakeSpeed.get());
+            io.setIntakeVoltage(CoralIntakeConstants.IntakeVolts.get());
             intaking = true;
             outtaking = false;
         });
@@ -115,10 +115,10 @@ public class CoralIntake extends SubsystemBase {
     public Command toggleOuttake() {
         return runOnce(() -> {
             if (!outtaking) {
-                io.setIntakePower(CoralIntakeConstants.OuttakeSpeed.get());
+                io.setIntakeVoltage(CoralIntakeConstants.OuttakeVolts.get());
                 outtaking = true;
             } else {
-                io.setIntakePower(0);
+                io.setIntakeVoltage(0);
                 outtaking = false;
             }
             intaking = false;
@@ -127,7 +127,7 @@ public class CoralIntake extends SubsystemBase {
 
     public Command turnOffRollers() {
         return runOnce(() -> {
-            io.setIntakePower(0);
+            io.setIntakeVoltage(0);
             intaking = false;
             outtaking = false;
         });

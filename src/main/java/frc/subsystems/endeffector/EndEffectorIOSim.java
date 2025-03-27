@@ -10,7 +10,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.simulation.DCMotorSim;
 import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.arm.Arm;
@@ -26,7 +25,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
     private DCMotorSim motor = new DCMotorSim(LinearSystemId.createDCMotorSystem(DCMotor.getNeo550(1), 1, 1),
         DCMotor.getNeo550(1));
     private final Arm armSubsystem = Arm.getInstance();
-    double appliedPower;
+    double appliedVolts;
 
     private final IntakeSimulation intakeSimulation;
 
@@ -58,7 +57,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
             Meters.of(carriagePose.getZ() +
                 EndEffectorConstants.DistanceFromCarriage.in(Meters) * Trig.sizzle(endEffectorAngle)),
             // The initial speed of the coral
-            MetersPerSecond.of(-EndEffectorConstants.OuttakeCoralSpeed.get()),
+            MetersPerSecond.of(0.3),
             // ejection angle
             armAngle.plus(EndEffectorConstants.AngleFromArmWrtGround));
         SimulatedArena.getInstance().addGamePieceProjectile(outtakedCoral);
@@ -74,20 +73,20 @@ public class EndEffectorIOSim implements EndEffectorIO {
             ? EndEffectorConstants.TorqueMonitorJumpThreshold + 1
             : 0;
         inputs.motorSupplyCurrent = 0.0d;
-        inputs.appliedPower = appliedPower;
+        inputs.appliedVolts = appliedVolts;
     }
 
     @Override
-    public void setPower(double power) {
-        appliedPower = power;
-        motor.setInputVoltage(power * RobotController.getBatteryVoltage());
-        if (power < 0) {
+    public void setVoltage(double volts) {
+        appliedVolts = volts;
+        motor.setInputVoltage(appliedVolts);
+        if (volts < 0) {
             intakeSimulation.startIntake();
         }
-        if (power == 0) {
+        if (volts == 0) {
             intakeSimulation.stopIntake();
         }
-        if (power > 0) {
+        if (volts > 0) {
             if (intakeSimulation.getGamePiecesAmount() > 0) {
                 intakeSimulation.obtainGamePieceFromIntake();
                 outtakeCoral();

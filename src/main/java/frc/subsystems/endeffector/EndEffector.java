@@ -30,11 +30,11 @@ public class EndEffector extends SubsystemBase {
         coralIntakingTorqueMonitor = new TorqueMonitor(EndEffectorConstants.TorqueMonitorJumpThreshold,
             EndEffectorConstants.TorqueMonitorJumpMagnitude, EndEffectorConstants.TorqueMonitorTripTime);
         new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
-            io.setPower(EndEffectorConstants.HoldCoralSpeed.get());
+            io.setVoltage(EndEffectorConstants.HoldCoralVolts.get());
             intakingCoral = false;
         }));
         new Trigger(this::hasAlgae).onTrue(Commands.runOnce(() -> {
-            io.setPower(EndEffectorConstants.HoldAlgaeSpeed.get());
+            io.setVoltage(EndEffectorConstants.HoldAlgaeVolts.get());
             intakingAlgae = false;
         }));
     }
@@ -47,11 +47,11 @@ public class EndEffector extends SubsystemBase {
     public Command toggleIntakeCoral() {
         return runOnce(() -> {
             if (!intakingCoral) {
-                io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
+                io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
                 intakingCoral = true;
                 System.out.println("EE: set intake coral to true!");
             } else {
-                io.setPower(0);
+                io.setVoltage(0);
                 intakingCoral = false;
                 System.out.println("EE: set intake coral to false!");
             }
@@ -63,7 +63,7 @@ public class EndEffector extends SubsystemBase {
 
     public Command intakeCoral() {
         return runOnce(() -> {
-            io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
+            io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
             intakingCoral = true;
             intakingAlgae = false;
             outtakingAlgae = false;
@@ -73,7 +73,7 @@ public class EndEffector extends SubsystemBase {
 
     public Command intakeAndWaitForCoral() {
         return run(() -> {
-            io.setPower(EndEffectorConstants.IntakeCoralSpeed.get());
+            io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
             intakingCoral = true;
             intakingAlgae = false;
             outtakingAlgae = false;
@@ -84,10 +84,10 @@ public class EndEffector extends SubsystemBase {
     public Command toggleIntakeAlgae() {
         return runOnce(() -> {
             if (!intakingAlgae) {
-                io.setPower(EndEffectorConstants.IntakeAlgaeSpeed.get());
+                io.setVoltage(EndEffectorConstants.IntakeAlgaeVolts.get());
                 intakingAlgae = true;
             } else {
-                io.setPower(0);
+                io.setVoltage(0);
                 intakingAlgae = false;
             }
             intakingCoral = false;
@@ -103,19 +103,19 @@ public class EndEffector extends SubsystemBase {
         return runOnce(() -> {
             coralIntakingTorqueMonitor.reset();
             if (outtakingAlgae || outtakingCoral) {
-                io.setPower(0);
+                io.setVoltage(0);
                 outtakingAlgae = false;
                 outtakingCoral = false;
                 return;
             }
             if (algaeSensorTrigger()) {
-                io.setPower(EndEffectorConstants.OuttakeAlageSpeed.get());
+                io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
                 intakingCoral = false;
                 intakingAlgae = false;
                 outtakingAlgae = true;
                 return;
             }
-            io.setPower(EndEffectorConstants.OuttakeCoralSpeed.get());
+            io.setVoltage(EndEffectorConstants.OuttakeCoralVolts.get());
             intakingCoral = false;
             intakingAlgae = false;
             outtakingCoral = true;
@@ -128,7 +128,7 @@ public class EndEffector extends SubsystemBase {
 
     public Command turnOff() {
         return runOnce(() -> {
-            io.setPower(0);
+            io.setVoltage(0);
             outtakingAlgae = false;
             outtakingCoral = false;
             intakingCoral = false;
