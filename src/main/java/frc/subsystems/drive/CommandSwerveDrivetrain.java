@@ -225,8 +225,6 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     singleTagDistanceFromCurrent.get() *
                         currentState.Pose.getTranslation().getDistance(singleTag.pose.getTranslation()) +
                     singleTagDistanceFromTag.get() * singleTag.avgTagDist;
-                System.out.println(
-                    "Fusing singletag measurement w/ distrust: " + distrust + " and ts: " + singleTag.timestampSeconds);
                 addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
                     VecBuilder.fill(distrust, distrust, 999999));
             }

@@ -51,6 +51,11 @@ public class AlignToReef extends Command {
         this.goalDriveOffset = driveOffset;
     }
 
+    public AlignToReef(Side side, Face face) {
+        this.side = side;
+        this.face = face;
+    }
+
     /**
      * Note when using this constructor: the driveOffset (ie. how far back the robot is from the chosen apriltag) is automatically determined from the last set REEF preset and does NOT consider dealgae preset
      */

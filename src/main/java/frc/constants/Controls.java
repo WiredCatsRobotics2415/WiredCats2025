@@ -112,8 +112,13 @@ public class Controls {
 
         public static final TuneableSuperStructureState GroundIntake = new TuneableSuperStructureState(Inches.of(0),
             Degrees.of(179), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntake");
+        public static final TuneableSuperStructureState KnockOverStack = new TuneableSuperStructureState(Inches.of(0),
+            Degrees.of(179), Degrees.of(25), "KnockOverStack");
 
         public static final TuneableSuperStructureState ProcessorScore = new TuneableSuperStructureState(Inches.of(0.5),
             Degrees.of(48.7), "Processor");
+
+        public static final TuneableSuperStructureState GroundIntakeAlgae = new TuneableSuperStructureState(
+            Inches.of(17.75), Degrees.of(17.675), "GroundIntakeAlgae");
     }
 }

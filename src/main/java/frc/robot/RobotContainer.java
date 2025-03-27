@@ -10,6 +10,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.autos.L4;
@@ -142,19 +143,19 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
-            // if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
-            // double[] input = oi.getRawXY();
-            // double x = input[1], y = input[0];
-            // // this mode disables rotation, and sets the maximum speed of the robot to the minorAdjPct speed.
-            // x = x / (1 / minorAdjXPct.get());
-            // y = y / (1 / minorAdjYPct.get());
-            // // x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
-            // // y = Math.abs(y) > minorAdjYPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
-            // return drive.driveOpenLoopRobotCentricRequest
-            // .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
-            // .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-            // .withRotationalRate(driveRotationLimiter.calculate(0));
-            // }
+            if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
+                double[] input = oi.getRawXY();
+                double x = input[1], y = input[0];
+                // this mode disables rotation, and sets the maximum speed of the robot to the minorAdjPct speed.
+                x = x / (1 / minorAdjXPct.get());
+                y = y / (1 / minorAdjYPct.get());
+                // x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
+                // y = Math.abs(y) > minorAdjYPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
+                return drive.driveOpenLoopRobotCentricRequest
+                    .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
+                    .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
+                    .withRotationalRate(driveRotationLimiter.calculate(0));
+            }
             double[] linearInput = oi.getXY();
             double x = linearInput[1], y = linearInput[0];
             double rotation = oi.getRotation();
@@ -239,18 +240,20 @@ public class RobotContainer {
         // .onFalse(superstructure.stow().andThen(CoralIntake.getInstance().turnOffRollers())
         // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
-        oi.binds.get(OI.Bind.AutoIntakeFromGround).onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake))
-            .onFalse(superstructure.beThereAsap(Presets.GroundIntakeUp).andThen(Commands.waitSeconds(0.5))
-                .andThen(superstructure.stow()))
-            .onChange(endEffector.toggleIntakeCoral().andThen(CoralIntake.getInstance().toggleIntake()));
+        oi.binds.get(OI.Bind.AutoIntakeFromGround)
+            .onTrue(new ParallelCommandGroup(superstructure.beThereAsapNoEnd(Presets.GroundIntake),
+                endEffector.intakeCoral(), CoralIntake.getInstance().intake()))
+            .onFalse(new ParallelCommandGroup(superstructure.beThereAsap(Presets.GroundIntakeUp)
+                .andThen(Commands.waitSeconds(0.5)).andThen(superstructure.stow()), endEffector.turnOff(),
+                CoralIntake.getInstance().turnOffRollers()));
 
         // oi.binds.get(OI.Bind.AutoIntakeFromGround)
         // .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake).alongWith(Commands.waitSeconds(1))
         // .andThen(CoralIntake.getInstance().toggleIntake()).alongWith(endEffector.toggleIntakeCoral()))
         // .onFalse(superstructure.stow());
 
-        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsap(Presets.ProcessorScore)
-            .andThen(Commands.waitUntil(superstructure::doneWithMovement)));
+        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore));
+        oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntakeAlgae));
 
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
         oi.binds.get(OI.Bind.ClimberBackward).onTrue(climber.runBackward()).onFalse(climber.stop());
@@ -309,8 +312,8 @@ public class RobotContainer {
 
         if (runningAutoAlign) {
             double[] input = oi.getRawXY();
-            if (input[0] > rawJoyAboveThresholdToCancelAutoAlign.get()
-                || input[1] > rawJoyAboveThresholdToCancelAutoAlign.get()) {
+            if (input[0] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())
+                || input[1] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())) {
                 System.out.println("Robot container: canceled auto input");
                 cancelAutoAlignment();
                 runningAutoAlign = false;

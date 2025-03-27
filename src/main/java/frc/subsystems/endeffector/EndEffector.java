@@ -122,6 +122,10 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
+    public Command shootCoral() {
+        return toggleOuttake().andThen(Commands.waitSeconds(1.25)).andThen(toggleOuttake());
+    }
+
     public Command turnOff() {
         return runOnce(() -> {
             io.setPower(0);
