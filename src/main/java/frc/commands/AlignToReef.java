@@ -106,7 +106,8 @@ public class AlignToReef extends Command {
             }
         }
         lastApriltagAlignedTo = apriltagPose;
-        Distance leftOffsetMeters = Inches.of(0), rightOffsetMeters = Inches.of(0);
+        Distance leftOffsetMeters = AlignToReef.LeftOffset.distance(),
+            rightOffsetMeters = AlignToReef.RightOffset.distance();
         if (goalDriveOffset == null) {
             switch (ReefPresetTo.getLastLevelSet()) {
                 case L1:
@@ -136,6 +137,8 @@ public class AlignToReef extends Command {
                     break;
             }
         }
+        System.out.println("goal drive offset (in): " + goalDriveOffset.get());
+        System.out.println(AlignmentHelpers.CenterToBumper.in(Inches));
         Transform2d leftOffset = new Transform2d(
             AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
             leftOffsetMeters.in(Meters), Rotation2d.kZero);

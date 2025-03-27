@@ -6,7 +6,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.RuntimeConstants;
 import frc.constants.Subsystems.ElevatorConstants;
-import frc.robot.Robot;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
@@ -40,7 +39,7 @@ public class Elevator extends SubsystemBase {
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         pid.setTolerance(ElevatorConstants.BaseGoalTolerance);
-        if (Robot.isSimulation()) pid.setTolerance(ElevatorConstants.SimGoalTolerance);
+        // if (Robot.isSimulation()) pid.setTolerance(ElevatorConstants.SimGoalTolerance);
         if (RuntimeConstants.TuningMode) {
             ElevatorCharacterization.enable(this);
             TuningModeTab.getInstance().addCommand("Run to 0",

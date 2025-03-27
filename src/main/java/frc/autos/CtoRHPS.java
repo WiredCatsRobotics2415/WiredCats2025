@@ -22,8 +22,8 @@ public class CtoRHPS extends GenericAuto {
 
         // Set pos based on limelight and MT1, we may wanna have set pose starts instead
         // TODO: since you tested in simulator without these commands actually running (these are commands not functions) and it worked, I won't touch it
-        drive.resetPoseFromLimelight();
-        drive.resetRotationFromLimelightMT1();
+        drive.resetRotationFromLimelightMT1().schedule();
+        drive.resetPoseFromLimelight().schedule();
 
         System.out.println("NEW RUN!!!");
         new AlignToReef(Side.Left).alongWith(new ReefPresetTo(Level.L4)).withTimeout(4)
@@ -35,7 +35,7 @@ public class CtoRHPS extends GenericAuto {
                 System.out.println(followPath.name);
                 AutoBuilder.followPath(followPath).schedule();
             })).andThen(new WaitUntilCommand(() -> atTarget)).andThen(new InstantCommand(() -> {
-                // TODO: HPS preset
+                System.out.println("HPS preset");
             })).andThen(new WaitUntilCommand(() -> hasCoral)).andThen(new InstantCommand(() -> {
                 System.out.println("Ended first path. Now starting path to Reef.");
                 followPath = paths.stream().filter(path -> path.name.equals("RHPStoReef")).findFirst().orElse(null);
@@ -47,11 +47,6 @@ public class CtoRHPS extends GenericAuto {
                     endEffector.toggleOuttake().withTimeout(3);
                     System.out.println("Auto is done!");
                 }))).schedule();
-        // })).andThen(new WaitUntilCommand(() -> atTarget)).andThen(new ScoreCoral(Side.Left, Level.L3)).withTimeout(4)
-        // .andThen(() ->
-        // {
-        // endEffector.toggleOuttake().withTimeout(3);
-        // System.out.println("Finished autonomous");
 
     }
 

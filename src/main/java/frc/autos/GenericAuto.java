@@ -41,7 +41,7 @@ public class GenericAuto extends Command {
         Pose2d current = drive.getState().Pose;
         if (path != null) {
             Pose2d target = path.getPathPoses().get(path.getPathPoses().size() - 1);
-            if (current.getTranslation().getDistance(target.getTranslation()) < 0.1) {
+            if (current.getTranslation().getDistance(target.getTranslation()) < 0.5) {
                 return true;
 
             }

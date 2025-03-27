@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.autos.CtoRHPS;
+import frc.autos.L4;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
 import frc.commands.AlignToReef;
@@ -129,6 +129,9 @@ public class RobotContainer {
         PathPlannerLogging.setLogCurrentPoseCallback((currentPose) -> {
             Logger.recordOutput("Pathplanner/CurrentPose", currentPose);
         });
+
+        autoChooser.addOption("CustomL4", new L4());
+        autoChooser.addOption("CustomCtoRHPS", new L4());
     }
 
     public void teleopEnable() {
@@ -315,7 +318,7 @@ public class RobotContainer {
         }
     }
 
-    public Command getAutonomousCommand() { return new CtoRHPS(); /* autoChooser.get(); */ }
+    public Command getAutonomousCommand() { return autoChooser.get(); }
 
     public void neutralizeSubsystems() {
         arm.setGoal(arm.getMeasurement());

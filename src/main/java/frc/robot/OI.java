@@ -25,7 +25,6 @@ public class OI {
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
-    private double realControllerMultiplier = 0.0d;
 
     private static OI instance;
 
@@ -39,7 +38,6 @@ public class OI {
     private OI() {
         controller = new CommandXboxController(0);
         numpad = new CommandJoystick(1);
-        realControllerMultiplier = Robot.isReal() ? 2.0d : 1.0d;
 
         binds.put(Bind.SeedFieldCentric, controller.button(GulikitButtons.Plus));
 
@@ -80,10 +78,8 @@ public class OI {
     }
 
     public double[] getXY() {
-        double x = MathUtil.applyDeadband(
-            controller.getRawAxis(GulikitButtons.LeftJoystickX) * realControllerMultiplier, Controls.Deadband);
-        double y = MathUtil.applyDeadband(
-            controller.getRawAxis(GulikitButtons.LeftJoystickY) * realControllerMultiplier, Controls.Deadband);
+        double x = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickX), Controls.Deadband);
+        double y = MathUtil.applyDeadband(controller.getRawAxis(GulikitButtons.LeftJoystickY), Controls.Deadband);
         double newX, newY = 0.0d;
         if (Controls.UseCurve) {
             double angle = Math.atan2(y, x);
@@ -100,8 +96,8 @@ public class OI {
     }
 
     public double[] getRawXY() {
-        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX) * realControllerMultiplier,
-            controller.getRawAxis(GulikitButtons.LeftJoystickY) * realControllerMultiplier };
+        return new double[] { controller.getRawAxis(GulikitButtons.LeftJoystickX),
+            controller.getRawAxis(GulikitButtons.LeftJoystickY) };
     }
 
     public double getRotation() {

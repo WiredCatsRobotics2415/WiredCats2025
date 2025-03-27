@@ -90,9 +90,9 @@ public class Controls {
         public static final TuneableNumber Level3OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
             "Presets/L3OffsetRight");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77.8),
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(76.6),
             Degrees.of(-20), "Level4");
-        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(13, "Presets/L4Offset");
+        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(31, "Presets/L4Offset");
         public static final TuneableNumber Level4OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
             "Presets/L4OffsetLeft");
         public static final TuneableNumber Level4OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
