@@ -68,6 +68,8 @@ public class ElevatorIOReal implements ElevatorIO {
 
     @Override
     public void updateInputs(ElevatorIOInputs inputs) {
+        BaseStatusSignal.refreshAll(leftTemp, leftStator, leftSupply, rightTemp, rightStator, rightSupply);
+
         inputs.isConnectedLeft = leftMotor.isAlive();
         inputs.temperatureLeft = leftTemp.getValueAsDouble();
         inputs.statorCurrentLeft = leftStator.getValueAsDouble();

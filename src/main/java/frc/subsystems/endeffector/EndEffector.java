@@ -108,13 +108,13 @@ public class EndEffector extends SubsystemBase {
                 outtakingCoral = false;
                 return;
             }
-            if (algaeSensorTrigger()) {
-                io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
-                intakingCoral = false;
-                intakingAlgae = false;
-                outtakingAlgae = true;
-                return;
-            }
+            // if (algaeSensorTrigger()) {
+            // io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
+            // intakingCoral = false;
+            // intakingAlgae = false;
+            // outtakingAlgae = true;
+            // return;
+            // }
             io.setVoltage(EndEffectorConstants.OuttakeCoralVolts.get());
             intakingCoral = false;
             intakingAlgae = false;
@@ -144,7 +144,7 @@ public class EndEffector extends SubsystemBase {
 
     public boolean algaeSensorTrigger() {
         return Vision.getInstance()
-            .getEndEffectorCameraAveragePixelValue() > EndEffectorConstants.AlgaeIntookCameraThreshold.get();
+            .getEndEffectorCameraAveragePixelValue() < EndEffectorConstants.AlgaeIntookCameraThreshold.get();
     }
 
     public boolean hasCoral() {

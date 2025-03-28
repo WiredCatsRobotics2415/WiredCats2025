@@ -35,6 +35,8 @@ public class ClimbIOReal implements ClimbIO {
 
     @Override
     public void updateInputs(ClimbIOInputs inputs) {
+        BaseStatusSignal.refreshAll(motorStator, motorSupply, motorTemp, motor.getRotorPosition());
+
         inputs.motorConnected = motor.isAlive();
         inputs.motorStatorCurrent = motorStator.getValueAsDouble();
         inputs.motorSupplyCurrent = motorSupply.getValueAsDouble();
