@@ -63,7 +63,13 @@ public class CtoRGround extends GenericAuto {
                 {
                     endEffector.toggleOuttakeCoral().withTimeout(3);
                     System.out.println("Auto is done!");
-                }))).schedule();
+                }))).andThen(Commands.waitSeconds(3)).andThen(new InstantCommand(() -> {
+                    System.out.println("Ending auto.");
+                    followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+                    System.out.println(followPath.name);
+                    AutoBuilder.followPath(followPath).schedule();
+                    superstructure.stow();
+                })).schedule();
 
     }
 

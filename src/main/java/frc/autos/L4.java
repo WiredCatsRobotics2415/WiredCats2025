@@ -1,5 +1,6 @@
 package frc.autos;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -14,6 +15,7 @@ public class L4 extends GenericAuto {
 
     @Override
     public void initialize() {
+        pathNames.add("L4Backup");
         addAutos();
 
         // Set pos based on limelight and MT1, we may wanna have set pose starts instead
@@ -28,6 +30,12 @@ public class L4 extends GenericAuto {
                 endEffector.toggleOuttakeCoral().andThen(Commands.waitSeconds(4)).andThen(endEffector.turnOff())
                     .schedule();
                 System.out.println("Ended scoring coral.");
+            })).andThen(Commands.waitSeconds(3)).andThen(new InstantCommand(() -> {
+                System.out.println("Ending auto.");
+                followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+                System.out.println(followPath.name);
+                AutoBuilder.followPath(followPath).schedule();
+                superstructure.stow();
             })).schedule();
     }
 
