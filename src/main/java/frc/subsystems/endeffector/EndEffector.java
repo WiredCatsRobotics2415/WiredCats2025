@@ -96,10 +96,7 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
-    /**
-     * Outtakes, spinning at different speeds/directions depending on which sensor is triggered. Will not run if neither sensor is triggered.
-     */
-    public Command toggleOuttake() {
+    public Command toggleOuttakeAlgae() {
         return runOnce(() -> {
             coralIntakingTorqueMonitor.reset();
             if (outtakingAlgae || outtakingCoral) {
@@ -108,22 +105,27 @@ public class EndEffector extends SubsystemBase {
                 outtakingCoral = false;
                 return;
             }
-            // if (algaeSensorTrigger()) {
-            // io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
-            // intakingCoral = false;
-            // intakingAlgae = false;
-            // outtakingAlgae = true;
-            // return;
-            // }
+            io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
+            intakingCoral = false;
+            intakingAlgae = false;
+            outtakingAlgae = true;
+        });
+    }
+
+    public Command toggleOuttakeCoral() {
+        return runOnce(() -> {
+            coralIntakingTorqueMonitor.reset();
+            if (outtakingAlgae || outtakingCoral) {
+                io.setVoltage(0);
+                outtakingAlgae = false;
+                outtakingCoral = false;
+                return;
+            }
             io.setVoltage(EndEffectorConstants.OuttakeCoralVolts.get());
             intakingCoral = false;
             intakingAlgae = false;
             outtakingCoral = true;
         });
-    }
-
-    public Command shootCoral() {
-        return toggleOuttake().andThen(Commands.waitSeconds(1.25)).andThen(toggleOuttake());
     }
 
     public Command turnOff() {

@@ -25,7 +25,8 @@ public class L4 extends GenericAuto {
         new ReefPresetTo(Level.L4).andThen(endEffector.toggleIntakeCoral()).andThen(Commands.waitSeconds(3.5))
             .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(2)).andThen(new InstantCommand(() ->
             {
-                endEffector.toggleOuttake().andThen(Commands.waitSeconds(4)).andThen(endEffector.turnOff()).schedule();
+                endEffector.toggleOuttakeCoral().andThen(Commands.waitSeconds(4)).andThen(endEffector.turnOff())
+                    .schedule();
                 System.out.println("Ended scoring coral.");
             })).schedule();
     }

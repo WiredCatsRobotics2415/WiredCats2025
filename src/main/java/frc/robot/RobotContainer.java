@@ -118,7 +118,7 @@ public class RobotContainer {
             new InstantCommand(() -> drive.switchPoseEstimator(PoseEstimationType.Global)));
         // NamedCommands.registerCommand("align", vision.singleTagTrack());
         // named commands for 2025 gwinnett
-        NamedCommands.registerCommand("Outtake", endEffector.toggleOuttake());
+        NamedCommands.registerCommand("Outtake", endEffector.toggleOuttakeCoral());
         NamedCommands.registerCommand("RaiseUp", new InstantCommand(() -> elevator.setGoal(40)));
 
         autoChooser = new LoggedDashboardChooser<>("Auto Routine", AutoBuilder.buildAutoChooser(""));
@@ -179,9 +179,12 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ManualArmForward).whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(-1.0)));
         oi.binds.get(OI.Bind.ManualArmBack).whileTrue(Commands.run(() -> superstructure.changeArmGoalSafely(1.0)));
 
-        oi.binds.get(OI.Bind.Shoot).onTrue(endEffector.toggleOuttake()).onFalse(endEffector.turnOff());
+        oi.binds.get(OI.Bind.Shoot)
+            .onTrue(endEffector.toggleOuttakeCoral().alongWith(CoralIntake.getInstance().toggleOuttake()))
+            .onFalse(endEffector.turnOff().alongWith(CoralIntake.getInstance().turnOffRollers()));
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
         oi.binds.get(OI.Bind.ManualIntake).onTrue(endEffector.toggleIntakeCoral());
+        oi.binds.get(OI.Bind.ManualAlgaeShoot).onTrue(endEffector.toggleOuttakeAlgae());
         // In case it should be A intakes coral, outtakes algae and B vice versa...
         // Dealgae is button A:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeCoral().alongWith(coralIntake.toggleIntake()))

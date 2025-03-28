@@ -162,11 +162,11 @@ public class Subsystems {
         public static final int MotorID = 12;
         public static final int IRSensorPort = 1;
 
-        public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-5, "EndEffector/IntakeCoralVolts");
+        public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-4, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber IntakeAlgaeVolts = new TuneableNumber(10, "EndEffector/IntakeAlgaeVolts");
         public static final TuneableNumber HoldCoralVolts = new TuneableNumber(-3, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber HoldAlgaeVolts = new TuneableNumber(7, "EndEffector/IntakeAlgaeVolts");
-        public static final TuneableNumber OuttakeCoralVolts = new TuneableNumber(8, "EndEffector/OuttakeCoralVolts");
+        public static final TuneableNumber OuttakeCoralVolts = new TuneableNumber(9, "EndEffector/OuttakeCoralVolts");
         public static final TuneableNumber OuttakeAlageVolts = new TuneableNumber(-12, "EndEffector/OuttakeAlageVolts");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024

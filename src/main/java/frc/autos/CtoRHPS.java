@@ -29,7 +29,8 @@ public class CtoRHPS extends GenericAuto {
         new AlignToReef(Side.Left).alongWith(new ReefPresetTo(Level.L4)).withTimeout(4)
             .andThen(new InstantCommand(() ->
             {
-                endEffector.toggleOuttake().andThen(Commands.waitSeconds(3)).andThen(endEffector.turnOff()).schedule();
+                endEffector.toggleOuttakeCoral().andThen(Commands.waitSeconds(3)).andThen(endEffector.turnOff())
+                    .schedule();
                 System.out.println("Ended scoring coral. Now starting path to HPS.");
                 followPath = paths.stream().filter(path -> path.name.equals("CtoRHPS")).findFirst().orElse(null);
                 System.out.println(followPath.name);
@@ -44,7 +45,7 @@ public class CtoRHPS extends GenericAuto {
             })).andThen(new WaitUntilCommand(() -> atTarget)).andThen(new AlignToReef(Side.Left)
                 .alongWith(new ReefPresetTo(Level.L3)).withTimeout(4).andThen(new InstantCommand(() ->
                 {
-                    endEffector.toggleOuttake().withTimeout(3);
+                    endEffector.toggleOuttakeCoral().withTimeout(3);
                     System.out.println("Auto is done!");
                 }))).schedule();
 
