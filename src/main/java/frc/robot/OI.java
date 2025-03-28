@@ -55,7 +55,6 @@ public class OI {
 
         binds.put(Bind.ChangeTeleopMode, controller.button(GulikitButtons.LeftPaddle));
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.RightPaddle));
-
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));
         binds.put(Bind.IntakeFromHPS, numpad.button(NumpadButtons.NumberFour));
         binds.put(Bind.DealgaePresetTop, numpad.button(NumpadButtons.NumberSeven));

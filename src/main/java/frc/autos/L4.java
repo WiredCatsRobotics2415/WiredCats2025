@@ -30,12 +30,11 @@ public class L4 extends GenericAuto {
                 endEffector.toggleOuttakeCoral().andThen(Commands.waitSeconds(4)).andThen(endEffector.turnOff())
                     .schedule();
                 System.out.println("Ended scoring coral.");
-            })).andThen(Commands.waitSeconds(3)).andThen(new InstantCommand(() -> {
-                System.out.println("Ending auto.");
                 followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
                 System.out.println(followPath.name);
                 AutoBuilder.followPath(followPath).schedule();
                 superstructure.stow();
+                System.out.println("Ending auto.");
             })).schedule();
     }
 

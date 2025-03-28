@@ -20,6 +20,7 @@ public class CtoRGround extends GenericAuto {
         pathNames.add("CtoLeftGround");
         pathNames.add("LeftIntake");
         pathNames.add("LeftIntakeFinal");
+        pathNames.add("L4FarBackup");
         addAutos();
 
         // Set pos based on limelight and MT1, we may wanna have set pose starts instead
@@ -63,13 +64,14 @@ public class CtoRGround extends GenericAuto {
                 {
                     endEffector.toggleOuttakeCoral().withTimeout(3);
                     System.out.println("Auto is done!");
-                }))).andThen(Commands.waitSeconds(3)).andThen(new InstantCommand(() -> {
-                    System.out.println("Ending auto.");
-                    followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+                    followPath = paths.stream().filter(path -> path.name.equals("L4FarBackup")).findFirst()
+                        .orElse(null);
                     System.out.println(followPath.name);
                     AutoBuilder.followPath(followPath).schedule();
                     superstructure.stow();
-                })).schedule();
+                    System.out.println("Ending auto.");
+                })))
+            .schedule();
 
     }
 
