@@ -58,10 +58,8 @@ public class TuneableNumber {
      * Assuming this number is in inches
      */
     public Distance distance() {
-        if (this.lastDistance == null) {
-            this.lastDistance = Inches.of(get());
-        }
-        return lastDistance;
+        System.out.println("distance call returns: " + get());
+        return Inches.of(get());
     }
 
     /**
