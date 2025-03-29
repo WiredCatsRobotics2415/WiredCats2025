@@ -7,6 +7,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -82,7 +83,7 @@ public class RobotContainer {
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(10);
     private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(10);
     private boolean runningAutoAlign = false;
-    private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.25,
+    private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.1,
         "RobotContainer/rawJoyAboveThresholdToCancelAutoAlign");
 
     private boolean manualGroundInakeOnGround = false;
@@ -143,7 +144,8 @@ public class RobotContainer {
     }
 
     private void configureControls() {
-        oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
+        oi.binds.get(OI.Bind.SeedFieldCentric)
+            .onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true).withTimeout(1));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
             if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
@@ -261,6 +263,7 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore));
         oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntakeAlgae));
+        oi.binds.get(OI.Bind.BargePreset).onTrue(superstructure.beThereAsapNoEnd(Presets.Barge));
 
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
         oi.binds.get(OI.Bind.ClimberBackward).onTrue(climber.runBackward()).onFalse(climber.stop());
@@ -307,15 +310,15 @@ public class RobotContainer {
     }
 
     public void periodic() {
-        // double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
         // driveXLimiter.setRateLimit(ssLimits[0]);
         // driveYLimiter.setRateLimit(ssLimits[1]);
         // driveRotationLimiter.setRateLimit(ssLimits[2]);
 
-        // drive.getDriveToPositionXController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
-        // drive.getDriveToPositionYController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        drive.getDriveToPositionXController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        drive.getDriveToPositionYController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
 
         if (runningAutoAlign) {
             double[] input = oi.getRawXY();

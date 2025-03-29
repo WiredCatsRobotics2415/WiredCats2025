@@ -72,11 +72,11 @@ public class Subsystems {
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(Controls.MaxDriveMeterS,
             "Drive/BaseVelocityMax");
-        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(8.66,
+        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
             "Drive/BaseXAccelerationMax");
-        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(8.66,
+        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
             "Drive/BaseYAccelerationMax");
-        public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+        public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(2 * Controls.MaxAngularRadS,
             "Drive/BaseRotationAccelMax");
 
         public static PIDConstants PPTranslationPID = new PIDConstants(PPTranslationP.get(), 0, 0); // test 3: kp 1, test 4-: kp 5, test 13-: kp 10, test 15-: kp 7, test 19-: kp 5, test 21: kp 7
@@ -87,8 +87,8 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(4.33, 0, 0.1); // 2
-        public static final PIDConstants YTranslationPID = new PIDConstants(4.33, 0, 0.1); // 5.6
+        public static final PIDConstants XTranslationPID = new PIDConstants(4, 0, 0.1); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(4, 0, 0.1); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
@@ -106,7 +106,7 @@ public class Subsystems {
         public static final double PotentiometerMinVolt = 0.372d;
         public static final double PotentiometerMaxVolt = 1.981d;
         public static final double MinHeight = 0.0d;
-        public static final double MaxHeight = 78.0d;
+        public static final double MaxHeight = 79.0d;
 
         // Prelim gains: https://www.reca.lc/linear?angle=%7B%22s%22%3A90%2C%22u%22%3A%22deg%22%7D&currentLimit=%7B%22s%22%3A40%2C%22u%22%3A%22A%22%7D&efficiency=80&limitAcceleration=0&limitDeceleration=0&limitVelocity=0&limitedAcceleration=%7B%22s%22%3A400%2C%22u%22%3A%22in%2Fs2%22%7D&limitedDeceleration=%7B%22s%22%3A50%2C%22u%22%3A%22in%2Fs2%22%7D&limitedVelocity=%7B%22s%22%3A10%2C%22u%22%3A%22in%2Fs%22%7D&load=%7B%22s%22%3A5%2C%22u%22%3A%22lbs%22%7D&motor=%7B%22quantity%22%3A2%2C%22name%22%3A%22Falcon%20500%22%7D&ratio=%7B%22magnitude%22%3A5%2C%22ratioType%22%3A%22Reduction%22%7D&spoolDiameter=%7B%22s%22%3A1.874%2C%22u%22%3A%22in%22%7D&travelDistance=%7B%22s%22%3A80%2C%22u%22%3A%22in%22%7D
         public static final TuneableNumber MultConstant = new TuneableNumber(1.4, "ElevatorFF/MultConstant");

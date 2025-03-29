@@ -17,4 +17,6 @@ public interface ClimbIO {
     public default void updateInputs(ClimbIOInputs inputs) {}
 
     public default void setVoltage(double volts) {};
+
+    public class ClimbIOEmpty implements ClimbIO {};
 }

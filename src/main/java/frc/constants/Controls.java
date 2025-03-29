@@ -120,7 +120,8 @@ public class Controls {
 
         public static final TuneableSuperStructureState GroundIntakeAlgae = new TuneableSuperStructureState(
             Inches.of(17.75), Degrees.of(17.675), "GroundIntakeAlgae");
-        
-        public static final TuneableSuperStructureState Barge = new TuneableSuperStructureState(null, null, null)
+
+        public static final TuneableSuperStructureState Barge = new TuneableSuperStructureState(Inches.of(78),
+            Degrees.of(158), "Barge");
     }
 }

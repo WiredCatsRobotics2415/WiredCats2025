@@ -48,7 +48,10 @@ public class SuperStructure extends SubsystemBase {
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
-    private TuneableNumber percentOfArmVelo = new TuneableNumber(0.7, "SuperStructure/percentOfArmVelo");
+    private TuneableNumber percentOfArmVeloWhileMoving = new TuneableNumber(0.5,
+        "SuperStructure/percentOfArmVeloWhileMoving");
+    private TuneableNumber percentOfArmVeloWhileHigh = new TuneableNumber(0.5,
+        "SuperStructure/percentOfArmVeloWhileMoving");
 
     private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelX");
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
@@ -74,6 +77,9 @@ public class SuperStructure extends SubsystemBase {
     private boolean isDone = true;
     private boolean isMovingCoralIntake;
 
+    private double[] limits = new double[3];
+
+    private TuneableSuperStructureState goal = Presets.Stow;
     private static SuperStructure instance;
 
     private SuperStructure() {
@@ -147,6 +153,7 @@ public class SuperStructure extends SubsystemBase {
      */
     public Command beThereAsap(TuneableSuperStructureState goal) {
         return runOnce(() -> {
+            this.goal = goal;
             Command plannedCommand;
             isDone = false;
             armSwitchingToFrontSide = arm.getMeasurement() > 90 && goal.getArm().get() < 90;
@@ -298,7 +305,6 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public double[] recommendedDriveAccelLimits() {
-        double[] limits = new double[3];
         limits[0] = DriveConstants.BaseXAccelerationMax.get() -
             (lastEEHeight / maxEEHeight) * (1 - pctOfDriveAccelX.get()) * DriveConstants.BaseXAccelerationMax.get();
         limits[1] = DriveConstants.BaseYAccelerationMax.get() -
@@ -313,11 +319,14 @@ public class SuperStructure extends SubsystemBase {
         updateCurrentStateCollisions();
         double currentMaxAccel = EndEffector.getInstance().hasAlgae() ? ArmConstants.AlgaeAccelerationMax.get()
             : ArmConstants.BaseAccelerationMax.get();
+
         double maxArmAcceleration = currentMaxAccel - ((elevator.getMeasurement() / ElevatorConstants.MaxHeight) *
             (1 - percentOfArmAccel.get()) * currentMaxAccel);
 
         double maxArmVelocity = ArmConstants.BaseVelocityMax.get() -
-            (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight) * (1 - percentOfArmVelo.get()) *
+            (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight) *
+                (1 - percentOfArmVeloWhileMoving.get()) * ArmConstants.BaseVelocityMax.get()) -
+            ((elevator.getMeasurement() / ElevatorConstants.MaxHeight) * (1 - percentOfArmVeloWhileHigh.get()) *
                 ArmConstants.BaseVelocityMax.get());
 
         arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
@@ -329,5 +338,13 @@ public class SuperStructure extends SubsystemBase {
         Logger.recordOutput("SuperStructure/IsDone", isDone);
         Logger.recordOutput("SuperStructure/MovingCintake", isMovingCoralIntake);
         Logger.recordOutput("SuperStructure/AllAtGoal", allAtGoal());
+        Logger.recordOutput("SuperStructure/MaxArmVelocity", maxArmVelocity);
+        Logger.recordOutput("SuperStructure/MaxArmAccel", maxArmAcceleration);
+        Logger.recordOutput("SuperStructure/BaseXAccelerationMax", limits[0]);
+        Logger.recordOutput("SuperStructure/BaseYAccelerationMax", limits[1]);
+        Logger.recordOutput("SuperStructure/BaseRotationAccelMax", limits[2]);
+        Logger.recordOutput("SuperStructure/SetGoalHeight", goal.getHeight().get());
+        Logger.recordOutput("SuperStructure/SetGoalArm", goal.getArm().get());
+        Logger.recordOutput("SuperStructure/SetGoalCIntake", goal.getCoralIntake().get());
     }
 }

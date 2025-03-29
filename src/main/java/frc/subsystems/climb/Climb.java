@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.constants.Subsystems.ClimberConstants;
+import frc.subsystems.climb.ClimbIO.ClimbIOEmpty;
 import frc.utils.Util;
 import org.littletonrobotics.junction.Logger;
 
@@ -14,7 +15,7 @@ public class Climb extends SubsystemBase {
     private ClimbIO io;
 
     private Climb() {
-        io = (ClimbIO) Util.getIOImplementation(ClimbIOReal.class, ClimbIOSim.class, new ClimbIO() {});
+        io = (ClimbIO) Util.getIOImplementation(ClimbIOEmpty.class, ClimbIOSim.class, new ClimbIO() {});
     }
 
     public static Climb getInstance() {

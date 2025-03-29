@@ -8,6 +8,7 @@ import frc.constants.Subsystems.EndEffectorConstants;
 import frc.subsystems.vision.Vision;
 import frc.utils.TorqueMonitor;
 import frc.utils.Util;
+import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
 
@@ -20,6 +21,9 @@ public class EndEffector extends SubsystemBase {
     @Getter private boolean intakingAlgae = false;
     @Getter private boolean outtakingCoral = false;
     @Getter private boolean outtakingAlgae = false;
+
+    private TuneableNumber proportionOfArmVeloToHoldCoralVolts = new TuneableNumber(-0.05,
+        "EndEffector/proportionOfArmVeloToHoldCoralVolts");
 
     private TorqueMonitor coralIntakingTorqueMonitor;
 
