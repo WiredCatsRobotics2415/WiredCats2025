@@ -41,7 +41,7 @@ public class CtoRGround extends GenericAuto {
                 AutoBuilder.followPath(followPath).schedule();
             })).andThen(new WaitUntilCommand(() -> atTarget)).andThen(new InstantCommand(() -> {
                 // goes into knock over, and turns on end effector and coral intake
-                superstructure.beThereAsapNoEnd(Presets.KnockOverStack).schedule();
+                superstructure.beThereAsapNoEnd(Presets.KnockOverStack, false, false).schedule();
                 endEffector.toggleIntakeCoral().schedule();
                 coralIntake.toggleIntake().schedule();
                 System.out.println("intaking");
@@ -50,7 +50,7 @@ public class CtoRGround extends GenericAuto {
                 AutoBuilder.followPath(followPath).schedule();
             })).andThen(new WaitUntilCommand(() -> atTarget)).andThen(new InstantCommand(() -> {
                 // goes into finalIntake
-                superstructure.beThereAsapNoEnd(Presets.GroundIntake).schedule();
+                superstructure.beThereAsapNoEnd(Presets.GroundIntake, false, false).schedule();
                 System.out.println("intaking final");
                 followPath = paths.stream().filter(path -> path.name.equals("LeftIntakeFinal")).findFirst()
                     .orElse(null);

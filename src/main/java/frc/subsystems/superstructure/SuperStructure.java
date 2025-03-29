@@ -58,6 +58,8 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
 
     private TuneableNumber swingThroughMinHeight = new TuneableNumber(55, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber algaeSwingThroughMinHeight = new TuneableNumber(70,
+        "SuperStructure/algaeSwingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
@@ -75,6 +77,7 @@ public class SuperStructure extends SubsystemBase {
     private Point2d eeTopTip = new Point2d(0, 0);
 
     private boolean isDone = true;
+    private boolean hasAlgae = false;
     private boolean isMovingCoralIntake;
 
     private double[] limits = new double[3];
@@ -93,10 +96,10 @@ public class SuperStructure extends SubsystemBase {
 
     public Command stow() {
         return this.runOnce(() -> {
-            if (EndEffector.getInstance().hasAlgae()) {
-                beThereAsapNoEnd(Presets.AlgaeStow).schedule();
+            if (hasAlgae) {
+                beThereAsapNoEnd(Presets.AlgaeStow, true, false).schedule();
             } else {
-                beThereAsapNoEnd(Presets.Stow).schedule();
+                beThereAsapNoEnd(Presets.Stow, false, false).schedule();
             }
         });
     }
@@ -151,7 +154,8 @@ public class SuperStructure extends SubsystemBase {
     /**
      * Returns a command that, when scheduled, schedules a command composition that moves the superstructure to the state. The composition requires all of the superstructure subsystems.
      */
-    public Command beThereAsap(TuneableSuperStructureState goal) {
+    public Command beThereAsap(TuneableSuperStructureState goal, boolean assumeHasAlgaeBefore,
+        boolean assumeNoAlgaeLater) {
         return runOnce(() -> {
             this.goal = goal;
             Command plannedCommand;
@@ -185,8 +189,12 @@ public class SuperStructure extends SubsystemBase {
                 elevator.setGoal(goal.getHeight().get());
                 if (elevator.getPid().goalError() >= 0) {
                     System.out.println("elevator moving up");
-                    if (elevator.getMeasurement() < swingThroughMinHeight.get()) { // if it needs to wait for the arm to swing through...
-                        elevator.setGoal(swingThroughMinHeight.get());
+                    boolean elevatorNeedsToMove = assumeHasAlgaeBefore
+                        ? elevator.getMeasurement() < algaeSwingThroughMinHeight.get()
+                        : elevator.getMeasurement() < swingThroughMinHeight.get();
+                    if (elevatorNeedsToMove) { // if it needs to wait for the arm to swing through...
+                        elevator.setGoal(
+                            assumeHasAlgaeBefore ? algaeSwingThroughMinHeight.get() : swingThroughMinHeight.get());
                         plannedCommand = Commands.waitUntil(() -> elevator.atGoal()).andThen(Commands.runOnce(() -> {
                             System.out.println("final up goal set");
                             elevator.setGoal(goal.getHeight().get());
@@ -199,12 +207,16 @@ public class SuperStructure extends SubsystemBase {
                     }
                 } else {
                     System.out.println("elevator moving down");
-                    if (goal.getHeight().get() < swingThroughMinHeight.get()) {
-                        System.out.println("Elevator set to swing through");
-                        elevator.setGoal(swingThroughMinHeight.get());
+                    if (assumeHasAlgaeBefore && goal.getHeight().get() < algaeSwingThroughMinHeight.get()) {
+                        elevator.setGoal(algaeSwingThroughMinHeight.get());
                     } else {
-                        System.out.println("Elevator going straight to goal");
-                        elevator.setGoal(goal.getHeight().get());
+                        if (goal.getHeight().get() < swingThroughMinHeight.get()) {
+                            System.out.println("Elevator set to swing through");
+                            elevator.setGoal(swingThroughMinHeight.get());
+                        } else {
+                            System.out.println("Elevator going straight to goal");
+                            elevator.setGoal(goal.getHeight().get());
+                        }
                     }
                     double armGoal = goal.getArm().get();
                     if (isMovingCoralIntake && elevator.getMeasurement() <= rightBeforeHitCintakeElevatorHeight.get()) {
@@ -233,6 +245,7 @@ public class SuperStructure extends SubsystemBase {
             plannedCommand = plannedCommand.andThen(Commands.waitUntil(this::allAtGoal))
                 .andThen(Commands.runOnce(() ->
                 {
+                    hasAlgae = !assumeNoAlgaeLater;
                     isDone = true;
                 })).finallyDo((boolean interrupted) -> {
                     // Do not remove this finallyDo, even though it does nothing
@@ -243,8 +256,9 @@ public class SuperStructure extends SubsystemBase {
         });
     }
 
-    public Command beThereAsapNoEnd(TuneableSuperStructureState goal) {
-        return beThereAsap(goal).andThen(Commands.idle(this));
+    public Command beThereAsapNoEnd(TuneableSuperStructureState goal, boolean assumeHasAlgaeBefore,
+        boolean assumeNoAlgaeLater) {
+        return beThereAsap(goal, assumeHasAlgaeBefore, assumeNoAlgaeLater).andThen(Commands.idle(this));
     }
 
     public boolean doneWithMovement() {
@@ -346,5 +360,6 @@ public class SuperStructure extends SubsystemBase {
         Logger.recordOutput("SuperStructure/SetGoalHeight", goal.getHeight().get());
         Logger.recordOutput("SuperStructure/SetGoalArm", goal.getArm().get());
         Logger.recordOutput("SuperStructure/SetGoalCIntake", goal.getCoralIntake().get());
+        Logger.recordOutput("SuperStructure/HasAlgae", hasAlgae);
     }
 }

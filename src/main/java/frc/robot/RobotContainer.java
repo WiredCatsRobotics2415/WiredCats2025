@@ -109,10 +109,10 @@ public class RobotContainer {
         NamedCommands.registerCommand("L2", new ReefPresetTo(Level.L2));
         NamedCommands.registerCommand("L1", new ReefPresetTo(Level.L1));
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
-        NamedCommands.registerCommand("GroundIntake",
-            superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
-        NamedCommands.registerCommand("SourceIntake",
-            superstructure.beThereAsap(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("GroundIntake", superstructure.beThereAsap(Presets.GroundIntake, false, false)
+            .alongWith(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("SourceIntake", superstructure.beThereAsap(Presets.IntakeFromHPS, false, false)
+            .alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("FocusPEOnReef",
             drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, ReefMeasurements.reefIds));
         NamedCommands.registerCommand("SwitchToGlobalPE",
@@ -196,8 +196,8 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.DeStickArm).onTrue(arm.deStuck());
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(
-            superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).alongWith(changeAlignTarget(AligningTo.HPS)));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS, false, false)
+            .alongWith(changeAlignTarget(AligningTo.HPS)));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
             .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
@@ -250,20 +250,23 @@ public class RobotContainer {
         // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .onTrue(new ParallelCommandGroup(superstructure.beThereAsapNoEnd(Presets.GroundIntake),
+            .onTrue(new ParallelCommandGroup(superstructure.beThereAsapNoEnd(Presets.GroundIntake, false, false),
                 endEffector.intakeCoral(), CoralIntake.getInstance().intake()))
-            .onFalse(new ParallelCommandGroup(superstructure.beThereAsap(Presets.GroundIntakeUp)
-                .andThen(Commands.waitSeconds(0.5)).andThen(superstructure.stow()), endEffector.turnOff(),
-                CoralIntake.getInstance().turnOffRollers()));
+            .onFalse(new ParallelCommandGroup(
+                superstructure.beThereAsap(Presets.GroundIntakeUp, false, false).andThen(Commands.waitSeconds(0.5))
+                    .andThen(superstructure.stow()),
+                endEffector.turnOff(), CoralIntake.getInstance().turnOffRollers()));
 
         // oi.binds.get(OI.Bind.AutoIntakeFromGround)
         // .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake).alongWith(Commands.waitSeconds(1))
         // .andThen(CoralIntake.getInstance().toggleIntake()).alongWith(endEffector.toggleIntakeCoral()))
         // .onFalse(superstructure.stow());
 
-        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore));
-        oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntakeAlgae));
-        oi.binds.get(OI.Bind.BargePreset).onTrue(superstructure.beThereAsapNoEnd(Presets.Barge));
+        oi.binds.get(OI.Bind.ProcessorPreset)
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore, true, true));
+        oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure
+            .beThereAsapNoEnd(Presets.GroundIntakeAlgae, false, false).alongWith(endEffector.toggleIntakeAlgae()));
+        oi.binds.get(OI.Bind.BargePreset).onTrue(superstructure.beThereAsapNoEnd(Presets.Barge, true, true));
 
         oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
         oi.binds.get(OI.Bind.ClimberBackward).onTrue(climber.runBackward()).onFalse(climber.stop());

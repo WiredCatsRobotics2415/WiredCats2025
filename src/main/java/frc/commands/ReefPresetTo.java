@@ -41,7 +41,7 @@ public class ReefPresetTo extends Command {
 
     @Override
     public void initialize() {
-        superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState);
+        superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState, false, false);
         superStructureCommand.schedule();
 
         RobotStatus.setRobotState(RobotState.AligningToScoreCoral);

@@ -75,6 +75,16 @@ public class EndEffector extends SubsystemBase {
         });
     }
 
+    public Command intakeAlgae() {
+        return runOnce(() -> {
+            io.setVoltage(EndEffectorConstants.IntakeAlgaeVolts.get());
+            intakingCoral = false;
+            intakingAlgae = true;
+            outtakingAlgae = false;
+            outtakingCoral = false;
+        });
+    }
+
     public Command intakeAndWaitForCoral() {
         return run(() -> {
             io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
