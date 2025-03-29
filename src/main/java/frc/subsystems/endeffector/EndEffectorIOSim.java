@@ -70,7 +70,7 @@ public class EndEffectorIOSim implements EndEffectorIO {
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = intakeSimulation.getGamePiecesAmount() != 0
-            ? EndEffectorConstants.TorqueMonitorJumpThreshold + 1
+            ? EndEffectorConstants.TorqueMonitorJumpThreshold.get() + 1
             : 0;
         inputs.motorSupplyCurrent = 0.0d;
         inputs.appliedVolts = appliedVolts;

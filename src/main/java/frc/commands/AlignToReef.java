@@ -29,9 +29,9 @@ public class AlignToReef extends Command {
 
     @Getter private static Pose2d lastApriltagAlignedTo;
 
-    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(8, "AlignToReef/LeftOffset");
+    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(11, "AlignToReef/LeftOffset");
     @Getter private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
-    private static final TuneableNumber DriveTolerance = new TuneableNumber(2, "AlignToReef/DriveTolerance");
+    private static final TuneableNumber DriveTolerance = new TuneableNumber(0.5, "AlignToReef/DriveTolerance");
 
     private TuneableNumber goalDriveOffset;
     private Side side;

@@ -48,7 +48,7 @@ public class SuperStructure extends SubsystemBase {
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
-    private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
+    private TuneableNumber percentOfArmVelo = new TuneableNumber(0.7, "SuperStructure/percentOfArmVelo");
 
     private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelX");
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");

@@ -72,9 +72,9 @@ public class Subsystems {
 
         public static final TuneableNumber BaseVelocityMax = new TuneableNumber(Controls.MaxDriveMeterS,
             "Drive/BaseVelocityMax");
-        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+        public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(8.66,
             "Drive/BaseXAccelerationMax");
-        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
+        public static final TuneableNumber BaseYAccelerationMax = new TuneableNumber(8.66,
             "Drive/BaseYAccelerationMax");
         public static final TuneableNumber BaseRotationAccelMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
             "Drive/BaseRotationAccelMax");
@@ -87,15 +87,15 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(1.66, 0, 0.1);
-        public static final PIDConstants YTranslationPID = new PIDConstants(5.4, 0, 0.1);
+        public static final PIDConstants XTranslationPID = new PIDConstants(4.33, 0, 0.1); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(4.33, 0, 0.1); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
-        public static final double HeadingkP = 4;
+        public static final TuneableNumber HeadingkP = new TuneableNumber(10, "Drive/HeadingkP");
         public static final double HeadingkI = 0;
-        public static final double HeadingkD = 0.4;
-        public static final double HeadingTolerance = 2;
+        public static final TuneableNumber HeadingkD = new TuneableNumber(0.4, "Drive/HeadingkD");
+        public static final TuneableNumber HeadingTolerance = new TuneableNumber(1, "Drive/HeadingTolerance");
     }
 
     public class ElevatorConstants {
@@ -117,8 +117,8 @@ public class Subsystems {
         public static final TuneableNumber kGForArm = new TuneableNumber(0.0, "ElevatorFF/kGForArm"); // TODO: the first value should be the kg from SysID when the arm is at 0degrees
         public static final TuneableNumber kGForArmWithAlgae = new TuneableNumber(0.0, "ElevatorFF/kGForArmWithAlgae");
 
-        public static final double BaseVelocityMax = 158d;
-        public static final double BaseAccelerationMax = 316d;
+        public static final double BaseVelocityMax = 237d;
+        public static final double BaseAccelerationMax = 474d;
         public static final double BaseGoalTolerance = 3d;
 
         public static final double SimGoalTolerance = 4.5;
@@ -160,7 +160,7 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final int MotorID = 12;
-        public static final int IRSensorPort = 1;
+        public static final int IRSensorPort = NavxMXPPorts.Analog0;
 
         public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-4, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber IntakeAlgaeVolts = new TuneableNumber(10, "EndEffector/IntakeAlgaeVolts");
@@ -173,9 +173,12 @@ public class Subsystems {
         public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(175,
             "EndEffector/AlgaeIntookCameraThreshold");
 
-        public static final double TorqueMonitorJumpThreshold = 17;
-        public static final double TorqueMonitorJumpMagnitude = 8;
-        public static final double TorqueMonitorTripTime = 0.325;
+        public static final TuneableNumber TorqueMonitorJumpThreshold = new TuneableNumber(17,
+            "EndEffector/TorqueMonitorJumpThreshold");
+        public static final TuneableNumber TorqueMonitorJumpMagnitude = new TuneableNumber(8,
+            "EndEffector/TorqueMonitorJumpMagnitude");
+        public static final TuneableNumber TorqueMonitorTripTime = new TuneableNumber(0.325,
+            "EndEffector/TorqueMonitorTripTime");
 
         public static final Distance EffectiveDistanceFromElevator = Inches.of(26);
         // end of end effector to carriage

@@ -75,7 +75,7 @@ public class Controls {
             "Presets/L1OffsetRight");
 
         public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(46.7),
-            Degrees.of(-2), "Level2");
+            Degrees.of(1), "Level2");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(13, "Presets/L2Offset");
         public static final TuneableNumber Level2OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
             "Presets/L2OffsetLeft");
@@ -90,8 +90,8 @@ public class Controls {
         public static final TuneableNumber Level3OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
             "Presets/L3OffsetRight");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(76.6),
-            Degrees.of(-20), "Level4");
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(78.5),
+            Degrees.of(-19), "Level4");
         public static final TuneableNumber Level4DriveOffset = new TuneableNumber(31, "Presets/L4Offset");
         public static final TuneableNumber Level4OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
             "Presets/L4OffsetLeft");
@@ -120,5 +120,7 @@ public class Controls {
 
         public static final TuneableSuperStructureState GroundIntakeAlgae = new TuneableSuperStructureState(
             Inches.of(17.75), Degrees.of(17.675), "GroundIntakeAlgae");
+        
+        public static final TuneableSuperStructureState Barge = new TuneableSuperStructureState(null, null, null)
     }
 }

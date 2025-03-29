@@ -86,17 +86,14 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Getter private TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
         DriveConstants.YTranslationPID,
         new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseYAccelerationMax.get()), "DriveToY");
-    private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveConstants.HeadingkP,
-        DriveConstants.HeadingkI, DriveConstants.HeadingkD);
+    private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(
+        DriveConstants.HeadingkP.get(), DriveConstants.HeadingkI, DriveConstants.HeadingkD.get());
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
     private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.7, "Drive/singleTagBaseDistrust");
     private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
     private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1.3, "Drive/singleTagDistanceFromTag");
-
-    private TuneableNumber headingTolerance = new TuneableNumber(DriveConstants.HeadingTolerance,
-        "Drive/HeadingTolerance");
 
     private Pose2d currentAutoDriveTarget = Pose2d.kZero;
 
@@ -123,17 +120,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configureAutoBuilder();
 
-        driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance);
+        driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance.get());
         driveToPositionHeadingController.enableContinuousInput(-Math.PI, Math.PI);
         driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
 
-        TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
-            resetPoseFromLimelight().ignoringDisable(true));
-        TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
-            resetRotationFromLimelightMT1().ignoringDisable(true));
-
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
+
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+                resetPoseFromLimelight().ignoringDisable(true));
+            TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
+                resetRotationFromLimelightMT1().ignoringDisable(true));
 
             DriveConstants.PPTranslationP.addListener(newP -> {
                 DriveConstants.PPTranslationPID = new PIDConstants(newP);
@@ -146,7 +143,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     DriveConstants.RotationPID);
             });
 
-            headingTolerance.addListener((newTol) -> {
+            DriveConstants.HeadingkP.addListener((newP) -> {
+                driveToPositionHeadingController.setP(newP);
+            });
+            DriveConstants.HeadingkD.addListener((newD) -> {
+                driveToPositionHeadingController.setD(newD);
+            });
+            DriveConstants.HeadingTolerance.addListener((newTol) -> {
                 driveToPositionHeadingController.setTolerance(newTol);
             });
 

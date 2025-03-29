@@ -50,7 +50,7 @@ public class ArmIOReal implements ArmIO {
 
         inputs.appliedVoltage = appliedVoltage;
         double tBor = throughbore.get();
-        if (tBor > 0 && tBor < 0.132) {
+        if (tBor > 0 && tBor < 0.16) {
             tBor += 1;
         }
         inputs.throughborePosition = tBor;

@@ -108,6 +108,7 @@ public class EndEffector extends SubsystemBase {
             io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
             intakingCoral = false;
             intakingAlgae = false;
+            outtakingCoral = false;
             outtakingAlgae = true;
         });
     }
@@ -124,6 +125,7 @@ public class EndEffector extends SubsystemBase {
             io.setVoltage(EndEffectorConstants.OuttakeCoralVolts.get());
             intakingCoral = false;
             intakingAlgae = false;
+            outtakingAlgae = false;
             outtakingCoral = true;
         });
     }

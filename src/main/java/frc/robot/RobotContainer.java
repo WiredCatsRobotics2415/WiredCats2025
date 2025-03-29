@@ -192,6 +192,7 @@ public class RobotContainer {
         // Shoot is button B:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
+        oi.binds.get(OI.Bind.DeStickArm).onTrue(arm.deStuck());
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(
             superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).alongWith(changeAlignTarget(AligningTo.HPS)));
@@ -325,6 +326,9 @@ public class RobotContainer {
                 runningAutoAlign = false;
             }
         }
+
+        Logger.recordOutput("RobotContainer/TeleopMode", currentTeleopDriveMode.toString());
+        Logger.recordOutput("RobotContainer/AligningTo", currentlyAligningTo.toString());
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

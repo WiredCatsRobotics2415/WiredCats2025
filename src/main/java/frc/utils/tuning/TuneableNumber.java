@@ -73,10 +73,7 @@ public class TuneableNumber {
      * Assuming this number is in degrees
      */
     public Angle angle() {
-        if (this.lastAngle == null) {
-            this.lastAngle = Degrees.of(get());
-        }
-        return lastAngle;
+        return Degrees.of(get());
     }
 
     public void set(double newNumber) {

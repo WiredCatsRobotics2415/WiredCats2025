@@ -21,7 +21,7 @@ public class OI {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround, L1, L2,
         L3, L4, AutoAlignLeft, AutoAlignRight, DealgaePresetTop, SeedFieldCentric, StowPreset, AutoIntakeFromGround,
         ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae, ManualIntake, DealgaePresetBottom,
-        ClimberForward, ClimberBackward, GroundIntakeAlgae, ManualAlgaeShoot
+        ClimberForward, ClimberBackward, GroundIntakeAlgae, ManualAlgaeShoot, DeStickArm
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -53,6 +53,7 @@ public class OI {
         binds.put(Bind.ManualIntake, controller.button(GulikitButtons.Y));
         binds.put(Bind.ManualAlgaeShoot, controller.button(GulikitButtons.B));
 
+        binds.put(Bind.DeStickArm, controller.povLeft());
         binds.put(Bind.ChangeTeleopMode, controller.button(GulikitButtons.LeftPaddle));
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.RightPaddle));
         binds.put(Bind.StowPreset, numpad.button(NumpadButtons.NumberZero));

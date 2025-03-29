@@ -37,8 +37,8 @@ public class AutoIntake extends Command {
     public void initialize() {
         System.out.println("autointaking!");
         hasSeenCoral = false;
-        driveHeading.HeadingController = new PhoenixPIDController(DriveConstants.HeadingkP, 0,
-            DriveConstants.HeadingkD);
+        driveHeading.HeadingController = new PhoenixPIDController(DriveConstants.HeadingkP.get(), 0,
+            DriveConstants.HeadingkD.get());
         driveHeading.HeadingController.enableContinuousInput(-Math.PI, Math.PI);
         countSinceLastSeenCoral = new Timer();
         vision = Vision.getInstance();
