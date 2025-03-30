@@ -10,11 +10,13 @@ public class TuneableSuperStructureState {
     @Getter private TuneableNumber height;
     @Getter private TuneableNumber arm;
     @Getter private TuneableNumber coralIntake;
+    @Getter private String name;
 
     public TuneableSuperStructureState(Distance height, Angle arm, Angle coralIntake, String name) {
         this.height = new TuneableNumber(height, "SSState/" + name + "/height");
         this.arm = new TuneableNumber(arm, "SSState/" + name + "/arm");
         this.coralIntake = new TuneableNumber(coralIntake, "SSState/" + name + "/cIntake");
+        this.name = name;
     }
 
     /**

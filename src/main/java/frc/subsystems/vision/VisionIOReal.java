@@ -95,6 +95,15 @@ public class VisionIOReal implements VisionIO {
             inputs.detectedObjectTx = object.txnc;
             inputs.detectedObjectTy = object.tync;
             inputs.detectedObjectLabel = object.classId;
+
+            inputs.detectedObjectBB_Corner1x = object.corner0_X;
+            inputs.detectedObjectBB_Corner1y = object.corner0_Y;
+            inputs.detectedObjectBB_Corner2x = object.corner1_X;
+            inputs.detectedObjectBB_Corner2y = object.corner1_Y;
+            inputs.detectedObjectBB_Corner3x = object.corner2_X;
+            inputs.detectedObjectBB_Corner3y = object.corner2_Y;
+            inputs.detectedObjectBB_Corner4x = object.corner3_X;
+            inputs.detectedObjectBB_Corner4y = object.corner3_Y;
         }
     }
 

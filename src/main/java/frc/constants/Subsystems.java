@@ -70,7 +70,7 @@ public class Subsystems {
         public static final TuneableNumber PPTranslationP = new TuneableNumber(20.0d, "Drive/PPTranslationP");
         public static final TuneableNumber RotationP = new TuneableNumber(15.0d, "Drive/RotationP");
 
-        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(Controls.MaxDriveMeterS,
+        public static final TuneableNumber BaseVelocityMax = new TuneableNumber(0.5 * Controls.MaxDriveMeterS,
             "Drive/BaseVelocityMax");
         public static final TuneableNumber BaseXAccelerationMax = new TuneableNumber(2 * Controls.MaxDriveMeterS,
             "Drive/BaseXAccelerationMax");
@@ -87,8 +87,8 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(4, 0, 0.4); // 2
-        public static final PIDConstants YTranslationPID = new PIDConstants(4, 0, 0.4); // 5.6
+        public static final PIDConstants XTranslationPID = new PIDConstants(4.33, 0, 0.433); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(4.33, 0, 0.433); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 

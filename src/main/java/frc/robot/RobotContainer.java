@@ -329,8 +329,8 @@ public class RobotContainer {
 
         if (runningAutoAlign) {
             double[] input = oi.getRawXY();
-            if (input[0] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())
-                || input[1] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())) {
+            if (Math.abs(input[0]) > rawJoyAboveThresholdToCancelAutoAlign.get()
+                || Math.abs(input[1]) > rawJoyAboveThresholdToCancelAutoAlign.get()) {
                 System.out.println("Robot container: canceled auto input");
                 cancelAutoAlignment();
                 runningAutoAlign = false;

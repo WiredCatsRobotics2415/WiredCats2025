@@ -35,17 +35,19 @@ public class AlignToReef extends Command {
     private static final TuneableNumber LeftAlignRotation = new TuneableNumber(0, "AlignToReef/LeftAlignRotation");
     private static final TuneableNumber RightAlignRotation = new TuneableNumber(0, "AlignToReef/RightAlignRotation");
 
+    private TuneableNumber constructorGoalDriveOffset;
+    private Face constructorFace;
+
     private TuneableNumber goalDriveOffset;
     private Side side;
-    private Face face;
 
     private Command driveCommand;
     private Command focusCommand;
 
     public AlignToReef(Side side, Face face, TuneableNumber driveOffset) {
         this.side = side;
-        this.face = face;
-        this.goalDriveOffset = driveOffset;
+        this.constructorFace = face;
+        this.constructorGoalDriveOffset = driveOffset;
     }
 
     public AlignToReef(Side side, TuneableNumber driveOffset) {
@@ -55,7 +57,7 @@ public class AlignToReef extends Command {
 
     public AlignToReef(Side side, Face face) {
         this.side = side;
-        this.face = face;
+        this.constructorFace = face;
     }
 
     /**
@@ -70,7 +72,7 @@ public class AlignToReef extends Command {
         Pose2d apriltagPose;
         Integer apriltagId;
 
-        if (face == null) {
+        if (constructorFace == null) {
             System.out.println("Finding closest reef face");
             Pair<Pose2d, Integer> apriltagPoseAndId = AlignmentHelpers.findNearestApriltag(
                 ReefMeasurements.reefApriltagsAlphabetic, ReefMeasurements.reefRedApriltags,
@@ -80,8 +82,8 @@ public class AlignToReef extends Command {
         } else {
             List<Pose2d> poses = ReefMeasurements.reefApriltagsAlphabetic.get();
             int[] ids = ReefMeasurements.reefIds.get();
-            System.out.println("using face " + face.toString());
-            switch (face) {
+            System.out.println("using face " + constructorFace.toString());
+            switch (constructorFace) {
                 case AB:
                     apriltagPose = poses.get(0);
                     apriltagId = ids[0];
@@ -115,7 +117,7 @@ public class AlignToReef extends Command {
         lastApriltagAlignedTo = apriltagPose;
         Distance leftOffsetMeters = AlignToReef.LeftOffset.distance(),
             rightOffsetMeters = AlignToReef.RightOffset.distance();
-        if (goalDriveOffset == null) {
+        if (constructorGoalDriveOffset == null) {
             switch (ReefPresetTo.getLastLevelSet()) {
                 case L1:
                     goalDriveOffset = Presets.Level1DriveOffset;
@@ -143,6 +145,8 @@ public class AlignToReef extends Command {
                     rightOffsetMeters = Presets.Level1OffsetRight.distance();
                     break;
             }
+        } else {
+            goalDriveOffset = constructorGoalDriveOffset;
         }
         System.out.println("goal drive offset (in): " + goalDriveOffset.get());
         System.out.println(AlignmentHelpers.CenterToBumper.in(Inches));
