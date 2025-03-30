@@ -31,7 +31,9 @@ public class AlignToReef extends Command {
 
     @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(11, "AlignToReef/LeftOffset");
     @Getter private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
-    private static final TuneableNumber DriveTolerance = new TuneableNumber(0.5, "AlignToReef/DriveTolerance");
+    private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
+    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(0, "AlignToReef/LeftAlignRotation");
+    private static final TuneableNumber RightAlignRotation = new TuneableNumber(0, "AlignToReef/RightAlignRotation");
 
     private TuneableNumber goalDriveOffset;
     private Side side;
@@ -146,10 +148,10 @@ public class AlignToReef extends Command {
         System.out.println(AlignmentHelpers.CenterToBumper.in(Inches));
         Transform2d leftOffset = new Transform2d(
             AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
-            leftOffsetMeters.in(Meters), Rotation2d.kZero);
+            leftOffsetMeters.in(Meters), Rotation2d.kZero.plus(LeftAlignRotation.rotation()));
         Transform2d rightOffset = new Transform2d(
             AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
-            -rightOffsetMeters.in(Meters), Rotation2d.kZero);
+            -rightOffsetMeters.in(Meters), Rotation2d.kZero.plus(RightAlignRotation.rotation()));
         Transform2d offset;
         switch (side) {
             case Left:

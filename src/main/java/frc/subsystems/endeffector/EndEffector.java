@@ -33,13 +33,20 @@ public class EndEffector extends SubsystemBase {
 
         coralIntakingTorqueMonitor = new TorqueMonitor(EndEffectorConstants.TorqueMonitorJumpThreshold,
             EndEffectorConstants.TorqueMonitorJumpMagnitude, EndEffectorConstants.TorqueMonitorTripTime);
-        new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
-            io.setVoltage(EndEffectorConstants.HoldCoralVolts.get());
-            intakingCoral = false;
-        }));
+        // new Trigger(this::hasCoral).onTrue(Commands.runOnce(() -> {
+        // System.out.println("going to hold coral");
+        // io.setVoltage(EndEffectorConstants.HoldCoralVolts.get());
+        // intakingCoral = false;
+        // intakingAlgae = false;
+        // outtakingCoral = false;
+        // outtakingAlgae = false;
+        // }));
         new Trigger(this::hasAlgae).onTrue(Commands.runOnce(() -> {
             io.setVoltage(EndEffectorConstants.HoldAlgaeVolts.get());
+            intakingCoral = false;
             intakingAlgae = false;
+            outtakingCoral = false;
+            outtakingAlgae = false;
         }));
     }
 
@@ -50,14 +57,14 @@ public class EndEffector extends SubsystemBase {
 
     public Command toggleIntakeCoral() {
         return runOnce(() -> {
-            if (!intakingCoral) {
-                io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
-                intakingCoral = true;
-                System.out.println("EE: set intake coral to true!");
-            } else {
+            if (intakingCoral) {
                 io.setVoltage(0);
                 intakingCoral = false;
                 System.out.println("EE: set intake coral to false!");
+            } else {
+                io.setVoltage(EndEffectorConstants.IntakeCoralVolts.get());
+                intakingCoral = true;
+                System.out.println("EE: set intake coral to true!");
             }
             intakingAlgae = false;
             outtakingCoral = false;
@@ -98,9 +105,11 @@ public class EndEffector extends SubsystemBase {
     public Command toggleIntakeAlgae() {
         return runOnce(() -> {
             if (!intakingAlgae) {
+                System.out.println("intaking algae");
                 io.setVoltage(EndEffectorConstants.IntakeAlgaeVolts.get());
                 intakingAlgae = true;
             } else {
+                System.out.println("no longer intaking algae");
                 io.setVoltage(0);
                 intakingAlgae = false;
             }
@@ -113,10 +122,12 @@ public class EndEffector extends SubsystemBase {
     public Command toggleOuttakeAlgae() {
         return runOnce(() -> {
             coralIntakingTorqueMonitor.reset();
-            if (outtakingAlgae || outtakingCoral) {
+            if (outtakingAlgae) {
                 io.setVoltage(0);
-                outtakingAlgae = false;
+                intakingCoral = false;
+                intakingAlgae = false;
                 outtakingCoral = false;
+                outtakingAlgae = false;
                 return;
             }
             io.setVoltage(EndEffectorConstants.OuttakeAlageVolts.get());
@@ -130,8 +141,10 @@ public class EndEffector extends SubsystemBase {
     public Command toggleOuttakeCoral() {
         return runOnce(() -> {
             coralIntakingTorqueMonitor.reset();
-            if (outtakingAlgae || outtakingCoral) {
+            if (outtakingCoral) {
                 io.setVoltage(0);
+                intakingCoral = false;
+                intakingAlgae = false;
                 outtakingAlgae = false;
                 outtakingCoral = false;
                 return;

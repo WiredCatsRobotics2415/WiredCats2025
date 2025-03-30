@@ -77,7 +77,6 @@ public class SuperStructure extends SubsystemBase {
     private Point2d eeTopTip = new Point2d(0, 0);
 
     private boolean isDone = true;
-    private boolean hasAlgae = false;
     private boolean isMovingCoralIntake;
 
     private double[] limits = new double[3];
@@ -96,7 +95,7 @@ public class SuperStructure extends SubsystemBase {
 
     public Command stow() {
         return this.runOnce(() -> {
-            if (hasAlgae) {
+            if (EndEffector.getInstance().algaeSensorTrigger()) {
                 beThereAsapNoEnd(Presets.AlgaeStow, true, false).schedule();
             } else {
                 beThereAsapNoEnd(Presets.Stow, false, false).schedule();
@@ -189,12 +188,13 @@ public class SuperStructure extends SubsystemBase {
                 elevator.setGoal(goal.getHeight().get());
                 if (elevator.getPid().goalError() >= 0) {
                     System.out.println("elevator moving up");
-                    boolean elevatorNeedsToMove = assumeHasAlgaeBefore
+                    boolean elevatorNeedsToMove = EndEffector.getInstance().algaeSensorTrigger()
                         ? elevator.getMeasurement() < algaeSwingThroughMinHeight.get()
                         : elevator.getMeasurement() < swingThroughMinHeight.get();
                     if (elevatorNeedsToMove) { // if it needs to wait for the arm to swing through...
-                        elevator.setGoal(
-                            assumeHasAlgaeBefore ? algaeSwingThroughMinHeight.get() : swingThroughMinHeight.get());
+                        elevator
+                            .setGoal(EndEffector.getInstance().algaeSensorTrigger() ? algaeSwingThroughMinHeight.get()
+                                : swingThroughMinHeight.get());
                         plannedCommand = Commands.waitUntil(() -> elevator.atGoal()).andThen(Commands.runOnce(() -> {
                             System.out.println("final up goal set");
                             elevator.setGoal(goal.getHeight().get());
@@ -207,7 +207,8 @@ public class SuperStructure extends SubsystemBase {
                     }
                 } else {
                     System.out.println("elevator moving down");
-                    if (assumeHasAlgaeBefore && goal.getHeight().get() < algaeSwingThroughMinHeight.get()) {
+                    if (EndEffector.getInstance().algaeSensorTrigger()
+                        && goal.getHeight().get() < algaeSwingThroughMinHeight.get()) {
                         elevator.setGoal(algaeSwingThroughMinHeight.get());
                     } else {
                         if (goal.getHeight().get() < swingThroughMinHeight.get()) {
@@ -245,7 +246,6 @@ public class SuperStructure extends SubsystemBase {
             plannedCommand = plannedCommand.andThen(Commands.waitUntil(this::allAtGoal))
                 .andThen(Commands.runOnce(() ->
                 {
-                    hasAlgae = !assumeNoAlgaeLater;
                     isDone = true;
                 })).finallyDo((boolean interrupted) -> {
                     // Do not remove this finallyDo, even though it does nothing
@@ -360,6 +360,5 @@ public class SuperStructure extends SubsystemBase {
         Logger.recordOutput("SuperStructure/SetGoalHeight", goal.getHeight().get());
         Logger.recordOutput("SuperStructure/SetGoalArm", goal.getArm().get());
         Logger.recordOutput("SuperStructure/SetGoalCIntake", goal.getCoralIntake().get());
-        Logger.recordOutput("SuperStructure/HasAlgae", hasAlgae);
     }
 }

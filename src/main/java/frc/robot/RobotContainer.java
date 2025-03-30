@@ -185,7 +185,8 @@ public class RobotContainer {
             .onTrue(endEffector.toggleOuttakeCoral().alongWith(CoralIntake.getInstance().toggleOuttake()))
             .onFalse(endEffector.turnOff().alongWith(CoralIntake.getInstance().turnOffRollers()));
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
-        oi.binds.get(OI.Bind.ManualIntake).onTrue(endEffector.toggleIntakeCoral());
+        oi.binds.get(OI.Bind.ManualIntake)
+            .onTrue(endEffector.toggleIntakeCoral().alongWith(CoralIntake.getInstance().toggleIntake()));
         oi.binds.get(OI.Bind.ManualAlgaeShoot).onTrue(endEffector.toggleOuttakeAlgae());
         // In case it should be A intakes coral, outtakes algae and B vice versa...
         // Dealgae is button A:
@@ -250,8 +251,11 @@ public class RobotContainer {
         // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .onTrue(new ParallelCommandGroup(superstructure.beThereAsapNoEnd(Presets.GroundIntake, false, false),
-                endEffector.intakeCoral(), CoralIntake.getInstance().intake()))
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake, false, false).alongWith(Commands.runOnce(() ->
+            {
+                endEffector.intakeCoral().schedule();
+                CoralIntake.getInstance().intake().schedule();
+            })))
             .onFalse(new ParallelCommandGroup(
                 superstructure.beThereAsap(Presets.GroundIntakeUp, false, false).andThen(Commands.waitSeconds(0.5))
                     .andThen(superstructure.stow()),

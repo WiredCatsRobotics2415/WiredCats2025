@@ -3,6 +3,7 @@ package frc.utils.tuning;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -74,6 +75,10 @@ public class TuneableNumber {
      */
     public Angle angle() {
         return Degrees.of(get());
+    }
+
+    public Rotation2d rotation() {
+        return Rotation2d.fromDegrees(get());
     }
 
     public void set(double newNumber) {

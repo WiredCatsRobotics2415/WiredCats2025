@@ -26,7 +26,7 @@ public class EndEffectorIOReal implements EndEffectorIO {
 
     @Override
     public void updateInputs(EndEffectorIOInputs inputs) {
-        inputs.sensorValue = (int) irSensor.getVoltage();
+        inputs.sensorValue = (int) irSensor.getValue();
 
         inputs.motorConnected = true;
         inputs.motorStatorCurrent = motor.getOutputCurrent();

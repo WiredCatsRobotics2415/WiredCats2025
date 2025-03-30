@@ -25,7 +25,7 @@ public class Subsystems {
         public static final String FrontLeftName = "limelight-left";
         public static final String FrontRightName = "limelight-right";
         public static final String BackCenterName = "limelight";
-        public static final String EndEffectorName = "10.24.15.200";
+        public static final String EndEffectorName = "limelight-end";
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
             BackCenterName };
@@ -87,15 +87,15 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(4, 0, 0.1); // 2
-        public static final PIDConstants YTranslationPID = new PIDConstants(4, 0, 0.1); // 5.6
+        public static final PIDConstants XTranslationPID = new PIDConstants(4, 0, 0.4); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(4, 0, 0.4); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
         public static final TuneableNumber HeadingkP = new TuneableNumber(10, "Drive/HeadingkP");
         public static final double HeadingkI = 0;
         public static final TuneableNumber HeadingkD = new TuneableNumber(0.4, "Drive/HeadingkD");
-        public static final TuneableNumber HeadingTolerance = new TuneableNumber(1, "Drive/HeadingTolerance");
+        public static final TuneableNumber HeadingTolerance = new TuneableNumber(2, "Drive/HeadingTolerance");
     }
 
     public class ElevatorConstants {
@@ -160,22 +160,22 @@ public class Subsystems {
 
     public class EndEffectorConstants {
         public static final int MotorID = 12;
-        public static final int IRSensorPort = NavxMXPPorts.Analog0;
+        public static final int IRSensorPort = 2;
 
         public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-4, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber IntakeAlgaeVolts = new TuneableNumber(10, "EndEffector/IntakeAlgaeVolts");
-        public static final TuneableNumber HoldCoralVolts = new TuneableNumber(-3, "EndEffector/IntakeCoralVolts");
+        public static final TuneableNumber HoldCoralVolts = new TuneableNumber(-1.5, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber HoldAlgaeVolts = new TuneableNumber(7, "EndEffector/IntakeAlgaeVolts");
         public static final TuneableNumber OuttakeCoralVolts = new TuneableNumber(9, "EndEffector/OuttakeCoralVolts");
         public static final TuneableNumber OuttakeAlageVolts = new TuneableNumber(-12, "EndEffector/OuttakeAlageVolts");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
-        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(175,
+        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(90,
             "EndEffector/AlgaeIntookCameraThreshold");
 
-        public static final TuneableNumber TorqueMonitorJumpThreshold = new TuneableNumber(17,
+        public static final TuneableNumber TorqueMonitorJumpThreshold = new TuneableNumber(6,
             "EndEffector/TorqueMonitorJumpThreshold");
-        public static final TuneableNumber TorqueMonitorJumpMagnitude = new TuneableNumber(8,
+        public static final TuneableNumber TorqueMonitorJumpMagnitude = new TuneableNumber(1,
             "EndEffector/TorqueMonitorJumpMagnitude");
         public static final TuneableNumber TorqueMonitorTripTime = new TuneableNumber(0.325,
             "EndEffector/TorqueMonitorTripTime");
