@@ -170,7 +170,7 @@ public class Subsystems {
         public static final TuneableNumber OuttakeAlageVolts = new TuneableNumber(-12, "EndEffector/OuttakeAlageVolts");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
-        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(90,
+        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(25,
             "EndEffector/AlgaeIntookCameraThreshold");
 
         public static final TuneableNumber TorqueMonitorJumpThreshold = new TuneableNumber(6,

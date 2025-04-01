@@ -53,8 +53,8 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber percentOfArmVeloWhileHigh = new TuneableNumber(0.5,
         "SuperStructure/percentOfArmVeloWhileMoving");
 
-    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.5, "SuperStructure/pctOfDriveAccelX");
-    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.5, "SuperStructure/pctOfDriveAccelY");
+    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.75, "SuperStructure/pctOfDriveAccelX");
+    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.75, "SuperStructure/pctOfDriveAccelY");
 
     private TuneableNumber swingThroughMinHeight = new TuneableNumber(55, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber algaeSwingThroughMinHeight = new TuneableNumber(70,
@@ -340,7 +340,6 @@ public class SuperStructure extends SubsystemBase {
         Logger.recordOutput("SuperStructure/MaxArmAccel", maxArmAcceleration);
         Logger.recordOutput("SuperStructure/BaseXAccelerationMax", limits[0]);
         Logger.recordOutput("SuperStructure/BaseYAccelerationMax", limits[1]);
-        Logger.recordOutput("SuperStructure/BaseRotationAccelMax", limits[2]);
         Logger.recordOutput("SuperStructure/SetGoalHeight", goal.getHeight().get());
         Logger.recordOutput("SuperStructure/SetGoalArm", goal.getArm().get());
         Logger.recordOutput("SuperStructure/SetGoalCIntake", goal.getCoralIntake().get());

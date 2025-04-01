@@ -29,11 +29,11 @@ public class AlignToReef extends Command {
 
     @Getter private static Pose2d lastApriltagAlignedTo;
 
-    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(11, "AlignToReef/LeftOffset");
-    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(5, "AlignToReef/RightOffset");
+    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(7.7, "AlignToReef/LeftOffset");
+    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(3.5, "AlignToReef/RightOffset");
     private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
-    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(0, "AlignToReef/LeftAlignRotation");
-    private static final TuneableNumber RightAlignRotation = new TuneableNumber(0, "AlignToReef/RightAlignRotation");
+    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(3, "AlignToReef/LeftAlignRotation");
+    private static final TuneableNumber RightAlignRotation = new TuneableNumber(4, "AlignToReef/RightAlignRotation");
 
     private TuneableNumber constructorGoalDriveOffset;
     private Face constructorFace;
@@ -121,28 +121,18 @@ public class AlignToReef extends Command {
             switch (ReefPresetTo.getLastLevelSet()) {
                 case L1:
                     goalDriveOffset = Presets.Level1DriveOffset;
-                    leftOffsetMeters = Presets.Level1OffsetLeft.distance();
-                    rightOffsetMeters = Presets.Level1OffsetRight.distance();
                     break;
                 case L2:
                     goalDriveOffset = Presets.Level2DriveOffset;
-                    leftOffsetMeters = Presets.Level2OffsetLeft.distance();
-                    rightOffsetMeters = Presets.Level2OffsetRight.distance();
                     break;
                 case L3:
                     goalDriveOffset = Presets.Level3DriveOffset;
-                    leftOffsetMeters = Presets.Level3OffsetLeft.distance();
-                    rightOffsetMeters = Presets.Level3OffsetRight.distance();
                     break;
                 case L4:
                     goalDriveOffset = Presets.Level4DriveOffset;
-                    leftOffsetMeters = Presets.Level4OffsetLeft.distance();
-                    rightOffsetMeters = Presets.Level4OffsetRight.distance();
                     break;
                 default:
                     goalDriveOffset = Presets.Level1DriveOffset;
-                    leftOffsetMeters = Presets.Level1OffsetLeft.distance();
-                    rightOffsetMeters = Presets.Level1OffsetRight.distance();
                     break;
             }
         } else {

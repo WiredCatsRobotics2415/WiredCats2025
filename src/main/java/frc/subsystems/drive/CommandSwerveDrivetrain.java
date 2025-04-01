@@ -91,9 +91,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
-    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.7, "Drive/singleTagBaseDistrust");
+    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.5, "Drive/singleTagBaseDistrust");
     private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
-    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1.3, "Drive/singleTagDistanceFromTag");
+    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1, "Drive/singleTagDistanceFromTag");
 
     private Pose2d currentAutoDriveTarget = Pose2d.kZero;
 
@@ -217,19 +217,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         SwerveDriveState currentState = getState();
         poseFuser.sendLimelightsOrientation(currentState);
+        double distrust = 0, singleTagDistanceFromCurrentM = 0, singleTagDistanceFromTagM = 0;
+        Pose2d singleTagPose = null;
         if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
             PoseEstimate singleTag = vision.getSingleTagPoseEstimate(currentSingleTagLLs, currentSingleTagId);
             if (singleTag != null) {
-                double distrust = singleTagBaseDistrust.get() +
-                    singleTagDistanceFromCurrent.get() *
-                        currentState.Pose.getTranslation().getDistance(singleTag.pose.getTranslation()) +
-                    singleTagDistanceFromTag.get() * singleTag.avgTagDist;
+                singleTagPose = singleTag.pose;
+                singleTagDistanceFromCurrentM = currentState.Pose.getTranslation()
+                    .getDistance(singleTag.pose.getTranslation());
+                singleTagDistanceFromTagM = singleTag.avgTagDist;
+                distrust = singleTagBaseDistrust.get() +
+                    singleTagDistanceFromCurrent.get() * singleTagDistanceFromCurrentM +
+                    singleTagDistanceFromTag.get() * singleTagDistanceFromTagM;
                 addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
                     VecBuilder.fill(distrust, distrust, 999999));
             }
         } else {
             poseFuser.update(currentState);
         }
+        Logger.recordOutput("Drive/SingleTagDistrust", distrust);
+        Logger.recordOutput("Drive/SingleTagDistanceFromCurrent", singleTagDistanceFromCurrentM);
+        Logger.recordOutput("Drive/SingleTagDistanceFromTag", singleTagDistanceFromTagM);
+        Logger.recordOutput("Drive/SingleTagPose", singleTagPose);
 
         Logger.recordOutput("Drive/Pose", currentState.Pose);
         if (mapleSimSwerveDrivetrain != null) Logger.recordOutput("Drive/SimulationPose",
