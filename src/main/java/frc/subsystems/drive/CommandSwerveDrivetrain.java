@@ -96,6 +96,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1, "Drive/singleTagDistanceFromTag");
 
     private Pose2d currentAutoDriveTarget = Pose2d.kZero;
+    private double appliedXVelocity = 0.0d;
+    private double appliedYVelocity = 0.0d;
+    private double lastSmallestDistrust = Double.MAX_VALUE;
 
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
@@ -226,16 +229,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 singleTagDistanceFromCurrentM = currentState.Pose.getTranslation()
                     .getDistance(singleTag.pose.getTranslation());
                 singleTagDistanceFromTagM = singleTag.avgTagDist;
+
                 distrust = singleTagBaseDistrust.get() +
                     singleTagDistanceFromCurrent.get() * singleTagDistanceFromCurrentM +
                     singleTagDistanceFromTag.get() * singleTagDistanceFromTagM;
+                lastSmallestDistrust = Math.min(distrust, lastSmallestDistrust);
                 addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
-                    VecBuilder.fill(distrust, distrust, 999999));
+                    VecBuilder.fill(lastSmallestDistrust, lastSmallestDistrust, 999999));
             }
         } else {
             poseFuser.update(currentState);
         }
         Logger.recordOutput("Drive/SingleTagDistrust", distrust);
+        Logger.recordOutput("Drive/SingleTagLastSmallestDistrust", lastSmallestDistrust);
         Logger.recordOutput("Drive/SingleTagDistanceFromCurrent", singleTagDistanceFromCurrentM);
         Logger.recordOutput("Drive/SingleTagDistanceFromTag", singleTagDistanceFromTagM);
         Logger.recordOutput("Drive/SingleTagPose", singleTagPose);
@@ -253,6 +259,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         Logger.recordOutput("Drive/SingleTagActive", currentPoseEstimationType == PoseEstimationType.SingleTag);
         Logger.recordOutput("Drive/SingleTagId", currentSingleTagId);
+
+        Logger.recordOutput("Drive/AppliedXVelocity", appliedXVelocity);
+        Logger.recordOutput("Drive/AppliedYVelocity", appliedYVelocity);
     }
 
     /**
@@ -260,7 +269,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int tag) {
         return new WaitUntilCommand(() -> vision.nearestTagToAtLeastOneOf(limelights) == tag)
-            .andThen(Commands.run(() ->
+            .andThen(Commands.runOnce(() -> lastSmallestDistrust = Double.MAX_VALUE)).andThen(Commands.run(() ->
             {
                 currentPoseEstimationType = PoseEstimationType.SingleTag;
                 currentSingleTagLLs = limelights;
@@ -272,7 +281,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
         return new WaitUntilCommand(() -> vision.aLimelightCanSeeOneOf(limelights, tagSet.get()))
-            .andThen(Commands.run(() ->
+            .andThen(Commands.runOnce(() -> lastSmallestDistrust = Double.MAX_VALUE)).andThen(Commands.run(() ->
             {
                 currentPoseEstimationType = PoseEstimationType.SingleTag;
                 currentSingleTagLLs = limelights;
@@ -334,9 +343,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double velocityX = MathUtil.clamp(
                 driveToPositionXController.calculate(currentPose.getX(), allianceCompensatedGoal.getX()), -maxSpeedMS,
                 maxSpeedMS);
+            appliedXVelocity = velocityX;
             double velocityY = MathUtil.clamp(
                 driveToPositionYController.calculate(currentPose.getY(), allianceCompensatedGoal.getY()), -maxSpeedMS,
                 maxSpeedMS);
+            appliedYVelocity = velocityY;
             double allianceCompensation = isBlue ? 1 : -1;
 
             return driveToPositionFacingAngleRequest.withTargetDirection(allianceCompensatedGoal.getRotation())

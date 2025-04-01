@@ -87,8 +87,8 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(4.33, 0, 0.433); // 2
-        public static final PIDConstants YTranslationPID = new PIDConstants(4.33, 0, 0.433); // 5.6
+        public static final PIDConstants XTranslationPID = new PIDConstants(4.33, 0, 0.2165); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(4.33, 0, 0.2165); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 
