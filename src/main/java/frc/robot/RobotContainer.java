@@ -81,7 +81,8 @@ public class RobotContainer {
     private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);
     private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(10);
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(10);
-    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(10);
+    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)
+        .withTimeout(10);
     private boolean runningAutoAlign = false;
     private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.1,
         "RobotContainer/rawJoyAboveThresholdToCancelAutoAlign");

@@ -77,6 +77,7 @@ public class Vision extends SubsystemBase {
         double xSum = 0;
         double ySum = 0;
         double smallestTimestamp = Double.MAX_VALUE;
+        double smallestTagDist = Double.MAX_VALUE;
         int numCamerasUsed = 0;
         for (int index : limelights.indexInPEList) {
             if (inputs.poseTagCounts[index] > 0 && inputs.nearestTags[index] == tag) {
@@ -84,6 +85,7 @@ public class Vision extends SubsystemBase {
                 ySum += inputs.poseEstimates[index].getY();
                 numCamerasUsed += 1;
                 smallestTimestamp = Math.min(smallestTimestamp, inputs.poseTimestampsSeconds[index]);
+                smallestTagDist = Math.min(smallestTagDist, inputs.poseTagDistances[index]);
             }
         }
 
@@ -91,6 +93,7 @@ public class Vision extends SubsystemBase {
         pe.pose = new Pose2d(xSum / numCamerasUsed, ySum / numCamerasUsed, Rotation2d.kZero);
         // Choosing latest pose increases trust
         pe.timestampSeconds = smallestTimestamp;
+        pe.avgTagDist = smallestTagDist;
 
         return pe;
     }

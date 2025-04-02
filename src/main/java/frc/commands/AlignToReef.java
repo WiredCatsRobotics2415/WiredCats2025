@@ -32,7 +32,7 @@ public class AlignToReef extends Command {
     @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(7.7, "AlignToReef/LeftOffset");
     @Getter private static final TuneableNumber RightOffset = new TuneableNumber(3.5, "AlignToReef/RightOffset");
     private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
-    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(3, "AlignToReef/LeftAlignRotation");
+    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5, "AlignToReef/LeftAlignRotation");
     private static final TuneableNumber RightAlignRotation = new TuneableNumber(4, "AlignToReef/RightAlignRotation");
 
     private TuneableNumber constructorGoalDriveOffset;
@@ -153,7 +153,9 @@ public class AlignToReef extends Command {
                 offset = leftOffset;
                 break;
             case Center:
-                offset = Transform2d.kZero;
+                offset = new Transform2d(
+                    AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters), 0,
+                    Rotation2d.kZero);
                 break;
             case Right:
                 System.out.println("align to reef using right offset");

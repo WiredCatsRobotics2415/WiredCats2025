@@ -74,7 +74,7 @@ public class Controls {
         public static final TuneableNumber Level1OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
             "Presets/L1OffsetRight");
 
-        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(46.7),
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(49.7),
             Degrees.of(1), "Level2");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(13, "Presets/L2Offset");
         public static final TuneableNumber Level2OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
@@ -90,7 +90,7 @@ public class Controls {
         public static final TuneableNumber Level3OffsetRight = new TuneableNumber(AlignToReef.getRightOffset().get(),
             "Presets/L3OffsetRight");
 
-        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(77),
+        public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(78.2),
             Degrees.of(-19), "Level4");
         public static final TuneableNumber Level4DriveOffset = new TuneableNumber(27, "Presets/L4Offset");
         public static final TuneableNumber Level4OffsetLeft = new TuneableNumber(AlignToReef.getLeftOffset().get(),
@@ -100,11 +100,9 @@ public class Controls {
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(37.5),
             Degrees.of(41), "BottomDeAlgae");
-        public static final TuneableNumber BottomDADriveOffset = new TuneableNumber(6, "Presets/BottomDADriveOffset");
-
         public static final TuneableSuperStructureState TopDeAlgae = new TuneableSuperStructureState(Inches.of(66.5),
             Degrees.of(22.5), "TopDeAlgae");
-        public static final TuneableNumber TopDADriveOffset = new TuneableNumber(6, "Presets/TopDADriveOffset");
+        public static final TuneableNumber DealgaeDriveOffset = new TuneableNumber(27, "Presets/BottomDADriveOffset");
 
         public static final TuneableSuperStructureState IntakeFromHPS = new TuneableSuperStructureState(Inches.of(45.1),
             Degrees.of(145.4), "IntakeFromHPS");

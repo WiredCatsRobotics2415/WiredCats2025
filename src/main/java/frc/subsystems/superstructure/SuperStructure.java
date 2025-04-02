@@ -53,8 +53,8 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber percentOfArmVeloWhileHigh = new TuneableNumber(0.5,
         "SuperStructure/percentOfArmVeloWhileMoving");
 
-    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.75, "SuperStructure/pctOfDriveAccelX");
-    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.75, "SuperStructure/pctOfDriveAccelY");
+    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.65, "SuperStructure/pctOfDriveAccelX");
+    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.65, "SuperStructure/pctOfDriveAccelY");
 
     private TuneableNumber swingThroughMinHeight = new TuneableNumber(55, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber algaeSwingThroughMinHeight = new TuneableNumber(70,

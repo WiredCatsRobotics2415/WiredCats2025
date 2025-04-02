@@ -45,6 +45,7 @@ import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.math.Algebra;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuneableNumber;
@@ -91,9 +92,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
-    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.5, "Drive/singleTagBaseDistrust");
-    private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
-    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1, "Drive/singleTagDistanceFromTag");
+    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.3, "Drive/singleTagBaseDistrust");
+    private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(2, "Drive/singleTagDistanceFromCurrent");
+    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(6, "Drive/singleTagDistanceFromTag");
+    private TuneableNumber singleTagVelocityMultiplier = new TuneableNumber(0, "Drive/singleTagVelocity");
+    private TuneableNumber singleTagOdometryDistrust = new TuneableNumber(200, "Drive/singleTagOdometryDistrust");
 
     private Pose2d currentAutoDriveTarget = Pose2d.kZero;
     private double appliedXVelocity = 0.0d;
@@ -220,7 +223,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         SwerveDriveState currentState = getState();
         poseFuser.sendLimelightsOrientation(currentState);
-        double distrust = 0, singleTagDistanceFromCurrentM = 0, singleTagDistanceFromTagM = 0;
+        double distrust = 0, singleTagDistanceFromCurrentM = 0, singleTagDistanceFromTagM = 0, singleTagVeloCalc = 0;
         Pose2d singleTagPose = null;
         if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
             PoseEstimate singleTag = vision.getSingleTagPoseEstimate(currentSingleTagLLs, currentSingleTagId);
@@ -229,21 +232,28 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                 singleTagDistanceFromCurrentM = currentState.Pose.getTranslation()
                     .getDistance(singleTag.pose.getTranslation());
                 singleTagDistanceFromTagM = singleTag.avgTagDist;
+                singleTagVeloCalc = Algebra.euclideanDistance(currentState.Speeds.vxMetersPerSecond,
+                    currentState.Speeds.vyMetersPerSecond);
 
                 distrust = singleTagBaseDistrust.get() +
                     singleTagDistanceFromCurrent.get() * singleTagDistanceFromCurrentM +
-                    singleTagDistanceFromTag.get() * singleTagDistanceFromTagM;
+                    singleTagDistanceFromTag.get() * singleTagDistanceFromTagM +
+                    singleTagVelocityMultiplier.get() * singleTagVeloCalc;
                 lastSmallestDistrust = Math.min(distrust, lastSmallestDistrust);
                 addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
                     VecBuilder.fill(lastSmallestDistrust, lastSmallestDistrust, 999999));
+                this.setVisionMeasurementStdDevs(
+                    VecBuilder.fill(singleTagOdometryDistrust.get(), singleTagOdometryDistrust.get(), 0));
             }
         } else {
             poseFuser.update(currentState);
+            this.setVisionMeasurementStdDevs(VecBuilder.fill(0, 0, 0));
         }
         Logger.recordOutput("Drive/SingleTagDistrust", distrust);
         Logger.recordOutput("Drive/SingleTagLastSmallestDistrust", lastSmallestDistrust);
         Logger.recordOutput("Drive/SingleTagDistanceFromCurrent", singleTagDistanceFromCurrentM);
         Logger.recordOutput("Drive/SingleTagDistanceFromTag", singleTagDistanceFromTagM);
+        Logger.recordOutput("Drive/SingleTagVelocity", singleTagVeloCalc);
         Logger.recordOutput("Drive/SingleTagPose", singleTagPose);
 
         Logger.recordOutput("Drive/Pose", currentState.Pose);
