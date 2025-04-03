@@ -17,11 +17,13 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.autos.CtoRGround;
 import frc.autos.CtoRHPS;
 import frc.autos.L4;
+import frc.autos.L4AndDealgae;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
 import frc.commands.AlignToReef;
 import frc.commands.AlignToReef.Side;
 import frc.commands.DealgaePresetTo;
+import frc.commands.InBargeZoneAlert;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
 import frc.constants.Controls;
@@ -138,6 +140,7 @@ public class RobotContainer {
         autoChooser.addOption("CustomL4", new L4());
         autoChooser.addOption("CustomCtoRHPS", new CtoRHPS());
         autoChooser.addOption("CtoRGround", new CtoRGround());
+        autoChooser.addOption("L4AndDealgae", new L4AndDealgae());
     }
 
     public void teleopEnable() {
@@ -196,7 +199,7 @@ public class RobotContainer {
         // Shoot is button B:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
-        oi.binds.get(OI.Bind.DeStickArm).onTrue(arm.deStuck());
+        // oi.binds.get(OI.Bind.DeStickArm).onTrue(arm.deStuck());
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
         oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS, false, false)
             .alongWith(changeAlignTarget(AligningTo.HPS)));
@@ -208,6 +211,8 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.L2).onTrue(new ReefPresetTo(Level.L2).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.L3).onTrue(new ReefPresetTo(Level.L3).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.L4).onTrue(new ReefPresetTo(Level.L4).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.StackAlageIntake)
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.StackIntakeAlgae, false, false));
         oi.binds.get(OI.Bind.AutoAlignLeft).onTrue(Commands.runOnce(() -> {
             System.out.println("Left auto align is aligning to: " + currentlyAligningTo);
             switch (currentlyAligningTo) {
@@ -315,6 +320,8 @@ public class RobotContainer {
         new Trigger(endEffector::hasCoral)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
         // new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
+
+        new InBargeZoneAlert().schedule();
     }
 
     public void periodic() {

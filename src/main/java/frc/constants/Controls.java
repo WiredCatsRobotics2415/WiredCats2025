@@ -121,5 +121,8 @@ public class Controls {
 
         public static final TuneableSuperStructureState Barge = new TuneableSuperStructureState(Inches.of(78),
             Degrees.of(158), "Barge");
+
+        public static final TuneableSuperStructureState StackIntakeAlgae = new TuneableSuperStructureState(
+            Inches.of(27), Degrees.of(17.675), "StackIntakeAlgae");
     }
 }

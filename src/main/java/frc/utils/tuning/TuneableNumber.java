@@ -59,7 +59,6 @@ public class TuneableNumber {
      * Assuming this number is in inches
      */
     public Distance distance() {
-        System.out.println("distance call returns: " + get());
         return Inches.of(get());
     }
 

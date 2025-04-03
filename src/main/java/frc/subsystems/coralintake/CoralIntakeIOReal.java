@@ -20,7 +20,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     private double appliedIntakeVolts;
 
     public CoralIntakeIOReal() {
-        SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(20, 40).idleMode(IdleMode.kBrake)
+        SparkBaseConfig config = new SparkMaxConfig().smartCurrentLimit(30, 60).idleMode(IdleMode.kBrake)
             .voltageCompensation(12).inverted(true);
 
         pivotMotor = new SparkMax(CoralIntakeConstants.PivotMotorID, MotorType.kBrushless);
@@ -58,7 +58,7 @@ public class CoralIntakeIOReal implements CoralIntakeIO {
     @Override
     public void setIntakeVoltage(double volts) {
         appliedIntakeVolts = volts;
-        intakeMotor.set(volts);
+        intakeMotor.setVoltage(volts);
     }
 
     @Override

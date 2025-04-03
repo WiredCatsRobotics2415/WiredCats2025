@@ -17,6 +17,7 @@ import frc.robot.RobotStatus.RobotState;
 import frc.utils.tuning.TuneableNumber;
 import java.util.List;
 import lombok.Getter;
+import org.littletonrobotics.junction.Logger;
 
 public class AlignToReef extends Command {
     public static enum Side {
@@ -31,9 +32,11 @@ public class AlignToReef extends Command {
 
     @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(7.7, "AlignToReef/LeftOffset");
     @Getter private static final TuneableNumber RightOffset = new TuneableNumber(3.5, "AlignToReef/RightOffset");
-    private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
-    private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5, "AlignToReef/LeftAlignRotation");
-    private static final TuneableNumber RightAlignRotation = new TuneableNumber(4, "AlignToReef/RightAlignRotation");
+    @Getter private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
+    @Getter private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5,
+        "AlignToReef/LeftAlignRotation");
+    @Getter private static final TuneableNumber RightAlignRotation = new TuneableNumber(4,
+        "AlignToReef/RightAlignRotation");
 
     private TuneableNumber constructorGoalDriveOffset;
     private Face constructorFace;
@@ -174,6 +177,11 @@ public class AlignToReef extends Command {
 
         focusCommand = AlignmentHelpers.drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, apriltagId);
         focusCommand.schedule();
+    }
+
+    @Override
+    public void execute() {
+        Logger.recordOutput("AlignToReef/SelectedApriltagPose", lastApriltagAlignedTo);
     }
 
     @Override

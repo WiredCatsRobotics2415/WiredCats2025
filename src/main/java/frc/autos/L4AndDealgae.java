@@ -6,11 +6,13 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.AlignToReef;
 import frc.commands.AlignToReef.Side;
+import frc.commands.DealgaePresetTo;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
+import frc.constants.Controls.Presets;
 import frc.robot.Robot;
 
-public class L4 extends GenericAuto {
+public class L4AndDealgae extends GenericAuto {
     private PathPlannerPath followPath;
 
     @Override
@@ -19,8 +21,6 @@ public class L4 extends GenericAuto {
         pathNames.add("L4Backup");
         addAutos();
 
-        // Set pos based on limelight and MT1, we may wanna have set pose starts instead
-        // TODO: since you tested in simulator without these commands actually running (these are commands not functions) and it worked, I won't touch it
         setStartingPosition(centerStartingPosition);
 
         new InstantCommand(() -> {
@@ -29,18 +29,24 @@ public class L4 extends GenericAuto {
             System.out.println(followPath.name);
             AutoBuilder.followPath(followPath).schedule();
             System.out.println("Started first path");
-        }).andThen(new ReefPresetTo(Level.L4)).andThen(endEffector.toggleIntakeCoral())
-            .andThen(Commands.waitSeconds(3.5)).andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(2))
-            .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(2)).andThen(endEffector.turnOff())
-            .andThen(new InstantCommand(() ->
+        }).andThen(new ReefPresetTo(Level.L4)).andThen(endEffector.toggleIntakeCoral()).andThen(Commands.waitSeconds(2.5))
+            .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(2))
+            .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(0.75))
+            .andThen(endEffector.turnOff()).andThen(new InstantCommand(() ->
             {
                 System.out.println("Ended scoring coral.");
                 followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
                 System.out.println(followPath.name);
                 AutoBuilder.followPath(followPath).schedule();
+                new DealgaePresetTo(false).schedule();
+            })).andThen(Commands.waitSeconds(1.3)).andThen(endEffector.toggleIntakeAlgae())
+            .andThen(new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)).andThen(Commands.waitSeconds(1)).andThen(() -> {
+                followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+                System.out.println(followPath.name);
+                AutoBuilder.followPath(followPath).schedule();
                 superstructure.stow().schedule();
-                System.out.println("Ending auto.");
-            })).schedule();
+                endEffector.turnOff().schedule();
+            }).schedule();
     }
 
     @Override

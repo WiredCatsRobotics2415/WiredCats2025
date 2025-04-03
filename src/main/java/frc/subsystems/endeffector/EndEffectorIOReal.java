@@ -37,6 +37,6 @@ public class EndEffectorIOReal implements EndEffectorIO {
     @Override
     public void setVoltage(double volts) {
         appliedVolts = volts;
-        motor.set(volts);
+        motor.setVoltage(volts);
     }
 }
