@@ -147,12 +147,12 @@ public class Controls {
                 System.out.println("    Last Level: " + ReefPresetTo.getLastLevelSet().toString());
                 System.out.println("    Last Side: " + AlignToReef.getLastSetSide().toString());
                 System.out.println("    Tag ID: " + AlignToReef.getLastApriltagIdAlignedTo());
-                double xDiff = Math.abs(current.getX() - lastAlignment.getX());
-                double yDiff = Math.abs(current.getY() - lastAlignment.getY());
+                double xDiff = Units.metersToInches(lastAlignment.getX() - current.getX());
+                double yDiff = Units.metersToInches(current.getY() - lastAlignment.getY());
                 double rotDiff = current.getRotation().minus(lastAlignment.getRotation()).getDegrees();
                 // if (rotDiff > 90) rotDiff = 180 - rotDiff;
-                System.out.println("    X (m): " + xDiff);
-                System.out.println("    Y (m): " + yDiff);
+                System.out.println("    X (in): " + xDiff);
+                System.out.println("    Y (in): " + yDiff);
                 System.out.println("    R (deg): " + rotDiff);
                 System.out.println(
                     "(these do not include bumper offsets, so you can put these numbers directly into a transform2d)");
@@ -161,6 +161,7 @@ public class Controls {
                 if (doAdjustAlignmentProfile) {
                     if (AlignToReef.getLastSetSide().equals(Side.Left)) {
                         AlignToReef.getLeftOffset().set(AlignToReef.getLeftOffset().get() + yDiff);
+                        AlignToReef.getLeftAlignRotation().set(AlignToReef.getLeftAlignRotation().get() + rotDiff);
                         if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
                             Presets.Level4DriveOffset.set(Presets.Level4DriveOffset.get() + xDiff);
                         } else {
@@ -169,6 +170,7 @@ public class Controls {
                         }
                     } else {
                         AlignToReef.getRightOffset().set(AlignToReef.getRightOffset().get() + yDiff);
+                        AlignToReef.getRightAlignRotation().set(AlignToReef.getRightAlignRotation().get() + rotDiff);
                         if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
                             Presets.Level4DriveOffset.set(Presets.Level4DriveOffset.get() + xDiff);
                         } else {
