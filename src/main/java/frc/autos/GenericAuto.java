@@ -29,6 +29,10 @@ public class GenericAuto extends Command {
     private final TuneableBoolean setStartingPositionSetting = new TuneableBoolean(true, "AutoSetStartingPosition");
     protected final AllianceDependent<Pose2d> centerStartingPosition = new AllianceDependent<Pose2d>(
         new Pose2d(7.319, 3.910, Rotation2d.k180deg), new Pose2d(10.44, 4.16, Rotation2d.kZero));
+    protected final AllianceDependent<Pose2d> leftStartingPosition = new AllianceDependent<Pose2d>(
+        new Pose2d(7.299, 6.154, Rotation2d.kZero), new Pose2d(10.231, 1.876, Rotation2d.k180deg));
+    protected final AllianceDependent<Pose2d> rightStartingPosition = new AllianceDependent<Pose2d>(
+        new Pose2d(7.299, 1.876, Rotation2d.kZero), new Pose2d(10.231, 6.154, Rotation2d.k180deg));
 
     protected void addAutos() {
         for (String name : pathNames) {

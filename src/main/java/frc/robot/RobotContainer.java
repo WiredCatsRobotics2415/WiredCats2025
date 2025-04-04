@@ -117,6 +117,7 @@ public class RobotContainer {
         NamedCommands.registerCommand("L3", new ReefPresetTo(Level.L3));
         NamedCommands.registerCommand("L2", new ReefPresetTo(Level.L2));
         NamedCommands.registerCommand("L1", new ReefPresetTo(Level.L1));
+        NamedCommands.registerCommand("Stow", superstructure.stow());
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
         NamedCommands.registerCommand("GroundIntake", superstructure.beThereAsap(Presets.GroundIntake, false, false)
             .alongWith(endEffector.intakeAndWaitForCoral()));
@@ -147,6 +148,8 @@ public class RobotContainer {
         autoChooser.addOption("CustomCtoRHPS", new CtoRHPS());
         autoChooser.addOption("CtoRGround", new CtoRGround());
         autoChooser.addOption("L4AndDealgae", new L4AndDealgae());
+        // autoChooser.addOption("LeftL2", new LeftL2());
+        // autoChooser.addOption("RightL2", new RightL2());
     }
 
     public void teleopEnable() {

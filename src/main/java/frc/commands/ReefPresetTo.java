@@ -1,7 +1,9 @@
 package frc.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
+import frc.robot.Robot;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.superstructure.SuperStructure;
@@ -19,6 +21,7 @@ public class ReefPresetTo extends Command {
     private TuneableSuperStructureState superStructureState;
     private Command superStructureCommand;
     private Level thisLevel;
+    private Timer simFinishTimer;
 
     public ReefPresetTo(Level reefLevel) {
         thisLevel = reefLevel;
@@ -52,13 +55,23 @@ public class ReefPresetTo extends Command {
         lastLevelSet = thisLevel;
 
         RobotStatus.setRobotState(RobotState.AligningToScoreCoral);
+        if (Robot.isSimulation()) {
+            simFinishTimer.start();
+        }
     }
 
     @Override
-    public boolean isFinished() { return superStructure.doneWithMovement() || superStructureCommand.isScheduled(); }
+    public boolean isFinished() { 
+        if (Robot.isSimulation()) {
+            return simFinishTimer.hasElapsed(1);
+        }
+        return superStructure.doneWithMovement() || superStructureCommand.isScheduled();
+    }
 
     @Override
     public void end(boolean interrupted) {
+        simFinishTimer.stop();
+        simFinishTimer.reset();
         System.out.println("ReefPresetTo is finished, interrupted: " + interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
