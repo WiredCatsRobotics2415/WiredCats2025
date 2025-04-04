@@ -19,6 +19,7 @@ import frc.autos.CtoRHPS;
 import frc.autos.GenericAuto;
 import frc.autos.L4;
 import frc.autos.L4AndDealgae;
+import frc.autos.RightL2;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
 import frc.commands.AlignToReef;
@@ -149,7 +150,7 @@ public class RobotContainer {
         autoChooser.addOption("CtoRGround", new CtoRGround());
         autoChooser.addOption("L4AndDealgae", new L4AndDealgae());
         // autoChooser.addOption("LeftL2", new LeftL2());
-        // autoChooser.addOption("RightL2", new RightL2());
+        autoChooser.addOption("CustomRightL2", new RightL2());
     }
 
     public void teleopEnable() {

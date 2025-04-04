@@ -12,7 +12,7 @@ import lombok.Getter;
 
 public class ReefPresetTo extends Command {
     public static enum Level {
-        L1, L2, L3, L4,
+        L1, L2, L3, L4, L2Scoring
     }
 
     @Getter private static Level lastLevelSet = Level.L1;
@@ -21,7 +21,7 @@ public class ReefPresetTo extends Command {
     private TuneableSuperStructureState superStructureState;
     private Command superStructureCommand;
     private Level thisLevel;
-    private Timer simFinishTimer;
+    private Timer simFinishTimer = new Timer();
 
     public ReefPresetTo(Level reefLevel) {
         thisLevel = reefLevel;
@@ -37,6 +37,9 @@ public class ReefPresetTo extends Command {
                 break;
             case L4:
                 superStructureState = Presets.Level4;
+                break;
+            case L2Scoring:
+                superStructureState = Presets.Level2Scoring;
                 break;
             default:
                 superStructureState = Presets.Level1;
@@ -61,7 +64,7 @@ public class ReefPresetTo extends Command {
     }
 
     @Override
-    public boolean isFinished() { 
+    public boolean isFinished() {
         if (Robot.isSimulation()) {
             return simFinishTimer.hasElapsed(1);
         }
@@ -70,8 +73,10 @@ public class ReefPresetTo extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        simFinishTimer.stop();
-        simFinishTimer.reset();
+        if (Robot.isSimulation()) {
+            simFinishTimer.stop();
+            simFinishTimer.reset();
+        }
         System.out.println("ReefPresetTo is finished, interrupted: " + interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }

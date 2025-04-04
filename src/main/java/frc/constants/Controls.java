@@ -83,10 +83,10 @@ public class Controls {
             Degrees.of(179.3), "Level1");
         public static final TuneableNumber Level1DriveOffset = new TuneableNumber(13, "Presets/L1Offset");
 
-        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(54.8),
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(56.5),
             Degrees.of(180.6), "Level2");
-        // public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(49.7),
-        // Degrees.of(1), "Level2");
+        public static final TuneableSuperStructureState Level2Scoring = new TuneableSuperStructureState(Inches.of(56.5),
+            Degrees.of(1), "Level2Scoring");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(12, "Presets/L2Offset");
 
         public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(63),

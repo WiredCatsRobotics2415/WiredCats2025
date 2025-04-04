@@ -19,16 +19,14 @@ public class RightL2 extends GenericAuto {
         System.out.println(followPath.name);
         AutoBuilder.followPath(followPath).schedule();
         System.out.println("Started first path");
-    }).andThen(new ReefPresetTo(Level.L2)).andThen(endEffector.toggleIntakeCoral()).andThen(Commands.waitSeconds(1.5))
-        .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(1.5))
-        .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1)).andThen(endEffector.turnOff())
-        .andThen(new InstantCommand(() ->
+    }).andThen(new ReefPresetTo(Level.L2Scoring)).andThen(Commands.waitSeconds(1.5)).andThen(new AlignToReef(Side.Left))
+        .andThen(Commands.waitSeconds(1.5)).andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1))
+        .andThen(endEffector.turnOff()).andThen(new InstantCommand(() ->
         {
             System.out.println("Ended scoring coral.");
             followPath = paths.stream().filter(path -> path.name.equals("RightL2End")).findFirst().orElse(null);
             System.out.println(followPath.name);
             AutoBuilder.followPath(followPath).schedule();
-            new ReefPresetTo(Level.L3).schedule();
             Commands.waitSeconds(1);
             superstructure.stow().schedule();
             System.out.println("Ending auto.");

@@ -19,8 +19,8 @@ public class LeftL2 extends GenericAuto {
         System.out.println(followPath.name);
         AutoBuilder.followPath(followPath).schedule();
         System.out.println("Started first path");
-    }).andThen(new ReefPresetTo(Level.L2)).andThen(endEffector.toggleIntakeCoral()).andThen(Commands.waitSeconds(1.5))
-        .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(1.5))
+    }).andThen(new ReefPresetTo(Level.L2Scoring)).andThen(endEffector.toggleIntakeCoral())
+        .andThen(Commands.waitSeconds(1.5)).andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(1.5))
         .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1)).andThen(endEffector.turnOff())
         .andThen(new InstantCommand(() ->
         {
