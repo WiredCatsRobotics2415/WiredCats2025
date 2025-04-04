@@ -2,8 +2,20 @@ package frc.constants;
 
 import static edu.wpi.first.units.Units.*;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import frc.commands.AlignToReef;
+import frc.commands.AlignToReef.Side;
+import frc.commands.AlignmentHelpers;
+import frc.commands.ReefPresetTo;
+import frc.commands.ReefPresetTo.Level;
 import frc.constants.Subsystems.CoralIntakeConstants;
+import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.superstructure.TuneableSuperStructureState;
 import frc.utils.tuning.TuneableNumber;
 
@@ -65,12 +77,16 @@ public class Controls {
             Degrees.of(179), Degrees.of(CoralIntakeConstants.GroundAngle.get()), "GroundIntakeUp");
 
         // Positive: coral scoring side
-        public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(28),
-            Degrees.of(-20), "Level1");
+        // public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(44.5),
+        // Degrees.of(-20), "Level1");
+        public static final TuneableSuperStructureState Level1 = new TuneableSuperStructureState(Inches.of(43.3),
+            Degrees.of(179.3), "Level1");
         public static final TuneableNumber Level1DriveOffset = new TuneableNumber(13, "Presets/L1Offset");
 
-        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(49.7),
-            Degrees.of(1), "Level2");
+        public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(54.8),
+            Degrees.of(180.6), "Level2");
+        // public static final TuneableSuperStructureState Level2 = new TuneableSuperStructureState(Inches.of(49.7),
+        // Degrees.of(1), "Level2");
         public static final TuneableNumber Level2DriveOffset = new TuneableNumber(12, "Presets/L2Offset");
 
         public static final TuneableSuperStructureState Level3 = new TuneableSuperStructureState(Inches.of(63),
@@ -79,7 +95,7 @@ public class Controls {
 
         public static final TuneableSuperStructureState Level4 = new TuneableSuperStructureState(Inches.of(78.2),
             Degrees.of(-19), "Level4");
-        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(16, "Presets/L4Offset");
+        public static final TuneableNumber Level4DriveOffset = new TuneableNumber(15.7, "Presets/L4Offset");
 
         public static final TuneableSuperStructureState BottomDeAlgae = new TuneableSuperStructureState(Inches.of(37.5),
             Degrees.of(41), "BottomDeAlgae");
@@ -107,5 +123,61 @@ public class Controls {
 
         public static final TuneableSuperStructureState StackIntakeAlgae = new TuneableSuperStructureState(
             Inches.of(27), Degrees.of(17.675), "StackIntakeAlgae");
+    }
+
+    public class AlignmentProfiles {
+        public static Transform2d LeftAlignmentL4 = new Transform2d(-0.35555, Units.inchesToMeters(5.4),
+            Rotation2d.fromDegrees(5.5));
+        public static Transform2d RightAlignmentL4 = new Transform2d(
+            AlignmentHelpers.CenterToBumper.plus(Inches.of(14)).times(-1).in(Meters), Units.inchesToMeters(-2.5),
+            Rotation2d.fromDegrees(4));
+        public static Transform2d LeftAlignmentL2L3 = new Transform2d(
+            AlignmentHelpers.CenterToBumper.plus(Inches.of(12)).times(-1).in(Meters), Units.inchesToMeters(5.4),
+            Rotation2d.fromDegrees(5.5));
+        public static Transform2d RightAlignmentL2L3 = new Transform2d(0.7098, 0.1365,
+            Rotation2d.fromDegrees(179.99999));
+
+        public static final Command takeSnapshot(boolean doAdjustAlignmentProfile) {
+            return Commands.runOnce(() -> {
+                Pose2d lastAlignment = AlignToReef.getLastAlignment();
+                Pose2d current = CommandSwerveDrivetrain.getInstance().getState().Pose;
+                if (AlignToReef.getLastSetSide() == null || ReefPresetTo.getLastLevelSet() == null) return;
+                System.out.println("---------------------------");
+                System.out.println("SNAPSHOT: ");
+                System.out.println("    Last Level: " + ReefPresetTo.getLastLevelSet().toString());
+                System.out.println("    Last Side: " + AlignToReef.getLastSetSide().toString());
+                System.out.println("    Tag ID: " + AlignToReef.getLastApriltagIdAlignedTo());
+                double xDiff = Math.abs(current.getX() - lastAlignment.getX());
+                double yDiff = Math.abs(current.getY() - lastAlignment.getY());
+                double rotDiff = current.getRotation().minus(lastAlignment.getRotation()).getDegrees();
+                // if (rotDiff > 90) rotDiff = 180 - rotDiff;
+                System.out.println("    X (m): " + xDiff);
+                System.out.println("    Y (m): " + yDiff);
+                System.out.println("    R (deg): " + rotDiff);
+                System.out.println(
+                    "(these do not include bumper offsets, so you can put these numbers directly into a transform2d)");
+                System.out.println("---------------------------");
+
+                if (doAdjustAlignmentProfile) {
+                    if (AlignToReef.getLastSetSide().equals(Side.Left)) {
+                        AlignToReef.getLeftOffset().set(AlignToReef.getLeftOffset().get() + yDiff);
+                        if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
+                            Presets.Level4DriveOffset.set(Presets.Level4DriveOffset.get() + xDiff);
+                        } else {
+                            Presets.Level3DriveOffset.set(Presets.Level3DriveOffset.get() + xDiff);
+                            Presets.Level2DriveOffset.set(Presets.Level2DriveOffset.get() + xDiff);
+                        }
+                    } else {
+                        AlignToReef.getRightOffset().set(AlignToReef.getRightOffset().get() + yDiff);
+                        if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
+                            Presets.Level4DriveOffset.set(Presets.Level4DriveOffset.get() + xDiff);
+                        } else {
+                            Presets.Level3DriveOffset.set(Presets.Level3DriveOffset.get() + xDiff);
+                            Presets.Level2DriveOffset.set(Presets.Level2DriveOffset.get() + xDiff);
+                        }
+                    }
+                }
+            });
+        }
     }
 }

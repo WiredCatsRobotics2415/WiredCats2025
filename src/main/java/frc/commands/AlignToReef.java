@@ -8,6 +8,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.commands.ReefPresetTo.Level;
+import frc.constants.Controls.AlignmentProfiles;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
@@ -28,18 +30,21 @@ public class AlignToReef extends Command {
     }
 
     @Getter private static Pose2d lastApriltagAlignedTo;
+    @Getter private static Pose2d lastAlignment;
     @Getter private static int lastApriltagIdAlignedTo;
 
-    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(5.4, "AlignToReef/LeftOffset");
-    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(2.5, "AlignToReef/RightOffset");
+    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(7.1, "AlignToReef/LeftOffset");
+    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(2.4, "AlignToReef/RightOffset");
     @Getter private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
     @Getter private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5,
         "AlignToReef/LeftAlignRotation");
     @Getter private static final TuneableNumber RightAlignRotation = new TuneableNumber(4,
         "AlignToReef/RightAlignRotation");
+    @Getter private static Side lastSetSide;
 
     private TuneableNumber constructorGoalDriveOffset;
     private Face constructorFace;
+    private boolean useProfiles;
 
     private TuneableNumber goalDriveOffset;
     private Side side;
@@ -61,6 +66,11 @@ public class AlignToReef extends Command {
     public AlignToReef(Side side, Face face) {
         this.side = side;
         this.constructorFace = face;
+    }
+
+    public AlignToReef(Side side, boolean useProfiles) {
+        this.useProfiles = useProfiles;
+        this.side = side;
     }
 
     /**
@@ -176,7 +186,28 @@ public class AlignToReef extends Command {
         }
         System.out.println("offset x: " + offset.getX() + ", y: " + offset.getY());
 
+        if (useProfiles) {
+            System.out.println("USING ALIGNMENT");
+            // offset = ReefPresetTo.getLastLevelSet().equals(Level.L4) ? constructorL4Alignment
+            // : constructorGeneralAlignment;
+            if (side.equals(Side.Left)) {
+                if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
+                    offset = AlignmentProfiles.LeftAlignmentL4;
+                } else {
+                    offset = AlignmentProfiles.LeftAlignmentL2L3;
+                }
+            } else {
+                if (ReefPresetTo.getLastLevelSet().equals(Level.L4)) {
+                    offset = AlignmentProfiles.RightAlignmentL4;
+                } else {
+                    offset = AlignmentProfiles.RightAlignmentL2L3;
+                }
+            }
+        }
+        lastSetSide = side;
+
         Pose2d driveTo = apriltagPose.plus(offset);
+        lastAlignment = driveTo;
         System.out.println("offset distance: " + driveTo.getTranslation().getDistance(offset.getTranslation()));
         driveCommand = AlignmentHelpers.drive.driveTo(driveTo, DriveTolerance.meters());
         driveCommand.schedule();

@@ -28,6 +28,7 @@ import frc.commands.InBargeZoneAlert;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
 import frc.constants.Controls;
+import frc.constants.Controls.AlignmentProfiles;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.DriveConstants;
@@ -82,6 +83,8 @@ public class RobotContainer {
 
     private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(10);
     private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);
+    // private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left, true).withTimeout(10);
+    // private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right, true).withTimeout(10);
     private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(10);
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(10);
     private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)
@@ -283,12 +286,14 @@ public class RobotContainer {
 
         oi.binds.get(OI.Bind.GroundPound).onTrue(Commands.runOnce(() -> {
             elevator.setVoltageOverride(true);
-            elevator.getIo().setVoltage(2);
-        }, elevator).andThen(Commands.waitSeconds(0.5)).andThen(Commands.runOnce(() -> {
-            elevator.getIo().setVoltage(-1.5);
-        }, elevator)).andThen(Commands.waitSeconds(0.75)).andThen(Commands.runOnce(() -> {
+            elevator.getIo().setVoltage(elevator.getVoltageHighClamp().get());
+        }, elevator).andThen(Commands.waitSeconds(0.75)).andThen(Commands.runOnce(() -> {
+            elevator.getIo().setVoltage(elevator.getVoltageLowClamp().get());
+        }, elevator)).andThen(Commands.waitSeconds(0.5)).andThen(Commands.runOnce(() -> {
             elevator.setVoltageOverride(false);
         }, elevator)));
+
+        oi.binds.get(OI.Bind.LeftDPad).onTrue(AlignmentProfiles.takeSnapshot(true));
     }
 
     private Command changeAlignTarget(AligningTo target) {

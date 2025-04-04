@@ -44,6 +44,10 @@ public class ReefPresetTo extends Command {
     @Override
     public void initialize() {
         superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState, false, false);
+        if (thisLevel.equals(Level.L1)) {
+            superStructureCommand = superStructure.beThereAsap(Presets.Level2, false, false)
+                .andThen(superStructure.beThereAsapNoEnd(Presets.Level1, false, false));
+        }
         superStructureCommand.schedule();
         lastLevelSet = thisLevel;
 

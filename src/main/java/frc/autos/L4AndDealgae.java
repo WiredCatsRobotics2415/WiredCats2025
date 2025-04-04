@@ -34,7 +34,7 @@ public class L4AndDealgae extends GenericAuto {
             new DealgaePresetTo(false).schedule();
         })).andThen(Commands.waitSeconds(1.3)).andThen(endEffector.toggleIntakeAlgae())
         .andThen(new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)).andThen(new Dealgae())
-        .andThen(Commands.waitSeconds(0.5)).andThen(() ->
+        .andThen(Commands.waitUntil(endEffector::algaeSensorTrigger)).andThen(() ->
         {
             followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
             System.out.println(followPath.name);

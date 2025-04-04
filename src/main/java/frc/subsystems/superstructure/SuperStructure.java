@@ -56,7 +56,7 @@ public class SuperStructure extends SubsystemBase {
     private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.8, "SuperStructure/pctOfDriveAccelX");
     private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.8, "SuperStructure/pctOfDriveAccelY");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(55, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(65, "SuperStructure/swingThroughMinHeight");
     private TuneableNumber algaeSwingThroughMinHeight = new TuneableNumber(70,
         "SuperStructure/algaeSwingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,

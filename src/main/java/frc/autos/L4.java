@@ -28,6 +28,8 @@ public class L4 extends GenericAuto {
             followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
             System.out.println(followPath.name);
             AutoBuilder.followPath(followPath).schedule();
+            new ReefPresetTo(Level.L3).schedule();
+            Commands.waitSeconds(1);
             superstructure.stow().schedule();
             System.out.println("Ending auto.");
         }));

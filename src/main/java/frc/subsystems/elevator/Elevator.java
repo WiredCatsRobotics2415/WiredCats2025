@@ -40,6 +40,9 @@ public class Elevator extends SubsystemBase {
     @Getter
     @Setter private boolean voltageOverride = false;
 
+    @Getter private TuneableNumber voltageLowClamp = new TuneableNumber(-1.75, "Elevator/voltageLowClamp");
+    @Getter private TuneableNumber voltageHighClamp = new TuneableNumber(4.5, "Elevator/voltageHighClamp");
+
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
         pid.setTolerance(ElevatorConstants.BaseGoalTolerance);
@@ -96,7 +99,7 @@ public class Elevator extends SubsystemBase {
         }
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
-        voltOut = MathUtil.clamp(voltOut, -1.25, 3);
+        voltOut = MathUtil.clamp(voltOut, voltageLowClamp.get(), voltageHighClamp.get());
         io.setVoltage(voltOut);
     }
 

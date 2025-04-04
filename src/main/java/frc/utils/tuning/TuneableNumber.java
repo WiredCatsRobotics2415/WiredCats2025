@@ -81,8 +81,8 @@ public class TuneableNumber {
     }
 
     public void set(double newNumber) {
+        previousNumber = newNumber;
         if (RuntimeConstants.TuningMode) {
-            previousNumber = newNumber;
             thisNetworkNumber.set(newNumber);
         }
     }
