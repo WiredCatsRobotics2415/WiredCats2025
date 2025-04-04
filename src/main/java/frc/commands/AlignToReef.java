@@ -1,6 +1,5 @@
 package frc.commands;
 
-import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Meters;
 
 import edu.wpi.first.math.Pair;
@@ -29,9 +28,10 @@ public class AlignToReef extends Command {
     }
 
     @Getter private static Pose2d lastApriltagAlignedTo;
+    @Getter private static int lastApriltagIdAlignedTo;
 
-    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(7.7, "AlignToReef/LeftOffset");
-    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(3.5, "AlignToReef/RightOffset");
+    @Getter private static final TuneableNumber LeftOffset = new TuneableNumber(5.4, "AlignToReef/LeftOffset");
+    @Getter private static final TuneableNumber RightOffset = new TuneableNumber(2.5, "AlignToReef/RightOffset");
     @Getter private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
     @Getter private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5,
         "AlignToReef/LeftAlignRotation");
@@ -118,23 +118,29 @@ public class AlignToReef extends Command {
             }
         }
         lastApriltagAlignedTo = apriltagPose;
+        lastApriltagIdAlignedTo = apriltagId;
         Distance leftOffsetMeters = AlignToReef.LeftOffset.distance(),
             rightOffsetMeters = AlignToReef.RightOffset.distance();
         if (constructorGoalDriveOffset == null) {
             switch (ReefPresetTo.getLastLevelSet()) {
                 case L1:
+                    System.out.println("L1 set");
                     goalDriveOffset = Presets.Level1DriveOffset;
                     break;
                 case L2:
+                    System.out.println("L2 set");
                     goalDriveOffset = Presets.Level2DriveOffset;
                     break;
                 case L3:
+                    System.out.println("L3 set");
                     goalDriveOffset = Presets.Level3DriveOffset;
                     break;
                 case L4:
+                    System.out.println("L4 set");
                     goalDriveOffset = Presets.Level4DriveOffset;
                     break;
                 default:
+                    System.out.println("L4 set default");
                     goalDriveOffset = Presets.Level1DriveOffset;
                     break;
             }
@@ -142,7 +148,6 @@ public class AlignToReef extends Command {
             goalDriveOffset = constructorGoalDriveOffset;
         }
         System.out.println("goal drive offset (in): " + goalDriveOffset.get());
-        System.out.println(AlignmentHelpers.CenterToBumper.in(Inches));
         Transform2d leftOffset = new Transform2d(
             AlignmentHelpers.CenterToBumper.plus(goalDriveOffset.distance()).times(-1).in(Meters),
             leftOffsetMeters.in(Meters), Rotation2d.kZero.plus(LeftAlignRotation.rotation()));
@@ -172,6 +177,7 @@ public class AlignToReef extends Command {
         System.out.println("offset x: " + offset.getX() + ", y: " + offset.getY());
 
         Pose2d driveTo = apriltagPose.plus(offset);
+        System.out.println("offset distance: " + driveTo.getTranslation().getDistance(offset.getTranslation()));
         driveCommand = AlignmentHelpers.drive.driveTo(driveTo, DriveTolerance.meters());
         driveCommand.schedule();
 
@@ -182,6 +188,7 @@ public class AlignToReef extends Command {
     @Override
     public void execute() {
         Logger.recordOutput("AlignToReef/SelectedApriltagPose", lastApriltagAlignedTo);
+        Logger.recordOutput("AlignToReef/LevelSelection", ReefPresetTo.getLastLevelSet());
     }
 
     @Override
@@ -191,7 +198,7 @@ public class AlignToReef extends Command {
     public void end(boolean interrupted) {
         focusCommand.cancel();
         driveCommand.cancel();
-        System.out.println("alignment to reef is DONE");
+        System.out.println("alignment to reef is DONE, interrupted: " + interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }
 }

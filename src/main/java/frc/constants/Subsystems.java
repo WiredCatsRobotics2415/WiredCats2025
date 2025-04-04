@@ -24,7 +24,7 @@ public class Subsystems {
     public class VisionConstants {
         public static final String FrontLeftName = "limelight-left";
         public static final String FrontRightName = "limelight-right";
-        public static final String BackCenterName = "limelight";
+        public static final String BackCenterName = "limelight-back";
         public static final String EndEffectorName = "limelight-end";
 
         public static final String[] PoseEstimationLLNames = new String[] { FrontRightName, FrontLeftName,
@@ -161,7 +161,7 @@ public class Subsystems {
         public static final int MotorID = 12;
         public static final int IRSensorPort = 2;
 
-        public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-4, "EndEffector/IntakeCoralVolts");
+        public static final TuneableNumber IntakeCoralVolts = new TuneableNumber(-10, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber IntakeAlgaeVolts = new TuneableNumber(10, "EndEffector/IntakeAlgaeVolts");
         public static final TuneableNumber HoldCoralVolts = new TuneableNumber(-1.5, "EndEffector/IntakeCoralVolts");
         public static final TuneableNumber HoldAlgaeVolts = new TuneableNumber(7, "EndEffector/IntakeAlgaeVolts");
@@ -169,7 +169,7 @@ public class Subsystems {
         public static final TuneableNumber OuttakeAlageVolts = new TuneableNumber(-12, "EndEffector/OuttakeAlageVolts");
 
         public static final TuneableNumber IRThreshold = new TuneableNumber(100, "EndEffector/IRThreshold"); // (2/14) copied from akit2024
-        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(25,
+        public static final TuneableNumber AlgaeIntookCameraThreshold = new TuneableNumber(40,
             "EndEffector/AlgaeIntookCameraThreshold");
 
         public static final TuneableNumber TorqueMonitorJumpThreshold = new TuneableNumber(6,
@@ -223,8 +223,8 @@ public class Subsystems {
         public static final TuneableNumber StowAccelerationMax = new TuneableNumber(360,
             "CoralIntake/StowAccelerationMax");
 
-        public static final TuneableNumber IntakeVolts = new TuneableNumber(-10, "CoralIntake/IntakeVolts");
-        public static final TuneableNumber OuttakeVolts = new TuneableNumber(10, "CoralIntake/OuttakeVolts");
+        public static final TuneableNumber IntakeVolts = new TuneableNumber(-12.2, "CoralIntake/IntakeVolts");
+        public static final TuneableNumber OuttakeVolts = new TuneableNumber(12.2, "CoralIntake/OuttakeVolts");
 
         public static final TuneableNumber MaxAngle = new TuneableNumber(90, "CoralIntake/StowAngle");
         public static final TuneableNumber StowAngle = new TuneableNumber(84, "CoralIntake/StowAngle");

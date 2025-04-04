@@ -16,6 +16,7 @@ import frc.utils.tuning.TuneableNumber;
 import frc.utils.tuning.TuneableProfiledPIDController;
 import frc.utils.tuning.TuningModeTab;
 import lombok.Getter;
+import lombok.Setter;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -35,6 +36,9 @@ public class Elevator extends SubsystemBase {
     @Getter private ElevatorIO io;
     private ElevatorIOInputsAutoLogged inputs = new ElevatorIOInputsAutoLogged();
     private static Elevator instance;
+
+    @Getter
+    @Setter private boolean voltageOverride = false;
 
     private Elevator() {
         io = (ElevatorIO) Util.getIOImplementation(ElevatorIOReal.class, ElevatorIOSim.class, new ElevatorIO() {});
@@ -77,6 +81,7 @@ public class Elevator extends SubsystemBase {
     public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint) {
+        if (voltageOverride) return;
         if (getMeasurement() < noVoltDeadbandHeight.get() && pid.atGoal()) {
             io.setVoltage(0.0d);
             return;
@@ -91,7 +96,7 @@ public class Elevator extends SubsystemBase {
         }
         if (EndEffector.getInstance().hasAlgae()) voltOut += ElevatorConstants.kGForArmWithAlgae.get();
 
-        voltOut = MathUtil.clamp(voltOut, -1, 3);
+        voltOut = MathUtil.clamp(voltOut, -1.25, 3);
         io.setVoltage(voltOut);
     }
 

@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.autos.CtoRGround;
 import frc.autos.CtoRHPS;
+import frc.autos.GenericAuto;
 import frc.autos.L4;
 import frc.autos.L4AndDealgae;
 import frc.commands.AlignToHPS;
@@ -90,6 +91,8 @@ public class RobotContainer {
         "RobotContainer/rawJoyAboveThresholdToCancelAutoAlign");
 
     private boolean manualGroundInakeOnGround = false;
+
+    private int autoChangerCommandLastHC = 0;
 
     private RobotContainer() {
         setupAuto();
@@ -275,11 +278,17 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.ProcessorPreset)
             .onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore, true, true));
         oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure
-            .beThereAsapNoEnd(Presets.GroundIntakeAlgae, false, false).alongWith(endEffector.toggleIntakeAlgae()));
+            .beThereAsapNoEnd(Presets.GroundIntakeAlgae, false, false).alongWith(endEffector.intakeAlgae()));
         oi.binds.get(OI.Bind.BargePreset).onTrue(superstructure.beThereAsapNoEnd(Presets.Barge, true, true));
 
-        oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
-        oi.binds.get(OI.Bind.ClimberBackward).onTrue(climber.runBackward()).onFalse(climber.stop());
+        oi.binds.get(OI.Bind.GroundPound).onTrue(Commands.runOnce(() -> {
+            elevator.setVoltageOverride(true);
+            elevator.getIo().setVoltage(2);
+        }, elevator).andThen(Commands.waitSeconds(0.5)).andThen(Commands.runOnce(() -> {
+            elevator.getIo().setVoltage(-1.5);
+        }, elevator)).andThen(Commands.waitSeconds(0.75)).andThen(Commands.runOnce(() -> {
+            elevator.setVoltageOverride(false);
+        }, elevator)));
     }
 
     private Command changeAlignTarget(AligningTo target) {
@@ -342,6 +351,18 @@ public class RobotContainer {
                 System.out.println("Robot container: canceled auto input");
                 cancelAutoAlignment();
                 runningAutoAlign = false;
+            }
+        }
+
+        Command c = autoChooser.get();
+        if (c != null) {
+            int currentHC = c.hashCode();
+            if (currentHC != autoChangerCommandLastHC) {
+                autoChangerCommandLastHC = currentHC;
+                if (c instanceof GenericAuto) {
+                    System.out.println("Setting auto paths");
+                    ((GenericAuto) c).addPaths();
+                }
             }
         }
 

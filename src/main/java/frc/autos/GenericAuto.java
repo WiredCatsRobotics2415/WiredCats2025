@@ -68,8 +68,10 @@ public class GenericAuto extends Command {
         if (setStartingPositionSetting.get()) drive.resetPose(startingPosition.get());
     }
 
+    public void addPaths() {};
+
     @Override
     public void end(boolean interrupted) {
-        System.out.println("command ended");
+        System.out.println("generic auto command ended");
     }
 }

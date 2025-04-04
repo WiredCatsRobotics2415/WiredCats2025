@@ -18,8 +18,10 @@ public class ReefPresetTo extends Command {
 
     private TuneableSuperStructureState superStructureState;
     private Command superStructureCommand;
+    private Level thisLevel;
 
     public ReefPresetTo(Level reefLevel) {
+        thisLevel = reefLevel;
         switch (reefLevel) {
             case L1:
                 superStructureState = Presets.Level1;
@@ -43,6 +45,7 @@ public class ReefPresetTo extends Command {
     public void initialize() {
         superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState, false, false);
         superStructureCommand.schedule();
+        lastLevelSet = thisLevel;
 
         RobotStatus.setRobotState(RobotState.AligningToScoreCoral);
     }
