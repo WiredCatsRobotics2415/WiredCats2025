@@ -5,12 +5,16 @@
   "pathFolders": [
     "BasicL3",
     "CenterLGround",
-    "LeftSourceSpeaker",
-    "Taxis",
     "CustomAutos",
-    "RightSourceSpeaker"
+    "LeftSourceSpeaker",
+    "old",
+    "RightSourceSpeaker",
+    "Taxis"
   ],
-  "autoFolders": [],
+  "autoFolders": [
+    "fowards",
+    "old"
+  ],
   "defaultMaxVel": 1.25,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
