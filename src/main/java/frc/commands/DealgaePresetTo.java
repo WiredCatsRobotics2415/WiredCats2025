@@ -45,11 +45,11 @@ public class DealgaePresetTo extends Command {
             boolean algaeOnTop = algaeOnTopForPose(AlignToReef.getLastApriltagAlignedTo());
 
             superStructureCommand = SuperStructure.getInstance()
-                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+                .beThereAsapNoEnd(algaeOnTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae, false, false);
             System.out.println("Auto selected top: " + algaeOnTop);
         } else {
             superStructureCommand = superStructure
-                .beThereAsapNoEnd(manualSelectGettingTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae);
+                .beThereAsapNoEnd(manualSelectGettingTop ? Presets.TopDeAlgae : Presets.BottomDeAlgae, false, false);
             System.out.println("Manual selected top: " + manualSelectGettingTop);
         }
         superStructureCommand.schedule();

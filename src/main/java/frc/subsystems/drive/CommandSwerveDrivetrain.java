@@ -45,6 +45,7 @@ import frc.constants.TunerConstants.TunerSwerveDrivetrain;
 import frc.subsystems.vision.Vision;
 import frc.utils.AllianceDependent;
 import frc.utils.LimelightHelpers.PoseEstimate;
+import frc.utils.math.Algebra;
 import frc.utils.math.Statistics;
 import frc.utils.simulation.MapleSimSwerveDrivetrain;
 import frc.utils.tuning.TuneableNumber;
@@ -86,19 +87,21 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     @Getter private TuneableProfiledPIDController driveToPositionYController = new TuneableProfiledPIDController(
         DriveConstants.YTranslationPID,
         new Constraints(DriveConstants.BaseVelocityMax.get(), DriveConstants.BaseYAccelerationMax.get()), "DriveToY");
-    private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(DriveConstants.HeadingkP,
-        DriveConstants.HeadingkI, DriveConstants.HeadingkD);
+    private PhoenixPIDController driveToPositionHeadingController = new PhoenixPIDController(
+        DriveConstants.HeadingkP.get(), DriveConstants.HeadingkI, DriveConstants.HeadingkD.get());
 
     private TuneableNumber resetPoseSamples = new TuneableNumber(40, "Drive/ResetPoseSamples");
 
-    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.7, "Drive/singleTagBaseDistrust");
-    private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(1, "Drive/singleTagDistanceFromCurrent");
-    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(1.3, "Drive/singleTagDistanceFromTag");
-
-    private TuneableNumber headingTolerance = new TuneableNumber(DriveConstants.HeadingTolerance,
-        "Drive/HeadingTolerance");
+    private TuneableNumber singleTagBaseDistrust = new TuneableNumber(0.3, "Drive/singleTagBaseDistrust");
+    private TuneableNumber singleTagDistanceFromCurrent = new TuneableNumber(2, "Drive/singleTagDistanceFromCurrent");
+    private TuneableNumber singleTagDistanceFromTag = new TuneableNumber(6, "Drive/singleTagDistanceFromTag");
+    private TuneableNumber singleTagVelocityMultiplier = new TuneableNumber(0, "Drive/singleTagVelocity");
+    private TuneableNumber singleTagOdometryDistrust = new TuneableNumber(200, "Drive/singleTagOdometryDistrust");
 
     private Pose2d currentAutoDriveTarget = Pose2d.kZero;
+    private double appliedXVelocity = 0.0d;
+    private double appliedYVelocity = 0.0d;
+    private double lastSmallestDistrust = Double.MAX_VALUE;
 
     private VisionPoseFuser poseFuser = new VisionPoseFuser(this);
     private Vision vision = Vision.getInstance();
@@ -123,17 +126,17 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         }
         configureAutoBuilder();
 
-        driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance);
+        driveToPositionHeadingController.setTolerance(DriveConstants.HeadingTolerance.get());
         driveToPositionHeadingController.enableContinuousInput(-Math.PI, Math.PI);
         driveToPositionFacingAngleRequest.HeadingController = driveToPositionHeadingController;
 
-        TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
-            resetPoseFromLimelight().ignoringDisable(true));
-        TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
-            resetRotationFromLimelightMT1().ignoringDisable(true));
-
         if (RuntimeConstants.TuningMode) {
             DriveCharacterization.enable(this);
+
+            TuningModeTab.getInstance().addCommand("Reset Pose from Limelight",
+                resetPoseFromLimelight().ignoringDisable(true));
+            TuningModeTab.getInstance().addCommand("Reset Rotation from MT1",
+                resetRotationFromLimelightMT1().ignoringDisable(true));
 
             DriveConstants.PPTranslationP.addListener(newP -> {
                 DriveConstants.PPTranslationPID = new PIDConstants(newP);
@@ -146,7 +149,13 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
                     DriveConstants.RotationPID);
             });
 
-            headingTolerance.addListener((newTol) -> {
+            DriveConstants.HeadingkP.addListener((newP) -> {
+                driveToPositionHeadingController.setP(newP);
+            });
+            DriveConstants.HeadingkD.addListener((newD) -> {
+                driveToPositionHeadingController.setD(newD);
+            });
+            DriveConstants.HeadingTolerance.addListener((newTol) -> {
                 driveToPositionHeadingController.setTolerance(newTol);
             });
 
@@ -214,19 +223,38 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         SwerveDriveState currentState = getState();
         poseFuser.sendLimelightsOrientation(currentState);
+        double distrust = 0, singleTagDistanceFromCurrentM = 0, singleTagDistanceFromTagM = 0, singleTagVeloCalc = 0;
+        Pose2d singleTagPose = null;
         if (currentPoseEstimationType == PoseEstimationType.SingleTag) {
             PoseEstimate singleTag = vision.getSingleTagPoseEstimate(currentSingleTagLLs, currentSingleTagId);
             if (singleTag != null) {
-                double distrust = singleTagBaseDistrust.get() +
-                    singleTagDistanceFromCurrent.get() *
-                        currentState.Pose.getTranslation().getDistance(singleTag.pose.getTranslation()) +
-                    singleTagDistanceFromTag.get() * singleTag.avgTagDist;
+                singleTagPose = singleTag.pose;
+                singleTagDistanceFromCurrentM = currentState.Pose.getTranslation()
+                    .getDistance(singleTag.pose.getTranslation());
+                singleTagDistanceFromTagM = singleTag.avgTagDist;
+                singleTagVeloCalc = Algebra.euclideanDistance(currentState.Speeds.vxMetersPerSecond,
+                    currentState.Speeds.vyMetersPerSecond);
+
+                distrust = singleTagBaseDistrust.get() +
+                    singleTagDistanceFromCurrent.get() * singleTagDistanceFromCurrentM +
+                    singleTagDistanceFromTag.get() * singleTagDistanceFromTagM +
+                    singleTagVelocityMultiplier.get() * singleTagVeloCalc;
+                lastSmallestDistrust = Math.min(distrust, lastSmallestDistrust);
                 addVisionMeasurement(singleTag.pose, Utils.fpgaToCurrentTime(singleTag.timestampSeconds),
-                    VecBuilder.fill(distrust, distrust, 999999));
+                    VecBuilder.fill(lastSmallestDistrust, lastSmallestDistrust, 999999));
+                this.setVisionMeasurementStdDevs(
+                    VecBuilder.fill(singleTagOdometryDistrust.get(), singleTagOdometryDistrust.get(), 0));
             }
         } else {
             poseFuser.update(currentState);
+            this.setVisionMeasurementStdDevs(VecBuilder.fill(0, 0, 0));
         }
+        Logger.recordOutput("Drive/SingleTagDistrust", distrust);
+        Logger.recordOutput("Drive/SingleTagLastSmallestDistrust", lastSmallestDistrust);
+        Logger.recordOutput("Drive/SingleTagDistanceFromCurrent", singleTagDistanceFromCurrentM);
+        Logger.recordOutput("Drive/SingleTagDistanceFromTag", singleTagDistanceFromTagM);
+        Logger.recordOutput("Drive/SingleTagVelocity", singleTagVeloCalc);
+        Logger.recordOutput("Drive/SingleTagPose", singleTagPose);
 
         Logger.recordOutput("Drive/Pose", currentState.Pose);
         if (mapleSimSwerveDrivetrain != null) Logger.recordOutput("Drive/SimulationPose",
@@ -241,6 +269,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
         Logger.recordOutput("Drive/SingleTagActive", currentPoseEstimationType == PoseEstimationType.SingleTag);
         Logger.recordOutput("Drive/SingleTagId", currentSingleTagId);
+
+        Logger.recordOutput("Drive/AppliedXVelocity", appliedXVelocity);
+        Logger.recordOutput("Drive/AppliedYVelocity", appliedYVelocity);
     }
 
     /**
@@ -248,7 +279,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
      */
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, int tag) {
         return new WaitUntilCommand(() -> vision.nearestTagToAtLeastOneOf(limelights) == tag)
-            .andThen(Commands.run(() ->
+            .andThen(Commands.runOnce(() -> lastSmallestDistrust = Double.MAX_VALUE)).andThen(Commands.run(() ->
             {
                 currentPoseEstimationType = PoseEstimationType.SingleTag;
                 currentSingleTagLLs = limelights;
@@ -260,7 +291,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     public Command focusOnTagWhenSeenTemporarily(LimelightsForElements limelights, AllianceDependent<int[]> tagSet) {
         return new WaitUntilCommand(() -> vision.aLimelightCanSeeOneOf(limelights, tagSet.get()))
-            .andThen(Commands.run(() ->
+            .andThen(Commands.runOnce(() -> lastSmallestDistrust = Double.MAX_VALUE)).andThen(Commands.run(() ->
             {
                 currentPoseEstimationType = PoseEstimationType.SingleTag;
                 currentSingleTagLLs = limelights;
@@ -322,9 +353,11 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             double velocityX = MathUtil.clamp(
                 driveToPositionXController.calculate(currentPose.getX(), allianceCompensatedGoal.getX()), -maxSpeedMS,
                 maxSpeedMS);
+            appliedXVelocity = velocityX;
             double velocityY = MathUtil.clamp(
                 driveToPositionYController.calculate(currentPose.getY(), allianceCompensatedGoal.getY()), -maxSpeedMS,
                 maxSpeedMS);
+            appliedYVelocity = velocityY;
             double allianceCompensation = isBlue ? 1 : -1;
 
             return driveToPositionFacingAngleRequest.withTargetDirection(allianceCompensatedGoal.getRotation())

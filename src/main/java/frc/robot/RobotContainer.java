@@ -7,6 +7,7 @@ import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -15,15 +16,20 @@ import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.autos.CtoRGround;
 import frc.autos.CtoRHPS;
+import frc.autos.GenericAuto;
 import frc.autos.L4;
+import frc.autos.L4AndDealgae;
+import frc.autos.RightL2;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
 import frc.commands.AlignToReef;
 import frc.commands.AlignToReef.Side;
 import frc.commands.DealgaePresetTo;
+import frc.commands.InBargeZoneAlert;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
 import frc.constants.Controls;
+import frc.constants.Controls.AlignmentProfiles;
 import frc.constants.Controls.Presets;
 import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.DriveConstants;
@@ -78,14 +84,19 @@ public class RobotContainer {
 
     private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left).withTimeout(10);
     private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right).withTimeout(10);
+    // private ParallelRaceGroup alignToReefLeft = new AlignToReef(Side.Left, true).withTimeout(10);
+    // private ParallelRaceGroup alignToReefRight = new AlignToReef(Side.Right, true).withTimeout(10);
     private ParallelRaceGroup alignToHPSLeft = new AlignToHPS(HPSSide.Left).withTimeout(10);
     private ParallelRaceGroup alignToHPSRight = new AlignToHPS(HPSSide.Right).withTimeout(10);
-    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center).withTimeout(10);
+    private ParallelRaceGroup alignToReefDealgae = new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)
+        .withTimeout(10);
     private boolean runningAutoAlign = false;
-    private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.25,
+    private TuneableNumber rawJoyAboveThresholdToCancelAutoAlign = new TuneableNumber(0.1,
         "RobotContainer/rawJoyAboveThresholdToCancelAutoAlign");
 
     private boolean manualGroundInakeOnGround = false;
+
+    private int autoChangerCommandLastHC = 0;
 
     private RobotContainer() {
         setupAuto();
@@ -107,11 +118,12 @@ public class RobotContainer {
         NamedCommands.registerCommand("L3", new ReefPresetTo(Level.L3));
         NamedCommands.registerCommand("L2", new ReefPresetTo(Level.L2));
         NamedCommands.registerCommand("L1", new ReefPresetTo(Level.L1));
+        NamedCommands.registerCommand("Stow", superstructure.stow());
         // these are not right... i need to see how exactly we need to move subsystems to do ground and source intake
-        NamedCommands.registerCommand("GroundIntake",
-            superstructure.beThereAsap(Presets.GroundIntake).alongWith(endEffector.intakeAndWaitForCoral()));
-        NamedCommands.registerCommand("SourceIntake",
-            superstructure.beThereAsap(Presets.IntakeFromHPS).alongWith(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("GroundIntake", superstructure.beThereAsap(Presets.GroundIntake, false, false)
+            .alongWith(endEffector.intakeAndWaitForCoral()));
+        NamedCommands.registerCommand("SourceIntake", superstructure.beThereAsap(Presets.IntakeFromHPS, false, false)
+            .alongWith(endEffector.intakeAndWaitForCoral()));
         NamedCommands.registerCommand("FocusPEOnReef",
             drive.focusOnTagWhenSeenTemporarily(LimelightsForElements.Reef, ReefMeasurements.reefIds));
         NamedCommands.registerCommand("SwitchToGlobalPE",
@@ -136,6 +148,9 @@ public class RobotContainer {
         autoChooser.addOption("CustomL4", new L4());
         autoChooser.addOption("CustomCtoRHPS", new CtoRHPS());
         autoChooser.addOption("CtoRGround", new CtoRGround());
+        autoChooser.addOption("L4AndDealgae", new L4AndDealgae());
+        // autoChooser.addOption("LeftL2", new LeftL2());
+        autoChooser.addOption("CustomRightL2", new RightL2());
     }
 
     public void teleopEnable() {
@@ -143,7 +158,8 @@ public class RobotContainer {
     }
 
     private void configureControls() {
-        oi.binds.get(OI.Bind.SeedFieldCentric).onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true));
+        oi.binds.get(OI.Bind.SeedFieldCentric)
+            .onTrue(drive.resetRotationFromLimelightMT1().ignoringDisable(true).withTimeout(1));
 
         drive.setDefaultCommand(drive.applyRequest(() -> {
             if (currentTeleopDriveMode == TeleopDriveMode.MinorAdjustment) {
@@ -183,7 +199,8 @@ public class RobotContainer {
             .onTrue(endEffector.toggleOuttakeCoral().alongWith(CoralIntake.getInstance().toggleOuttake()))
             .onFalse(endEffector.turnOff().alongWith(CoralIntake.getInstance().turnOffRollers()));
         oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleIntakeAlgae());
-        oi.binds.get(OI.Bind.ManualIntake).onTrue(endEffector.toggleIntakeCoral());
+        oi.binds.get(OI.Bind.ManualIntake)
+            .onTrue(endEffector.toggleIntakeCoral().alongWith(CoralIntake.getInstance().toggleIntake()));
         oi.binds.get(OI.Bind.ManualAlgaeShoot).onTrue(endEffector.toggleOuttakeAlgae());
         // In case it should be A intakes coral, outtakes algae and B vice versa...
         // Dealgae is button A:
@@ -192,9 +209,10 @@ public class RobotContainer {
         // Shoot is button B:
         // oi.binds.get(OI.Bind.DeAlgae).onTrue(endEffector.toggleOuttake().alongWith(coralIntake.toggleOuttake())).onFalse(endEffector.turnOff().alongWith(coralIntake.turnOffRollers()));
 
+        // oi.binds.get(OI.Bind.DeStickArm).onTrue(arm.deStuck());
         oi.binds.get(OI.Bind.StowPreset).onTrue(superstructure.stow().ignoringDisable(true));
-        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(
-            superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS).alongWith(changeAlignTarget(AligningTo.HPS)));
+        oi.binds.get(OI.Bind.IntakeFromHPS).onTrue(superstructure.beThereAsapNoEnd(Presets.IntakeFromHPS, false, false)
+            .alongWith(changeAlignTarget(AligningTo.HPS)));
         oi.binds.get(OI.Bind.DealgaePresetTop).onTrue(new DealgaePresetTo(true)
             .alongWith(changeAlignTarget(AligningTo.CenterReefForDealgae)).alongWith(endEffector.toggleIntakeAlgae()));
         oi.binds.get(OI.Bind.DealgaePresetBottom).onTrue(new DealgaePresetTo(false)
@@ -203,6 +221,8 @@ public class RobotContainer {
         oi.binds.get(OI.Bind.L2).onTrue(new ReefPresetTo(Level.L2).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.L3).onTrue(new ReefPresetTo(Level.L3).alongWith(changeAlignTarget(AligningTo.Reef)));
         oi.binds.get(OI.Bind.L4).onTrue(new ReefPresetTo(Level.L4).alongWith(changeAlignTarget(AligningTo.Reef)));
+        oi.binds.get(OI.Bind.StackAlageIntake)
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.StackIntakeAlgae, false, false));
         oi.binds.get(OI.Bind.AutoAlignLeft).onTrue(Commands.runOnce(() -> {
             System.out.println("Left auto align is aligning to: " + currentlyAligningTo);
             switch (currentlyAligningTo) {
@@ -247,22 +267,37 @@ public class RobotContainer {
         // .finallyDo(() -> vision.setEndEffectorPipeline(Vision.EndEffectorPipeline.DriverView)));
 
         oi.binds.get(OI.Bind.AutoIntakeFromGround)
-            .onTrue(new ParallelCommandGroup(superstructure.beThereAsapNoEnd(Presets.GroundIntake),
-                endEffector.intakeCoral(), CoralIntake.getInstance().intake()))
-            .onFalse(new ParallelCommandGroup(superstructure.beThereAsap(Presets.GroundIntakeUp)
-                .andThen(Commands.waitSeconds(0.5)).andThen(superstructure.stow()), endEffector.turnOff(),
-                CoralIntake.getInstance().turnOffRollers()));
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake, false, false).alongWith(Commands.runOnce(() ->
+            {
+                endEffector.intakeCoral().schedule();
+                CoralIntake.getInstance().intake().schedule();
+            })))
+            .onFalse(new ParallelCommandGroup(
+                superstructure.beThereAsap(Presets.GroundIntakeUp, false, false).andThen(Commands.waitSeconds(0.5))
+                    .andThen(superstructure.stow()),
+                endEffector.turnOff(), CoralIntake.getInstance().turnOffRollers()));
 
         // oi.binds.get(OI.Bind.AutoIntakeFromGround)
         // .onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntake).alongWith(Commands.waitSeconds(1))
         // .andThen(CoralIntake.getInstance().toggleIntake()).alongWith(endEffector.toggleIntakeCoral()))
         // .onFalse(superstructure.stow());
 
-        oi.binds.get(OI.Bind.ProcessorPreset).onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore));
-        oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure.beThereAsapNoEnd(Presets.GroundIntakeAlgae));
+        oi.binds.get(OI.Bind.ProcessorPreset)
+            .onTrue(superstructure.beThereAsapNoEnd(Presets.ProcessorScore, true, true));
+        oi.binds.get(OI.Bind.GroundIntakeAlgae).onTrue(superstructure
+            .beThereAsapNoEnd(Presets.GroundIntakeAlgae, false, false).alongWith(endEffector.intakeAlgae()));
+        oi.binds.get(OI.Bind.BargePreset).onTrue(superstructure.beThereAsapNoEnd(Presets.Barge, true, true));
 
-        oi.binds.get(OI.Bind.ClimberForward).onTrue(climber.runForward()).onFalse(climber.stop());
-        oi.binds.get(OI.Bind.ClimberBackward).onTrue(climber.runBackward()).onFalse(climber.stop());
+        oi.binds.get(OI.Bind.GroundPound).onTrue(Commands.runOnce(() -> {
+            elevator.setVoltageOverride(true);
+            elevator.getIo().setVoltage(elevator.getVoltageHighClamp().get());
+        }, elevator).andThen(Commands.waitSeconds(0.75)).andThen(Commands.runOnce(() -> {
+            elevator.getIo().setVoltage(elevator.getVoltageLowClamp().get());
+        }, elevator)).andThen(Commands.waitSeconds(0.5)).andThen(Commands.runOnce(() -> {
+            elevator.setVoltageOverride(false);
+        }, elevator)));
+
+        oi.binds.get(OI.Bind.LeftDPad).onTrue(AlignmentProfiles.takeSnapshot(true));
     }
 
     private Command changeAlignTarget(AligningTo target) {
@@ -303,28 +338,45 @@ public class RobotContainer {
         new Trigger(endEffector::hasCoral)
             .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
         // new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
+
+        new InBargeZoneAlert().schedule();
     }
 
     public void periodic() {
-        // double[] ssLimits = superstructure.recommendedDriveAccelLimits();
+        double[] ssLimits = superstructure.recommendedDriveAccelLimits();
         // driveXLimiter.setRateLimit(ssLimits[0]);
         // driveYLimiter.setRateLimit(ssLimits[1]);
         // driveRotationLimiter.setRateLimit(ssLimits[2]);
 
-        // drive.getDriveToPositionXController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
-        // drive.getDriveToPositionYController()
-        // .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
+        drive.getDriveToPositionXController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[0]));
+        drive.getDriveToPositionYController()
+            .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
 
         if (runningAutoAlign) {
             double[] input = oi.getRawXY();
-            if (input[0] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())
-                || input[1] > Math.abs(rawJoyAboveThresholdToCancelAutoAlign.get())) {
+            if (Math.abs(input[0]) > rawJoyAboveThresholdToCancelAutoAlign.get()
+                || Math.abs(input[1]) > rawJoyAboveThresholdToCancelAutoAlign.get()) {
                 System.out.println("Robot container: canceled auto input");
                 cancelAutoAlignment();
                 runningAutoAlign = false;
             }
         }
+
+        Command c = autoChooser.get();
+        if (c != null) {
+            int currentHC = c.hashCode();
+            if (currentHC != autoChangerCommandLastHC) {
+                autoChangerCommandLastHC = currentHC;
+                if (c instanceof GenericAuto) {
+                    System.out.println("Setting auto paths");
+                    ((GenericAuto) c).addPaths();
+                }
+            }
+        }
+
+        Logger.recordOutput("RobotContainer/TeleopMode", currentTeleopDriveMode.toString());
+        Logger.recordOutput("RobotContainer/AligningTo", currentlyAligningTo.toString());
     }
 
     public Command getAutonomousCommand() { return autoChooser.get(); }

@@ -3,6 +3,7 @@ package frc.utils.tuning;
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
@@ -58,7 +59,6 @@ public class TuneableNumber {
      * Assuming this number is in inches
      */
     public Distance distance() {
-        System.out.println("distance call returns: " + get());
         return Inches.of(get());
     }
 
@@ -73,15 +73,16 @@ public class TuneableNumber {
      * Assuming this number is in degrees
      */
     public Angle angle() {
-        if (this.lastAngle == null) {
-            this.lastAngle = Degrees.of(get());
-        }
-        return lastAngle;
+        return Degrees.of(get());
+    }
+
+    public Rotation2d rotation() {
+        return Rotation2d.fromDegrees(get());
     }
 
     public void set(double newNumber) {
+        previousNumber = newNumber;
         if (RuntimeConstants.TuningMode) {
-            previousNumber = newNumber;
             thisNetworkNumber.set(newNumber);
         }
     }

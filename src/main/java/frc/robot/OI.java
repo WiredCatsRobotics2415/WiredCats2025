@@ -21,7 +21,8 @@ public class OI {
         ManualElevatorUp, ManualElevatorDown, ManualArmBack, ManualArmForward, IntakeFromHPS, IntakeFromGround, L1, L2,
         L3, L4, AutoAlignLeft, AutoAlignRight, DealgaePresetTop, SeedFieldCentric, StowPreset, AutoIntakeFromGround,
         ChangeTeleopMode, ProcessorPreset, BargePreset, Shoot, DeAlgae, ManualIntake, DealgaePresetBottom,
-        ClimberForward, ClimberBackward, GroundIntakeAlgae, ManualAlgaeShoot
+        ClimberForward, ClimberBackward, GroundIntakeAlgae, ManualAlgaeShoot, DeStickArm, StackAlageIntake, GroundPound,
+        LeftDPad
     }
 
     public Map<Bind, Trigger> binds = new HashMap<Bind, Trigger>();
@@ -53,6 +54,7 @@ public class OI {
         binds.put(Bind.ManualIntake, controller.button(GulikitButtons.Y));
         binds.put(Bind.ManualAlgaeShoot, controller.button(GulikitButtons.B));
 
+        binds.put(Bind.DeStickArm, controller.povLeft());
         binds.put(Bind.ChangeTeleopMode, controller.button(GulikitButtons.LeftPaddle));
         binds.put(Bind.AutoIntakeFromGround, controller.button(GulikitButtons.RightPaddle));
 
@@ -70,7 +72,9 @@ public class OI {
         binds.put(Bind.GroundIntakeAlgae, numpad.button(NumpadButtons.Plus));
         binds.put(Bind.BargePreset, numpad.button(NumpadButtons.Asterisk));
         binds.put(Bind.ClimberForward, controller.povUp());
-        binds.put(Bind.ClimberBackward, controller.povDown());
+        binds.put(Bind.GroundPound, controller.povDown());
+        binds.put(Bind.LeftDPad, controller.povLeft());
+        binds.put(Bind.StackAlageIntake, numpad.button(NumpadButtons.Minus));
     }
 
     private double deadbandCompensation(double r) {

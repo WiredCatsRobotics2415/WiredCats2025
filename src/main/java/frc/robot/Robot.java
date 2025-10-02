@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.constants.RuntimeConstants;
+import frc.constants.RuntimeConstants.Mode;
 import frc.robot.RobotStatus.RobotState;
 import frc.utils.AllianceDependent;
 import frc.utils.TorqueSafety;
@@ -57,7 +58,7 @@ public class Robot extends LoggedRobot {
         switch (RuntimeConstants.CurrentMode) {
             case REAL:
                 // Running on a real robot, log to a USB stick ("/U/logs")
-                Logger.addDataReceiver(new WPILOGWriter("/U/logs"));
+                Logger.addDataReceiver(new WPILOGWriter());
                 Logger.addDataReceiver(new NT4Publisher());
                 SignalLogger.setPath("/U/logs");
                 SignalLogger.start();
@@ -66,6 +67,7 @@ public class Robot extends LoggedRobot {
             case SIM:
                 // Running a physics simulator, log to NT
                 SimulationTab.enableSimulationControls();
+                SignalLogger.start();
                 Logger.addDataReceiver(new NT4Publisher());
                 break;
 
@@ -77,7 +79,6 @@ public class Robot extends LoggedRobot {
                 Logger.addDataReceiver(new WPILOGWriter(LogFileUtil.addPathSuffix(logPath, "_sim")));
                 if (!RuntimeConstants.HootFileName.equals("")) {
                     HootReplay.loadFile(RuntimeConstants.HootFileName);
-                    HootReplay.play();
                     System.out.println("Playing replay file " + RuntimeConstants.HootFileName);
                 }
                 break;
@@ -111,6 +112,10 @@ public class Robot extends LoggedRobot {
         CommandScheduler.getInstance().onCommandFinish((Command command) -> logCommandFunction.accept(command, false));
         CommandScheduler.getInstance()
             .onCommandInterrupt((Command command) -> logCommandFunction.accept(command, false));
+
+        if (RuntimeConstants.CurrentMode == Mode.REPLAY && !RuntimeConstants.HootFileName.equals("")) {
+            HootReplay.play();
+        }
     }
 
     @Override

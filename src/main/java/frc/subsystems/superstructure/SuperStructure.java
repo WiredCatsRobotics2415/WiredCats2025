@@ -48,13 +48,17 @@ public class SuperStructure extends SubsystemBase {
     private double cIntakeLength = CoralIntakeConstants.EffectiveLength.in(Inches);
 
     private TuneableNumber percentOfArmAccel = new TuneableNumber(0.2, "SuperStructure/percentOfArmAccel");
-    private TuneableNumber percentOfArmVelo = new TuneableNumber(0.4, "SuperStructure/percentOfArmVelo");
+    private TuneableNumber percentOfArmVeloWhileMoving = new TuneableNumber(0.5,
+        "SuperStructure/percentOfArmVeloWhileMoving");
+    private TuneableNumber percentOfArmVeloWhileHigh = new TuneableNumber(0.5,
+        "SuperStructure/percentOfArmVeloWhileMoving");
 
-    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelX");
-    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.2, "SuperStructure/pctOfDriveAccelY");
-    private TuneableNumber pctOfDriveAccelR = new TuneableNumber(0.35, "SuperStructure/pctOfDriveAccelR");
+    private TuneableNumber pctOfDriveAccelX = new TuneableNumber(0.8, "SuperStructure/pctOfDriveAccelX");
+    private TuneableNumber pctOfDriveAccelY = new TuneableNumber(0.8, "SuperStructure/pctOfDriveAccelY");
 
-    private TuneableNumber swingThroughMinHeight = new TuneableNumber(55, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber swingThroughMinHeight = new TuneableNumber(65, "SuperStructure/swingThroughMinHeight");
+    private TuneableNumber algaeSwingThroughMinHeight = new TuneableNumber(70,
+        "SuperStructure/algaeSwingThroughMinHeight");
     private TuneableNumber frontSideRightBeforeSwingThrough = new TuneableNumber(75,
         "SuperStructure/frontSideRightBeforeSwingThrough");
     private TuneableNumber backSideRightBeforeSwingThrough = new TuneableNumber(100,
@@ -74,6 +78,9 @@ public class SuperStructure extends SubsystemBase {
     private boolean isDone = true;
     private boolean isMovingCoralIntake;
 
+    private double[] limits = new double[2];
+
+    private TuneableSuperStructureState goal = Presets.Stow;
     private static SuperStructure instance;
 
     private SuperStructure() {
@@ -87,10 +94,10 @@ public class SuperStructure extends SubsystemBase {
 
     public Command stow() {
         return this.runOnce(() -> {
-            if (EndEffector.getInstance().hasAlgae()) {
-                beThereAsapNoEnd(Presets.AlgaeStow).schedule();
+            if (EndEffector.getInstance().algaeSensorTrigger()) {
+                beThereAsapNoEnd(Presets.AlgaeStow, true, false).schedule();
             } else {
-                beThereAsapNoEnd(Presets.Stow).schedule();
+                beThereAsapNoEnd(Presets.Stow, false, false).schedule();
             }
         });
     }
@@ -145,8 +152,10 @@ public class SuperStructure extends SubsystemBase {
     /**
      * Returns a command that, when scheduled, schedules a command composition that moves the superstructure to the state. The composition requires all of the superstructure subsystems.
      */
-    public Command beThereAsap(TuneableSuperStructureState goal) {
+    public Command beThereAsap(TuneableSuperStructureState goal, boolean assumeHasAlgaeBefore,
+        boolean assumeNoAlgaeLater) {
         return runOnce(() -> {
+            this.goal = goal;
             Command plannedCommand;
             isDone = false;
             armSwitchingToFrontSide = arm.getMeasurement() > 90 && goal.getArm().get() < 90;
@@ -155,18 +164,15 @@ public class SuperStructure extends SubsystemBase {
             isMovingCoralIntake = !coralIntake.pivotAtGoal();
             if (isMovingCoralIntake) {
                 if (coralIntake.getPid().goalError() >= 0) { // rasing cintake
-                    System.out.println("Cintake stowing");
                     coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.StowVelocityMax.get(),
                         CoralIntakeConstants.StowAccelerationMax.get()));
                 } else {
-                    System.out.println("Cintake slapping down");
                     coralIntake.getPid().setConstraints(new Constraints(CoralIntakeConstants.SlapdownVelocityMax.get(),
                         CoralIntakeConstants.SlapdownAccelerationMax.get()));
                 }
             }
             // if the arm does not need to switch sides, then we can just run it
             if (!armSwitchingToFrontSide && !armSwitchingToBackSide) {
-                System.out.println("arm does not need to switch sides so just running it");
                 plannedCommand = Commands.runOnce(() -> {
                     elevator.setGoal(goal.getHeight().get());
                     arm.setGoal(goal.getArm().get());
@@ -177,11 +183,14 @@ public class SuperStructure extends SubsystemBase {
                 // if the elevator has to move down, set its goal to the swingthrough height and set arm goal to goal right before it would hit the cintake, then once the arm is past swingthrough then set elevator to its true goal
                 elevator.setGoal(goal.getHeight().get());
                 if (elevator.getPid().goalError() >= 0) {
-                    System.out.println("elevator moving up");
-                    if (elevator.getMeasurement() < swingThroughMinHeight.get()) { // if it needs to wait for the arm to swing through...
-                        elevator.setGoal(swingThroughMinHeight.get());
+                    boolean elevatorNeedsToMove = EndEffector.getInstance().algaeSensorTrigger()
+                        ? elevator.getMeasurement() < algaeSwingThroughMinHeight.get()
+                        : elevator.getMeasurement() < swingThroughMinHeight.get();
+                    if (elevatorNeedsToMove) { // if it needs to wait for the arm to swing through...
+                        elevator
+                            .setGoal(EndEffector.getInstance().algaeSensorTrigger() ? algaeSwingThroughMinHeight.get()
+                                : swingThroughMinHeight.get());
                         plannedCommand = Commands.waitUntil(() -> elevator.atGoal()).andThen(Commands.runOnce(() -> {
-                            System.out.println("final up goal set");
                             elevator.setGoal(goal.getHeight().get());
                             arm.setGoal(goal.getArm().get());
                         }));
@@ -191,30 +200,26 @@ public class SuperStructure extends SubsystemBase {
                         arm.setGoal(goal.getArm().get());
                     }
                 } else {
-                    System.out.println("elevator moving down");
-                    if (goal.getHeight().get() < swingThroughMinHeight.get()) {
-                        System.out.println("Elevator set to swing through");
-                        elevator.setGoal(swingThroughMinHeight.get());
+                    if (EndEffector.getInstance().algaeSensorTrigger()
+                        && goal.getHeight().get() < algaeSwingThroughMinHeight.get()) {
+                        elevator.setGoal(algaeSwingThroughMinHeight.get());
                     } else {
-                        System.out.println("Elevator going straight to goal");
-                        elevator.setGoal(goal.getHeight().get());
+                        if (goal.getHeight().get() < swingThroughMinHeight.get()) {
+                            elevator.setGoal(swingThroughMinHeight.get());
+                        } else {
+                            elevator.setGoal(goal.getHeight().get());
+                        }
                     }
                     double armGoal = goal.getArm().get();
                     if (isMovingCoralIntake && elevator.getMeasurement() <= rightBeforeHitCintakeElevatorHeight.get()) {
-                        System.out.println("setting arm goal to rightBeforeHitCintake");
                         arm.setGoal(armGoal > rightBeforeHitCintake.get() ? rightBeforeHitCintake.get() : armGoal);
                     } else {
-                        System.out.println("arm going straight to goal");
                         arm.setGoal(armGoal);
                     }
                     plannedCommand = Commands.waitUntil(() -> {
-                        System.out
-                            .println("swang: " + this.armPastSwingThrough() + ", pivot: " + coralIntake.pivotAtGoal());
                         if (!isMovingCoralIntake) {
-                            System.out.println("    not caring about cintake");
                             return this.armPastSwingThrough();
                         } else {
-                            System.out.println("    caring about cintake");
                             return this.armPastSwingThrough() && coralIntake.pivotAtGoal();
                         }
                     }).andThen(Commands.runOnce(() -> {
@@ -236,8 +241,9 @@ public class SuperStructure extends SubsystemBase {
         });
     }
 
-    public Command beThereAsapNoEnd(TuneableSuperStructureState goal) {
-        return beThereAsap(goal).andThen(Commands.idle(this));
+    public Command beThereAsapNoEnd(TuneableSuperStructureState goal, boolean assumeHasAlgaeBefore,
+        boolean assumeNoAlgaeLater) {
+        return beThereAsap(goal, assumeHasAlgaeBefore, assumeNoAlgaeLater).andThen(Commands.idle(this));
     }
 
     public boolean doneWithMovement() {
@@ -298,13 +304,11 @@ public class SuperStructure extends SubsystemBase {
     }
 
     public double[] recommendedDriveAccelLimits() {
-        double[] limits = new double[3];
+        double elevatorHeightProportion = (elevator.getMeasurement() / ElevatorConstants.MaxHeight);
         limits[0] = DriveConstants.BaseXAccelerationMax.get() -
-            (lastEEHeight / maxEEHeight) * (1 - pctOfDriveAccelX.get()) * DriveConstants.BaseXAccelerationMax.get();
+            (elevatorHeightProportion * pctOfDriveAccelX.get() * DriveConstants.BaseXAccelerationMax.get());
         limits[1] = DriveConstants.BaseYAccelerationMax.get() -
-            (lastEEHeight / maxEEHeight) * (1 - pctOfDriveAccelY.get()) * DriveConstants.BaseYAccelerationMax.get();
-        limits[2] = DriveConstants.BaseRotationAccelMax.get() - (lastEEDistanceFromElevator / eeLength) *
-            (1 - pctOfDriveAccelR.get()) * DriveConstants.BaseRotationAccelMax.get();
+            (elevatorHeightProportion * pctOfDriveAccelY.get() * DriveConstants.BaseYAccelerationMax.get());
         return limits;
     }
 
@@ -313,11 +317,14 @@ public class SuperStructure extends SubsystemBase {
         updateCurrentStateCollisions();
         double currentMaxAccel = EndEffector.getInstance().hasAlgae() ? ArmConstants.AlgaeAccelerationMax.get()
             : ArmConstants.BaseAccelerationMax.get();
+
         double maxArmAcceleration = currentMaxAccel - ((elevator.getMeasurement() / ElevatorConstants.MaxHeight) *
             (1 - percentOfArmAccel.get()) * currentMaxAccel);
 
         double maxArmVelocity = ArmConstants.BaseVelocityMax.get() -
-            (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight) * (1 - percentOfArmVelo.get()) *
+            (((Math.abs(elevator.getPid().goalError())) / ElevatorConstants.MaxHeight) *
+                (1 - percentOfArmVeloWhileMoving.get()) * ArmConstants.BaseVelocityMax.get()) -
+            ((elevator.getMeasurement() / ElevatorConstants.MaxHeight) * (1 - percentOfArmVeloWhileHigh.get()) *
                 ArmConstants.BaseVelocityMax.get());
 
         arm.getPid().setConstraints(new Constraints(maxArmVelocity, maxArmAcceleration));
@@ -329,5 +336,15 @@ public class SuperStructure extends SubsystemBase {
         Logger.recordOutput("SuperStructure/IsDone", isDone);
         Logger.recordOutput("SuperStructure/MovingCintake", isMovingCoralIntake);
         Logger.recordOutput("SuperStructure/AllAtGoal", allAtGoal());
+        Logger.recordOutput("SuperStructure/MaxArmVelocity", maxArmVelocity);
+        Logger.recordOutput("SuperStructure/MaxArmAccel", maxArmAcceleration);
+        Logger.recordOutput("SuperStructure/BaseXAccelerationMax", limits[0]);
+        Logger.recordOutput("SuperStructure/BaseYAccelerationMax", limits[1]);
+        Logger.recordOutput("SuperStructure/SetGoalHeight", goal.getHeight().get());
+        Logger.recordOutput("SuperStructure/SetGoalArm", goal.getArm().get());
+        Logger.recordOutput("SuperStructure/SetGoalCIntake", goal.getCoralIntake().get());
+        Logger.recordOutput("SuperStructure/GoalName", goal.getName());
+        Logger.recordOutput("SuperStructure/LastEEHeight", lastEEHeight);
+        Logger.recordOutput("SuperStructure/LastEEDistanceFromElevator", lastEEDistanceFromElevator);
     }
 }

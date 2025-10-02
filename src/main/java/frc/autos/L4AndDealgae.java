@@ -7,11 +7,14 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.commands.AlignToReef;
 import frc.commands.AlignToReef.Side;
+import frc.commands.Dealgae;
+import frc.commands.DealgaePresetTo;
 import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
+import frc.constants.Controls.Presets;
 import frc.robot.Robot;
 
-public class L4 extends GenericAuto {
+public class L4AndDealgae extends GenericAuto {
     private PathPlannerPath followPath;
     private Command auto = new InstantCommand(() -> {
         superstructure.stow().schedule();
@@ -28,16 +31,20 @@ public class L4 extends GenericAuto {
             followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
             System.out.println(followPath.name);
             AutoBuilder.followPath(followPath).schedule();
-            new ReefPresetTo(Level.L3).schedule();
-            Commands.waitSeconds(1);
+            new DealgaePresetTo(false).schedule();
+        })).andThen(Commands.waitSeconds(1.3)).andThen(endEffector.toggleIntakeAlgae())
+        .andThen(new AlignToReef(Side.Center, Presets.DealgaeDriveOffset)).andThen(new Dealgae())
+        .andThen(Commands.waitUntil(endEffector::algaeSensorTrigger)).andThen(() ->
+        {
+            followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+            System.out.println(followPath.name);
+            AutoBuilder.followPath(followPath).schedule();
             superstructure.stow().schedule();
-            System.out.println("Ending auto.");
-        }));
+            endEffector.turnOff().schedule();
+        });
 
     @Override
     public void initialize() {
-        // Set pos based on limelight and MT1, we may wanna have set pose starts instead
-        // TODO: since you tested in simulator without these commands actually running (these are commands not functions) and it worked, I won't touch it
         setStartingPosition(centerStartingPosition);
         auto.schedule();
     }

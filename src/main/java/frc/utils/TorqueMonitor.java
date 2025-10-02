@@ -1,19 +1,20 @@
 package frc.utils;
 
 import edu.wpi.first.wpilibj.Timer;
+import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 
 public class TorqueMonitor {
-    private double jumpThreshold;
-    private double jumpMagnitude;
-    private double tripTime;
+    private TuneableNumber jumpThreshold;
+    private TuneableNumber jumpMagnitude;
+    private TuneableNumber tripTime;
 
     private Timer tripTimer;
     @Getter private boolean tripped;
     private boolean firstRun = true;
     private double lastCurrent;
 
-    public TorqueMonitor(double jumpThreshold, double jumpMagnitude, double tripTime) {
+    public TorqueMonitor(TuneableNumber jumpThreshold, TuneableNumber jumpMagnitude, TuneableNumber tripTime) {
         this.jumpThreshold = jumpThreshold;
         this.jumpMagnitude = jumpMagnitude;
         this.tripTime = tripTime;
@@ -31,15 +32,15 @@ public class TorqueMonitor {
             firstRun = true;
             return;
         }
-        if (statorCurrent > jumpThreshold && (statorCurrent - lastCurrent) > jumpMagnitude) {
+        if (statorCurrent > jumpThreshold.get() && (statorCurrent - lastCurrent) > jumpMagnitude.get()) {
             tripTimer.start();
             return;
         }
-        if (tripTimer.hasElapsed(tripTime)) {
+        if (tripTimer.hasElapsed(tripTime.get())) {
             tripped = true;
             return;
         }
-        if (tripTimer.isRunning() && statorCurrent < jumpThreshold) {
+        if (tripTimer.isRunning() && statorCurrent < jumpThreshold.get()) {
             tripTimer.stop();
             tripTimer.reset();
         }

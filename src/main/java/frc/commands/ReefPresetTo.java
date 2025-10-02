@@ -1,7 +1,9 @@
 package frc.commands;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.constants.Controls.Presets;
+import frc.robot.Robot;
 import frc.robot.RobotStatus;
 import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.superstructure.SuperStructure;
@@ -10,7 +12,7 @@ import lombok.Getter;
 
 public class ReefPresetTo extends Command {
     public static enum Level {
-        L1, L2, L3, L4,
+        L1, L2, L3, L4, L2Scoring
     }
 
     @Getter private static Level lastLevelSet = Level.L1;
@@ -18,8 +20,11 @@ public class ReefPresetTo extends Command {
 
     private TuneableSuperStructureState superStructureState;
     private Command superStructureCommand;
+    private Level thisLevel;
+    private Timer simFinishTimer = new Timer();
 
     public ReefPresetTo(Level reefLevel) {
+        thisLevel = reefLevel;
         switch (reefLevel) {
             case L1:
                 superStructureState = Presets.Level1;
@@ -33,6 +38,9 @@ public class ReefPresetTo extends Command {
             case L4:
                 superStructureState = Presets.Level4;
                 break;
+            case L2Scoring:
+                superStructureState = Presets.Level2Scoring;
+                break;
             default:
                 superStructureState = Presets.Level1;
                 break;
@@ -41,17 +49,34 @@ public class ReefPresetTo extends Command {
 
     @Override
     public void initialize() {
-        superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState);
+        superStructureCommand = superStructure.beThereAsapNoEnd(superStructureState, false, false);
+        if (thisLevel.equals(Level.L1)) {
+            superStructureCommand = superStructure.beThereAsap(Presets.Level2, false, false)
+                .andThen(superStructure.beThereAsapNoEnd(Presets.Level1, false, false));
+        }
         superStructureCommand.schedule();
+        lastLevelSet = thisLevel;
 
         RobotStatus.setRobotState(RobotState.AligningToScoreCoral);
+        if (Robot.isSimulation()) {
+            simFinishTimer.start();
+        }
     }
 
     @Override
-    public boolean isFinished() { return superStructure.doneWithMovement() || superStructureCommand.isScheduled(); }
+    public boolean isFinished() {
+        if (Robot.isSimulation()) {
+            return simFinishTimer.hasElapsed(1);
+        }
+        return superStructure.doneWithMovement() || superStructureCommand.isScheduled();
+    }
 
     @Override
     public void end(boolean interrupted) {
+        if (Robot.isSimulation()) {
+            simFinishTimer.stop();
+            simFinishTimer.reset();
+        }
         System.out.println("ReefPresetTo is finished, interrupted: " + interrupted);
         RobotStatus.setRobotState(RobotState.WaitingToScoreCoral);
     }

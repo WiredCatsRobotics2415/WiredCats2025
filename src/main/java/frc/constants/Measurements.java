@@ -24,6 +24,7 @@ import edu.wpi.first.units.measure.MomentOfInertia;
 import frc.constants.Subsystems.DriveConstants;
 import frc.utils.AllianceDependent;
 import java.util.List;
+import org.ironmaple.simulation.drivesims.COTS;
 
 public class Measurements {
     public static final AprilTagFieldLayout ApriltagFieldLayout = AprilTagFieldLayout
@@ -41,11 +42,11 @@ public class Measurements {
 
         public static final Angle ElevatorTilt = Degrees.of(3.7); // Towards the front
 
-        public static final Mass RobotWeight = Pounds.of(113.6);
+        public static final Mass RobotWeight = Pounds.of(131); // approx, with bumpers and battery
         public static final MomentOfInertia RobotMOI = KilogramSquareMeters.of(RobotWeight.in(Kilograms) *
             (DriveTrainTrackWidth.in(Meters) / 2) * (DriveConstants.HeadingKA / TunerConstants.driveGains.kA));
         public static final ModuleConfig SwerveModuleConfig = new ModuleConfig(TunerConstants.kWheelRadius,
-            TunerConstants.kSpeedAt12Volts, 1.542, // TODO: find this with slip current characerization
+            TunerConstants.kSpeedAt12Volts, COTS.WHEELS.DEFAULT_NEOPRENE_TREAD.cof, // TODO: find this with slip current characerization
             DCMotor.getKrakenX60Foc(1), TunerConstants.kSlipCurrent, 1);
 
         public static final RobotConfig PPRobotConfig = new RobotConfig(RobotWeight, RobotMOI, SwerveModuleConfig,

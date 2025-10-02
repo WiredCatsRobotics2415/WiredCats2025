@@ -3,12 +3,14 @@ package frc.autos;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.drive.CommandSwerveDrivetrain;
 import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.utils.AllianceDependent;
+import frc.utils.tuning.TuneableBoolean;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.json.simple.parser.ParseException;
@@ -23,6 +25,14 @@ public class GenericAuto extends Command {
     protected boolean atTarget;
     protected boolean hasCoral;
     protected ArrayList<PathPlannerPath> paths = new ArrayList<>();
+
+    private final TuneableBoolean setStartingPositionSetting = new TuneableBoolean(true, "AutoSetStartingPosition");
+    protected final AllianceDependent<Pose2d> centerStartingPosition = new AllianceDependent<Pose2d>(
+        new Pose2d(7.319, 3.910, Rotation2d.k180deg), new Pose2d(10.44, 4.16, Rotation2d.kZero));
+    protected final AllianceDependent<Pose2d> leftStartingPosition = new AllianceDependent<Pose2d>(
+        new Pose2d(7.299, 6.154, Rotation2d.k180deg), new Pose2d(10.231, 1.876, Rotation2d.kZero));
+    protected final AllianceDependent<Pose2d> rightStartingPosition = new AllianceDependent<Pose2d>(
+        new Pose2d(7.299, 1.876, Rotation2d.k180deg), new Pose2d(10.231, 6.154, Rotation2d.kZero));
 
     protected void addAutos() {
         for (String name : pathNames) {
@@ -58,8 +68,14 @@ public class GenericAuto extends Command {
         return false;
     }
 
+    protected void setStartingPosition(AllianceDependent<Pose2d> startingPosition) {
+        if (setStartingPositionSetting.get()) drive.resetPose(startingPosition.get());
+    }
+
+    public void addPaths() {};
+
     @Override
     public void end(boolean interrupted) {
-        System.out.println("command ended");
+        System.out.println("generic auto command ended");
     }
 }

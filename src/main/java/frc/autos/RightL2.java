@@ -11,24 +11,22 @@ import frc.commands.ReefPresetTo;
 import frc.commands.ReefPresetTo.Level;
 import frc.robot.Robot;
 
-public class L4 extends GenericAuto {
+public class RightL2 extends GenericAuto {
     private PathPlannerPath followPath;
     private Command auto = new InstantCommand(() -> {
         superstructure.stow().schedule();
-        followPath = paths.stream().filter(path -> path.name.equals("L4Start")).findFirst().orElse(null);
+        followPath = paths.stream().filter(path -> path.name.equals("RightL2Start")).findFirst().orElse(null);
         System.out.println(followPath.name);
         AutoBuilder.followPath(followPath).schedule();
         System.out.println("Started first path");
-    }).andThen(new ReefPresetTo(Level.L4)).andThen(endEffector.toggleIntakeCoral()).andThen(Commands.waitSeconds(1.5))
-        .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(1.5))
-        .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1)).andThen(endEffector.turnOff())
-        .andThen(new InstantCommand(() ->
+    }).andThen(new ReefPresetTo(Level.L2Scoring)).andThen(Commands.waitSeconds(1.5)).andThen(new AlignToReef(Side.Left))
+        .andThen(Commands.waitSeconds(1.5)).andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1))
+        .andThen(endEffector.turnOff()).andThen(new InstantCommand(() ->
         {
             System.out.println("Ended scoring coral.");
-            followPath = paths.stream().filter(path -> path.name.equals("L4Backup")).findFirst().orElse(null);
+            followPath = paths.stream().filter(path -> path.name.equals("RightL2End")).findFirst().orElse(null);
             System.out.println(followPath.name);
             AutoBuilder.followPath(followPath).schedule();
-            new ReefPresetTo(Level.L3).schedule();
             Commands.waitSeconds(1);
             superstructure.stow().schedule();
             System.out.println("Ending auto.");
@@ -38,7 +36,7 @@ public class L4 extends GenericAuto {
     public void initialize() {
         // Set pos based on limelight and MT1, we may wanna have set pose starts instead
         // TODO: since you tested in simulator without these commands actually running (these are commands not functions) and it worked, I won't touch it
-        setStartingPosition(centerStartingPosition);
+        setStartingPosition(rightStartingPosition);
         auto.schedule();
     }
 
@@ -57,8 +55,8 @@ public class L4 extends GenericAuto {
 
     @Override
     public void addPaths() {
-        pathNames.add("L4Start");
-        pathNames.add("L4Backup");
+        pathNames.add("RightL2Start");
+        pathNames.add("RightL2End");
         addAutos();
     }
 }

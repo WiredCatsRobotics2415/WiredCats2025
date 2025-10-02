@@ -25,6 +25,8 @@ public class Arm extends SubsystemBase {
     @Getter private DoubleDifferentiableValue differentiableMeasurementDegrees = new DoubleDifferentiableValue();
     private boolean isCoasting = false;
     private boolean hasResetPidController = false;
+    private boolean deSticking = false;
+    private @Getter double currentSetVelocity = 0.0d;
 
     private TuneableArmFF ff = new TuneableArmFF(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA,
         "ArmFF");
@@ -115,6 +117,8 @@ public class Arm extends SubsystemBase {
     public double getMeasurement() { return lastMeasurement; }
 
     private void useOutput(double output, TrapezoidProfile.State setpoint, double measurementDegrees) {
+        if (deSticking) return;
+        currentSetVelocity = setpoint.velocity;
         double feedforward = ff.calculate(Units.degreesToRadians(setpoint.position), setpoint.velocity);
         double voltOut = output + feedforward;
 
@@ -133,6 +137,16 @@ public class Arm extends SubsystemBase {
         if (!isCoasting) {
             io.setVoltage(voltOut);
         }
+    }
+
+    public Command deStuck() {
+        return run(() -> {
+            deSticking = true;
+            io.setVoltage(1);
+        }).withTimeout(0.5).andThen(runOnce(() -> {
+            deSticking = false;
+            io.setVoltage(0);
+        }));
     }
 
     @Override

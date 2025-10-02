@@ -219,8 +219,8 @@ public class MapleSimSwerveDrivetrain {
             // Disable CanCoder inversion
             .withEncoderInverted(false)
             // Adjust steer motor PID gains for simulation
-            .withSteerMotorGains(moduleConstants.SteerMotorGains.withKP(70) // Proportional gain
-                .withKD(4.5)) // Derivative gain
+            .withSteerMotorGains(moduleConstants.SteerMotorGains.withKP(50) // Proportional gain
+                .withKD(3)) // Derivative gain
             // Adjust friction voltages
             .withDriveFrictionVoltage(Volts.of(0.1)).withSteerFrictionVoltage(Volts.of(0.15))
             // Adjust steer inertia

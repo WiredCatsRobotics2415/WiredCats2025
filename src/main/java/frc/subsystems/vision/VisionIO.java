@@ -21,6 +21,15 @@ public interface VisionIO {
         public double detectedObjectTx;
         public double detectedObjectTy;
         public int detectedObjectLabel;
+
+        public double detectedObjectBB_Corner1x;
+        public double detectedObjectBB_Corner1y;
+        public double detectedObjectBB_Corner2x;
+        public double detectedObjectBB_Corner2y;
+        public double detectedObjectBB_Corner3x;
+        public double detectedObjectBB_Corner3y;
+        public double detectedObjectBB_Corner4x;
+        public double detectedObjectBB_Corner4y;
     }
 
     public default void updateInputs(VisionIOInputs inputs) {}
