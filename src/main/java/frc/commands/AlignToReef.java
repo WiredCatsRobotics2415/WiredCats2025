@@ -38,7 +38,7 @@ public class AlignToReef extends Command {
     @Getter private static final TuneableNumber DriveTolerance = new TuneableNumber(1, "AlignToReef/DriveTolerance");
     @Getter private static final TuneableNumber LeftAlignRotation = new TuneableNumber(5.5,
         "AlignToReef/LeftAlignRotation");
-    @Getter private static final TuneableNumber RightAlignRotation = new TuneableNumber(4,
+    @Getter private static final TuneableNumber RightAlignRotation = new TuneableNumber(1,
         "AlignToReef/RightAlignRotation");
     @Getter private static Side lastSetSide;
 
@@ -141,6 +141,10 @@ public class AlignToReef extends Command {
                     System.out.println("L2 set");
                     goalDriveOffset = Presets.Level2DriveOffset;
                     break;
+                case L2Scoring:
+                    System.out.println("L2 scoring set");
+                    goalDriveOffset = Presets.Level2DriveOffset;
+                    break;
                 case L3:
                     System.out.println("L3 set");
                     goalDriveOffset = Presets.Level3DriveOffset;
@@ -150,7 +154,7 @@ public class AlignToReef extends Command {
                     goalDriveOffset = Presets.Level4DriveOffset;
                     break;
                 default:
-                    System.out.println("L4 set default");
+                    System.out.println("L1 set default");
                     goalDriveOffset = Presets.Level1DriveOffset;
                     break;
             }

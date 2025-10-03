@@ -18,7 +18,7 @@ public class RobotStatus {
 
     public enum RobotState {
         Disabled(leds.set(UseableColor.BreathingGreen)), Enabled(leds.set(UseableColor.ChasingGreen)),
-        AligningToHPS(leds.set(UseableColor.Pink)), AutoGroundIntaking(leds.set(UseableColor.Pink)),
+        AligningToHPS(leds.set(UseableColor.Pink)), AutoGroundIntaking(leds.set(UseableColor.Rainbow)),
         AligningToDeAlgae(leds.set(UseableColor.Pink)), Stow(leds.set(UseableColor.White)),
         AligningToScoreCoral(leds.set(UseableColor.Pink)), AligningToBarge(leds.set(UseableColor.Pink)),
         WaitingForCoralAtHPS(leds.set(UseableColor.Red)), WaitingToDeAlgae(leds.set(UseableColor.Red)),

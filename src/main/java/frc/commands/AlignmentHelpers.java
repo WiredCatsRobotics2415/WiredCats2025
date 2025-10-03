@@ -41,7 +41,7 @@ public class AlignmentHelpers {
                 return new Pair<Pose2d, Integer>(tagPostiions.get().get(i), tagSeenByAtLeastOne);
             }
         }
-        Pose2d currentPosition = CommandSwerveDrivetrain.getInstance().getState().Pose;
+        Pose2d currentPosition = drive.getState().Pose;
         Pose2d apriltagPose;
         int tagToFocusOn;
         if (AllianceDependent.isCurrentlyBlue()) {

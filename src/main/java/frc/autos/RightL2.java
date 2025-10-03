@@ -14,14 +14,14 @@ import frc.robot.Robot;
 public class RightL2 extends GenericAuto {
     private PathPlannerPath followPath;
     private Command auto = new InstantCommand(() -> {
-        superstructure.stow().schedule();
         followPath = paths.stream().filter(path -> path.name.equals("RightL2Start")).findFirst().orElse(null);
         System.out.println(followPath.name);
         AutoBuilder.followPath(followPath).schedule();
         System.out.println("Started first path");
-    }).andThen(new ReefPresetTo(Level.L2Scoring)).andThen(Commands.waitSeconds(1.5)).andThen(new AlignToReef(Side.Left))
-        .andThen(Commands.waitSeconds(1.5)).andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1))
-        .andThen(endEffector.turnOff()).andThen(new InstantCommand(() ->
+    }).until(() -> atTarget).andThen(new ReefPresetTo(Level.L2Scoring)).andThen(Commands.waitSeconds(1.5))
+        .andThen(new AlignToReef(Side.Left)).andThen(Commands.waitSeconds(1.5))
+        .andThen(endEffector.toggleOuttakeCoral()).andThen(Commands.waitSeconds(1)).andThen(endEffector.turnOff())
+        .andThen(new InstantCommand(() ->
         {
             System.out.println("Ended scoring coral.");
             followPath = paths.stream().filter(path -> path.name.equals("RightL2End")).findFirst().orElse(null);

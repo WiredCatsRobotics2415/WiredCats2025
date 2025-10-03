@@ -15,6 +15,8 @@ import frc.constants.Subsystems.CoralIntakeConstants;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.ElevatorConstants;
 import frc.constants.Subsystems.EndEffectorConstants;
+import frc.robot.RobotStatus;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.coralintake.CoralIntake;
 import frc.subsystems.elevator.Elevator;
@@ -94,6 +96,7 @@ public class SuperStructure extends SubsystemBase {
 
     public Command stow() {
         return this.runOnce(() -> {
+            RobotStatus.keepStateUntilInterrupted(RobotState.Stow);
             if (EndEffector.getInstance().algaeSensorTrigger()) {
                 beThereAsapNoEnd(Presets.AlgaeStow, true, false).schedule();
             } else {

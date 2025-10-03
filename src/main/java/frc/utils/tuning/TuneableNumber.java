@@ -15,6 +15,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 public class TuneableNumber {
     private static ArrayList<TuneableNumber> all = new ArrayList<TuneableNumber>();
     private static int indexToUpdate = 0;
+    private String key;
 
     private Angle lastAngle;
     private Distance lastDistance;
@@ -25,6 +26,7 @@ public class TuneableNumber {
 
     public TuneableNumber(double defaultNumber, String key) {
         this.previousNumber = defaultNumber;
+        this.key = key;
         if (RuntimeConstants.TuningMode) {
             thisNetworkNumber = new LoggedNetworkNumber("/Tuning/" + key, defaultNumber);
             thisNetworkNumber.setDefault(defaultNumber);

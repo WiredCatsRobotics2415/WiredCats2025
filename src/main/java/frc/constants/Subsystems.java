@@ -43,7 +43,7 @@ public class Subsystems {
 
     public class LEDStripConstants {
         public static final int PortPWM = 9;
-        public static final int BlinkinPort = 13;
+        public static final int BlinkinPort = 0;
         public static final int NumberOfLeds = 5 * 60; // https://www.revrobotics.com/rev-11-1197/
         public static final Distance LedSpacing = Meters.of(1.0 / 60.0);
 
@@ -86,8 +86,8 @@ public class Subsystems {
             TunerConstants.kSpeedAt12Volts.div(2).per(Second), RadiansPerSecond.of(Controls.MaxAngularRadS),
             RadiansPerSecondPerSecond.of(Controls.MaxAngularRadS).div(2));
 
-        public static final PIDConstants XTranslationPID = new PIDConstants(7.7, 0, 0.2165); // 2
-        public static final PIDConstants YTranslationPID = new PIDConstants(7.7, 0, 0.2165); // 5.6
+        public static final PIDConstants XTranslationPID = new PIDConstants(20, 0, 0.2165); // 2
+        public static final PIDConstants YTranslationPID = new PIDConstants(20, 0, 0.2165); // 5.6
 
         public static final double HeadingKA = 0.015d; // TODO: find with swerve rotation sysid routine
 

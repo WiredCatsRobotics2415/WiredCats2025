@@ -19,6 +19,7 @@ import frc.autos.CtoRHPS;
 import frc.autos.GenericAuto;
 import frc.autos.L4;
 import frc.autos.L4AndDealgae;
+import frc.autos.LeftL2;
 import frc.autos.RightL2;
 import frc.commands.AlignToHPS;
 import frc.commands.AlignToHPS.HPSSide;
@@ -35,6 +36,7 @@ import frc.constants.Measurements.ReefMeasurements;
 import frc.constants.Subsystems.DriveConstants;
 import frc.constants.Subsystems.LEDStripConstants.UseableColor;
 import frc.constants.Subsystems.VisionConstants.LimelightsForElements;
+import frc.robot.RobotStatus.RobotState;
 import frc.subsystems.arm.Arm;
 import frc.subsystems.climb.Climb;
 import frc.subsystems.coralintake.CoralIntake;
@@ -45,7 +47,6 @@ import frc.subsystems.endeffector.EndEffector;
 import frc.subsystems.leds.LEDStrip;
 import frc.subsystems.superstructure.SuperStructure;
 import frc.subsystems.vision.Vision;
-import frc.utils.math.AdjustableSLR;
 import frc.utils.tuning.TuneableNumber;
 import lombok.Getter;
 import org.littletonrobotics.junction.Logger;
@@ -76,9 +77,6 @@ public class RobotContainer {
     @Getter private TeleopDriveMode currentTeleopDriveMode = TeleopDriveMode.Normal;
     @Getter private AligningTo currentlyAligningTo = AligningTo.Reef;
 
-    private AdjustableSLR driveXLimiter = new AdjustableSLR(DriveConstants.BaseXAccelerationMax.get());
-    private AdjustableSLR driveYLimiter = new AdjustableSLR(DriveConstants.BaseYAccelerationMax.get());
-    private AdjustableSLR driveRotationLimiter = new AdjustableSLR(DriveConstants.BaseRotationAccelMax.get());
     private TuneableNumber minorAdjXPct = new TuneableNumber(0.6, "Drive/minorAdjXPct");
     private TuneableNumber minorAdjYPct = new TuneableNumber(0.6, "Drive/minorAdjYPct");
 
@@ -103,6 +101,7 @@ public class RobotContainer {
         configureControls();
         configureTriggers();
         neutralizeSubsystems();
+        RobotStatus.keepStateUntilInterrupted(RobotState.Disabled);
     }
 
     public static RobotContainer getInstance() {
@@ -151,6 +150,7 @@ public class RobotContainer {
         autoChooser.addOption("L4AndDealgae", new L4AndDealgae());
         // autoChooser.addOption("LeftL2", new LeftL2());
         autoChooser.addOption("CustomRightL2", new RightL2());
+        autoChooser.addOption("CustomLeftL2", new LeftL2());
     }
 
     public void teleopEnable() {
@@ -170,18 +170,14 @@ public class RobotContainer {
                 y = y / (1 / minorAdjYPct.get());
                 // x = Math.abs(x) > minorAdjXPct.get() ? Math.signum(x) * minorAdjXPct.get() : 0;
                 // y = Math.abs(y) > minorAdjYPct.get() ? Math.signum(y) * minorAdjYPct.get() : 0;
-                return drive.driveOpenLoopRobotCentricRequest
-                    .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
-                    .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-                    .withRotationalRate(driveRotationLimiter.calculate(0));
+                return drive.driveOpenLoopRobotCentricRequest.withVelocityX(-x * Controls.MaxDriveMeterS)
+                    .withVelocityY(-y * Controls.MaxDriveMeterS).withRotationalRate(0);
             }
             double[] linearInput = oi.getXY();
             double x = linearInput[1], y = linearInput[0];
             double rotation = oi.getRotation();
-            return drive.driveOpenLoopFieldCentricRequest
-                .withVelocityX(driveXLimiter.calculate(-x * Controls.MaxDriveMeterS))
-                .withVelocityY(driveYLimiter.calculate(-y * Controls.MaxDriveMeterS))
-                .withRotationalRate(driveRotationLimiter.calculate(-rotation * Controls.MaxAngularRadS));
+            return drive.driveOpenLoopFieldCentricRequest.withVelocityX(-x * Controls.MaxDriveMeterS)
+                .withVelocityY(-y * Controls.MaxDriveMeterS).withRotationalRate(-rotation * Controls.MaxAngularRadS);
         }).withName("Teleop Default"));
         oi.binds.get(OI.Bind.ChangeTeleopMode).debounce(0.25, DebounceType.kRising)
             .onTrue(Commands.runOnce(() -> currentTeleopDriveMode = TeleopDriveMode.MinorAdjustment))
@@ -271,6 +267,7 @@ public class RobotContainer {
             {
                 endEffector.intakeCoral().schedule();
                 CoralIntake.getInstance().intake().schedule();
+                RobotStatus.keepStateUntilInterrupted(RobotState.AutoGroundIntaking).schedule();
             })))
             .onFalse(new ParallelCommandGroup(
                 superstructure.beThereAsap(Presets.GroundIntakeUp, false, false).andThen(Commands.waitSeconds(0.5))
@@ -333,10 +330,14 @@ public class RobotContainer {
         // .andThen(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1.2))
         // .andThen(RobotStatus.setRobotStateOnce(RobotState.Enabled)));
 
-        new Trigger(endEffector::hasAlgae)
-            .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
-        new Trigger(endEffector::hasCoral)
-            .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
+        // new Trigger(endEffector::hasAlgae)
+        // .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
+        new Trigger(() -> endEffector.isOuttakingCoral())
+            .onTrue(ledStrip.flash(UseableColor.Pink, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1.2));
+        new Trigger(() -> endEffector.isOuttakingAlgae())
+            .onTrue(ledStrip.flash(UseableColor.Pink, Seconds.of(0.3), Seconds.of(0.3)).withTimeout(1.2));
+        // new Trigger(endEffector::hasCoral)
+        // .onTrue(ledStrip.flash(UseableColor.SkyBlue, Seconds.of(0.3), Seconds.of(0.3)));
         // new Trigger(endEffector::hasCoral).onTrue(coralIntake.turnOffRollers());
 
         new InBargeZoneAlert().schedule();
