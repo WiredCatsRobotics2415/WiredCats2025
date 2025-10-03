@@ -354,6 +354,7 @@ public class RobotContainer {
         drive.getDriveToPositionYController()
             .setConstraints(new Constraints(DriveConstants.BaseVelocityMax.get(), ssLimits[1]));
 
+        // if move the controller, it cancels autoalign
         if (runningAutoAlign) {
             double[] input = oi.getRawXY();
             if (Math.abs(input[0]) > rawJoyAboveThresholdToCancelAutoAlign.get()
