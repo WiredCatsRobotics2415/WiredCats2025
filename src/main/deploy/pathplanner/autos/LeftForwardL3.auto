@@ -33,6 +33,18 @@
           "data": {
             "name": "Outtake"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftBcwd1"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
+          }
         }
       ]
     }

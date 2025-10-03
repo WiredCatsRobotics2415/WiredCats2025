@@ -33,6 +33,18 @@
           "data": {
             "name": "Outtake"
           }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "3rdBackL3"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "Stow"
+          }
         }
       ]
     }
